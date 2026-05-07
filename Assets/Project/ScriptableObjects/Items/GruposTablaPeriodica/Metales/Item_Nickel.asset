@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Nickel
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Nickel
+  displayName: Ni
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Niquel: El n\xEDquel es un metal de color blanco plateado de alta
+    pulibilidad. Es duro, maleable, d\xFActil, presenta cierto grado de ferromagnetismo
+    y es un buen conductor t\xE9rmico y el\xE9ctrico.\r\n\r\nSe utiliza para fabricar
+    acero inoxidable y hace que otras aleaciones sean m\xE1s resistentes a la corrosi\xF3n.
+    El n\xEDquel se usa en monedas y en acero niquelado para blindaje y b\xF3vedas
+    a prueba de robos. El revestimiento de n\xEDquel proporciona una capa protectora
+    para otros metales. El n\xEDquel se utiliza tambi\xE9n en cer\xE1mica, fabricaci\xF3n
+    de imanes y en bater\xEDas recargables."

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Cobalt
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Cobalt
+  displayName: Co
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Cobalto: Se encuentra en la cobaltita, la escuterudita, la eritrina
+    y otros minerales, y es un subproducto del procesamiento de menas de n\xEDquel,
+    plata, plomo, cobre y hierro.\n\nEl cobalto es un metal fr\xE1gil y duro que
+    en su estado habitual es una mezcla de dos al\xF3tropos. El cobalto-60 artificial
+    es una fuente importante de rayos gamma y se usa como agente radioterap\xE9utico.\r\n\r\nEn
+    las aleaciones, se usa para pigmentos y herramientas de corte de alta velocidad,
+    gran resistencia y resistentes a altas temperaturas; en aceros magn\xE9ticos
+    e inoxidables; y en turbinas de aviaci\xF3n y generadores de turbinas de gas. "

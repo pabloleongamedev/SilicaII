@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Neon
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Neon
+  displayName: Ne
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Neon: El ne\xF3n es muy inerte, pero se ha documentado la existencia
+    de un compuesto de fl\xFAor-ne\xF3n. Tambi\xE9n forma un hidrato inestable. El
+    ne\xF3n tiene m\xE1s capacidad refrigerante por volumen que el helio l\xEDquido
+    y triplica la del hidr\xF3geno l\xEDquido.\r\n\r\nEl ne\xF3n se usa con mayor
+    frecuencia en avisos publicitarios, pero tambi\xE9n es un componente en indicadores
+    de alto voltaje, pararrayos y tubos de ond\xE1metros. El ne\xF3n tambi\xE9n se
+    usa con el helio para fabricar l\xE1seres gaseosos."

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Sodium
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Sodium
+  displayName: Na
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Sodio: El sodio nunca se encuentra en estado libre en la naturaleza.
+    Es un metal blando, brillante y de color plateado que flota en el agua. Puede
+    inflamarse espont\xE1neamente en contacto con el agua y en condiciones normales
+    no arde en contacto con el aire a temperaturas inferiores a 115 \xB0C. Su compuesto
+    m\xE1s frecuente es el cloruro de sodio (sal com\xFAn), pero tambi\xE9n se encuentra
+    en el nitrato de sodio, la criolita, el anf\xEDbol, la zeolita y muchos otros
+    minerales.\r\n\r\nLos compuestos de sodio son importantes en las industrias del
+    papel, el vidrio, el jab\xF3n, los textiles, el petr\xF3leo, los productos qu\xEDmicos
+    y la metal\xFArgica."

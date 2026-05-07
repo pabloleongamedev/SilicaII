@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Arsenic
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Arsenic
+  displayName: As
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Arsenico: El ars\xE9nico es un s\xF3lido fr\xE1gil, cristalino y
+    semimet\xE1lico que se deslustra cuando se expone al aire. El ars\xE9nico puro
+    se encuentra en la forma amarilla o gris met\xE1lica, cuyas densidades relativas
+    son ligeramente distintas. Cuando se calienta, se oxida r\xE1pidamente y se convierte
+    en \xF3xido de ars\xE9nico, que tiene un olor similar al ajo. El ars\xE9nico
+    y sus compuestos son t\xF3xicos. Los compuestos \xFAtiles del ars\xE9nico son
+    el tri\xF3xido de ars\xE9nico, el sulfuro de ars\xE9nico, el Verde de Par\xEDs,
+    el arseniato de calcio y el arseniato de plomo.\r\n\r\nAlgunos de los usos del
+    ars\xE9nico son para el revestimiento de bronce, la pirotecnia y el endurecimiento
+    y mejora de perdigones. Sus compuestos se han usado en insecticidas y venenos
+    en la agricultura."

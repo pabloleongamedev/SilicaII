@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Helium
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Helium
+  displayName: He
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Helio: El primer indicio de helio se detect\xF3 durante el eclipse
+    solar de 1868. Es el segundo elemento m\xE1s abundante y se puede extraer a partir
+    de gas natural. La mayor\xEDa del helio en Estados Unidos se obtiene en pozos
+    ubicados en Texas, Oklahoma y Kansas.\r\n\r\nEl helio se emplea extensamente
+    en el campo de la criogenia y en investigaciones de superconductividad. Permanece
+    en su forma l\xEDquida hasta el cero absoluto, pero se solidifica r\xE1pidamente
+    ante un aumento de presi\xF3n."

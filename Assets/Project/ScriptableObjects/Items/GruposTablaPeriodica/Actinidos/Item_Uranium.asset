@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Uranium
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Uranium
+  displayName: U
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Uranio: El metal del uranio puro es blanco plateado, con una radioactividad
+    d\xE9bil y es m\xE1s duro que la mayor\xEDa del resto de elementos. Es denso,
+    maleable, d\xFActil, ligeramente paramagn\xE9tico, con una electropositividad
+    marcada, es un conductor de la electricidad precario y es pir\xF3foro en piezas
+    peque\xF1as.\r\n\r\nEn la naturaleza se producen cantidades peque\xF1as de uranio
+    en el agua, el suelo, las rocas y los minerales.\r\n\r\nEl \xF3xido de uranio
+    se us\xF3 durante siglos para colorear esmaltes cer\xE1micos y vidrios, pero
+    el uso contempor\xE1neo del uranio explota sus propiedades nucleares. El uranio-235
+    es el \xFAnico is\xF3topo f\xF3sil que se produce de manera natural."

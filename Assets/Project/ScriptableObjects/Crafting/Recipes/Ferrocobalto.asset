@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8534a1bfed21d0041a6911b0789dc524, type: 3}
+  m_Name: Ferrocobalto
+  m_EditorClassIdentifier: Assembly-CSharp::RecipeData_SO
+  result: {fileID: 11400000, guid: 90fd0045f88977449855da04c53702f8, type: 2}
+  resultAmount: 3
+  ingredients:
+  - item: {fileID: 11400000, guid: ec6c8cdffaa94fb4db33d05e2e9ac206, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: aaa372f64b8e67843ab176c0413982ec, type: 2}
+    amount: 1
+  description: "Aleaci\xF3n met\xE1lica densa para protecci\xF3n contra impactos."

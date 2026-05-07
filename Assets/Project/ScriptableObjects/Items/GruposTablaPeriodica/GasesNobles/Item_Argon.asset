@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Argon
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Argon
+  displayName: Ar
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Argon: El arg\xF3n es un gas inerte y no forma verdaderos compuestos
+    qu\xEDmicos. En su forma natural, el arg\xF3n se compone de una mezcla de tres
+    is\xF3topos. Tambi\xE9n existen doce is\xF3topos radioactivos.\r\n\r\nEl arg\xF3n
+    se usa para bombillas de l\xE1mparas incandescentes y fluorescentes, y para los
+    fototubos y tubos incandescentes. El arg\xF3n se usa como un gas de protecci\xF3n
+    para la soldadura y corte con arco, act\xFAa como una manta en la producci\xF3n
+    de titanio y otros elementos reactivos, y ofrece una atm\xF3sfera protectora
+    para el crecimiento de cristales de silicio y germanio."

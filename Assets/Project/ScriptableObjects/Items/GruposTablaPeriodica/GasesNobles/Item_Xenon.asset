@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Xenon
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Xenon
+  displayName: Xe
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Xenon: El gas de xen\xF3n se utiliza en tubos electr\xF3nicos, l\xE1mparas
+    estrobosc\xF3picas y bactericidas, y l\xE1mparas de l\xE1ser que producen luz
+    coherente.\r\n\r\nLos perxenatos se utilizan en la qu\xEDmica anal\xEDtica como
+    agentes oxidantes. El xen\xF3n en s\xED mismo es seguro, pero sus compuestos
+    son altamente t\xF3xicos debido a sus capacidades oxidativas."

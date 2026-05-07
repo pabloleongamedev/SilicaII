@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8534a1bfed21d0041a6911b0789dc524, type: 3}
+  m_Name: Carburo de Wolframio
+  m_EditorClassIdentifier: Assembly-CSharp::RecipeData_SO
+  result: {fileID: 11400000, guid: aded2d36c9b61384b979f268bb1e1874, type: 2}
+  resultAmount: 3
+  ingredients:
+  - item: {fileID: 11400000, guid: 064cfeed760ebf84eaa482103ae2e927, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: b8a5a6f6c0b6ba546bd707ecdeffb2e5, type: 2}
+    amount: 1
+  description: "Combinaci\xF3n cl\xE1sica para alta resistencia estructural. "

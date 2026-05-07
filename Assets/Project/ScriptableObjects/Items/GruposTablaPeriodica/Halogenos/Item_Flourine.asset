@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Flourine
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Flourine
+  displayName: F
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Flour:  Es el elemento con mayor electronegatividad y reactividad
+    de todos.\r\n\r\nSu gas es de color amarillo p\xE1lido, es corrosivo y reacciona
+    con la mayor\xEDa de las sustancias org\xE1nicas e inorg\xE1nicas. El fl\xFAor
+    puro y los iones de fluoruro son altamente t\xF3xicos y presentan un caracter\xEDstico
+    olor penetrante.\r\n\r\nEl fl\xFAor y sus compuestos ayudan a producir uranio
+    (a partir de hexafluoruro) y m\xE1s de 100 productos qu\xEDmicos comerciales
+    y pl\xE1sticos para altas temperaturas. El \xE1cido fluorh\xEDdrico se utiliza
+    para los fluoroclorohidrocarburos como refrigerante para aires acondicionados
+    y refrigeraci\xF3n. El fluoruro soluble en agua potable se ha utilizado para
+    ayudar a evitar las caries dentales."

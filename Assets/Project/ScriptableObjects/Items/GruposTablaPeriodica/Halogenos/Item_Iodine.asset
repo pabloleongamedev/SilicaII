@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Iodine
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Iodine
+  displayName: I
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Yodo: El yodo es un hal\xF3geno descubierto en 1811. a temperatura
+    ambiente se convierte en un gas de color violeta azulado con un olor caracter\xEDstico.
+    Forma compuestos, pero es menos reactivo que otros hal\xF3genos. El yodo tiene
+    algunas propiedades met\xE1licas, es altamente soluble en agua y forma una soluci\xF3n
+    p\xFArpura cuando se disuelve en cloroformo, tetracloruro de carbono o sulfuro
+    de carbono.\r\n\r\nSe han reconocido treinta is\xF3topos de yodo y solo se ha
+    encontrado un is\xF3topo estable en la naturaleza. El radiois\xF3topo artificial
+    I-131 se utiliza para el tratamiento de alteraciones de la gl\xE1ndula tiroides.
+    Los compuestos del yodo se utilizan en qu\xEDmica org\xE1nica y medicina.\r\n\r\nSe
+    debe tener cuidado al manipular y utilizar el yodo, ya que causa lesiones al
+    contacto con la piel e irrita los ojos y las mucosas."

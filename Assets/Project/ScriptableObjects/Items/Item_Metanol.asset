@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Metanol
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Metanol
+  displayName: Ch3O3
+  icon: {fileID: 21300000, guid: f933bd8b53dafcc4fbd0d252053f53a4, type: 3}
+  maxStack: 99
+  description: "Metanol: Tambien llamado el combustible azul, es un combustible l\xEDquido
+    mucho m\xE1s potente y estable que el gas Hidr\xF3geno. Tambi\xE9n puede servir
+    como anticongelante util para poder explorar en zonas de fr\xEDo extremo sin
+    que mis articulaciones roboticas se bloqueen."

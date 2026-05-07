@@ -1,0 +1,116 @@
+using UnityEngine;
+
+public class DeliveryBoxInteractable : MonoBehaviour, IInteractable
+{
+    [Header("Config")]
+    [SerializeField] private int amountToConsume = 1;
+
+    [Header("Refs")]
+    [SerializeField] private InventoryController inventoryController;
+    [SerializeField] private PlayerStateController playerState;
+
+    private IInventoryReadModel read;
+    private IInventoryWriteModel write;
+
+    // 🔥 referencia ACTIVA (sin singleton global sucio)
+    private static DeliveryBoxInteractable activeBox;
+
+    private bool isWaitingForItem = false;
+
+    // =========================================================
+    private void Start()
+    {
+        read = inventoryController.ReadModel;
+        write = inventoryController.WriteModel;
+    }
+
+    // =========================================================
+    public void Interact(InteractionContext context)
+    {
+        if (IsInventoryEmpty())
+        {
+            Notify("Ve a buscar muchos elementos", NotificationType.Warning);
+            return;
+        }
+
+        // 🔥 ACTIVAR ESTA CAJA
+        activeBox = this;
+        isWaitingForItem = true;
+
+        playerState.SetState(UIState.Inventory);
+
+        Notify("Selecciona un objeto para entregar", NotificationType.Info);
+    }
+
+    public string GetInteractionText()
+    {
+        return "Presiona E para usar la caja";
+    }
+
+    // =========================================================
+    // 🔥 BOTÓN "USAR" LLAMA A ESTO
+    // =========================================================
+    public static void OnUseButtonPressed(ItemData_SO item, int amount)
+    {
+        if (activeBox == null)
+            return;
+
+        activeBox.HandleUse(item, amount);
+    }
+
+    // =========================================================
+    private void HandleUse(ItemData_SO item, int amount)
+    {
+        if (!isWaitingForItem)
+            return;
+
+        if (item == null)
+            return;
+
+        int available = read.GetAmount(item);
+
+        if (available <= 0)
+        {
+            Notify("No tienes ese objeto", NotificationType.Warning);
+            return;
+        }
+
+        int toRemove = Mathf.Min(amountToConsume, available);
+
+        write.RemoveItem(item, toRemove);
+
+        Notify($"Has entregado {item.name} x{toRemove}", NotificationType.Success);
+
+        // 🔥 LIMPIAR ESTADO
+        isWaitingForItem = false;
+        activeBox = null;
+
+        playerState.SetState(UIState.None);
+    }
+
+    // =========================================================
+    private bool IsInventoryEmpty()
+    {
+        for (int i = 0; i < read.Capacity; i++)
+        {
+            var slot = read.GetItem(i);
+
+            if (slot != null && slot.Quantity > 0)
+                return false;
+        }
+
+        return true;
+    }
+
+    // =========================================================
+    private void Notify(string msg, NotificationType type)
+    {
+        Debug.Log("[DeliveryBox] " + msg);
+
+        GameplayEvents.OnNotification?.Invoke(new NotificationData
+        {
+            message = msg,
+            type = type
+        });
+    }
+}

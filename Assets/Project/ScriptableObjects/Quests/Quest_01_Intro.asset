@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a44bc7547b1f2d4aa7ffc70a5adba81, type: 3}
+  m_Name: Quest_01_Intro
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData_SO
+  questName: "Introduci\xF3n refinamiento qu\xEDmico"
+  tasks:
+  - description: 'Recolecta celulosa '
+    type: 0
+    targetItem: {fileID: 11400000, guid: 0ee87a40f16905d4386adae18a53aedb, type: 2}
+    requiredAmount: 1
+  - description: Refina celulosa
+    type: 1
+    targetItem: {fileID: 11400000, guid: 0ee87a40f16905d4386adae18a53aedb, type: 2}
+    requiredAmount: 1
+  - description: Refina agua
+    type: 1
+    targetItem: {fileID: 11400000, guid: 600e681a57dae254ab21049155ccbac3, type: 2}
+    requiredAmount: 4

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Bromine
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Bromine
+  displayName: Br
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  maxStack: 99
+  description: "Bromo: \r\nEl bromo se descubri\xF3 en 1826, pero no se prepar\xF3
+    en grandes cantidades hasta 1860.\r\n\r\nEl bromo es un elemento l\xEDquido no
+    met\xE1lico. Es un l\xEDquido denso de color marr\xF3n rojizo que produce un
+    vapor rojo con un olor caracter\xEDstico y desagradable. El vapor irrita los
+    ojos y la garganta, y al exponerlo a la piel produce \xFAlceras dolorosas.\r\n\r\nEl
+    bromo reacciona con muchos elementos, es f\xE1cilmente soluble en agua o sulfuro
+    de carbono y se puede extraer a partir de salmueras y agua de mar.\r\n\r\nEl
+    bromo se utiliza en pesticidas para fumigaci\xF3n, agentes a prueba de fuego,
+    compuestos de purificaci\xF3n de agua, tintes, medicinas, soluciones antis\xE9pticas
+    y sustancias qu\xEDmicas para fotograf\xEDa. Los compuestos org\xE1nicos e inorg\xE1nicos
+    de bromo tambi\xE9n tienen aplicaciones importantes en muchas industrias."

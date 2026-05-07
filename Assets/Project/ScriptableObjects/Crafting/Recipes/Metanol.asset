@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8534a1bfed21d0041a6911b0789dc524, type: 3}
+  m_Name: Metanol
+  m_EditorClassIdentifier: Assembly-CSharp::RecipeData_SO
+  result: {fileID: 11400000, guid: eff4f86843ae44044b3cbebc29238ec1, type: 2}
+  resultAmount: 1
+  ingredients:
+  - item: {fileID: 11400000, guid: 88eb3893adcb3e241ad47a4d6b690b6a, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: 8272e73f8a0d75e43874dbff358d823d, type: 2}
+    amount: 1
+  description: Para obtener Metanol es necesario combiar una molecula de metano con
+    con una moleculas de Monoxido de carbono.
