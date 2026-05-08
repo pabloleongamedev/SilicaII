@@ -1275,7 +1275,7 @@ GameObject:
   - component: {fileID: 1679740133}
   m_Layer: 3
   m_Name: Ground
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1370,53 +1370,6 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 10, y: 1, z: 10}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2044456422
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2044456424}
-  - component: {fileID: 2044456423}
-  m_Layer: 0
-  m_Name: InventoryTester
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2044456423
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2044456422}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f80ef42dd11f7841afd9d6e7b814f71, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventoryTester
-  inventoryController: {fileID: 0}
-  testItemA: {fileID: 0}
-  testItemB: {fileID: 0}
---- !u!4 &2044456424
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2044456422}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.29175, y: 0, z: 12.86983}
-  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1542,7 +1495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d9ec9f0e043bc4448175320c3324d8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InteractionUIController
-  detector: {fileID: 0}
+  detector: {fileID: 3044617806153453669}
   panel: {fileID: 6448703111043887844}
   text: {fileID: 447306422964130965}
 --- !u!114 &46793575550639540
@@ -3476,10 +3429,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 8733136263211125367}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  item: {fileID: 0}
+  item: {fileID: 11400000, guid: b8a5a6f6c0b6ba546bd707ecdeffb2e5, type: 2}
   amount: 1
 --- !u!114 &710258500109329100
 MonoBehaviour:
@@ -5389,10 +5342,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5765777215076191880}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  item: {fileID: 0}
+  item: {fileID: 11400000, guid: 2450ec614ba58a947a73dc3b31c35fe2, type: 2}
   amount: 1
 --- !u!1 &1602570200350351865
 GameObject:
@@ -5471,10 +5424,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2824582497511295678}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  item: {fileID: 0}
+  item: {fileID: 11400000, guid: 88eb3893adcb3e241ad47a4d6b690b6a, type: 2}
   amount: 1
 --- !u!222 &1654097542663386823
 CanvasRenderer:
@@ -7118,7 +7071,7 @@ MonoBehaviour:
   toolView: {fileID: 6475128585227375801}
   inventoryListView: {fileID: 3991479591569778717}
   refineButton: {fileID: 3622661255584258789}
-  inventoryController: {fileID: 0}
+  inventoryController: {fileID: 4500600134571752369}
 --- !u!114 &2296492001564758940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8408,9 +8361,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43c7ebeeb1b71c74dbd94f466662ee0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAudio
-  walkAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  runAction: {fileID: -7471211009204490832, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  jetPackAction: {fileID: 1120369429361536294, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  walkAction: {fileID: -1680190386980627800, guid: d978929666caf6f43982baf97a023ff8, type: 3}
+  runAction: {fileID: -7471211009204490832, guid: d978929666caf6f43982baf97a023ff8, type: 3}
+  jetPackAction: {fileID: 1120369429361536294, guid: d978929666caf6f43982baf97a023ff8, type: 3}
 --- !u!1 &2719397095850523006
 GameObject:
   m_ObjectHideFlags: 0
@@ -9759,7 +9712,6 @@ GameObject:
   - component: {fileID: 4500600134571752369}
   - component: {fileID: 3044617806153453669}
   - component: {fileID: 3840046965175972305}
-  - component: {fileID: 7097504220549393418}
   - component: {fileID: 4411547220594217273}
   - component: {fileID: 2682811921948513039}
   m_Layer: 0
@@ -10689,7 +10641,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CraftingController
   database: {fileID: 11400000, guid: 7d624ec5dbede7d48b05dd2555b3b957, type: 2}
-  inventoryController: {fileID: 0}
+  inventoryController: {fileID: 4500600134571752369}
   toolView: {fileID: 6235476814452945905}
   listView: {fileID: 5291728023944837297}
   detailView: {fileID: 5232405848263147797}
@@ -12508,7 +12460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5711a2948596b643b6c48c0cc92f942, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScannerTrigger
-  scanAction: {fileID: 2584591009235624263, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  scanAction: {fileID: 2584591009235624263, guid: d978929666caf6f43982baf97a023ff8, type: 3}
   PivotScan: {fileID: 3594630744036881946}
   audioScanner: {fileID: 0}
   canvasName: {fileID: 0}
@@ -12617,8 +12569,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInventoryBridge
   config: {fileID: 11400000, guid: 53d14ad7068ba3f4c974cf53c546b232, type: 2}
-  inventoryView: {fileID: 0}
-  listView: {fileID: 0}
+  inventoryView: {fileID: 142851993286727077}
+  listView: {fileID: 1024174498404474587}
 --- !u!114 &4521693446147947864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17563,10 +17515,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2216967918816471408}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  item: {fileID: 0}
+  item: {fileID: 11400000, guid: 95c7214d34bbc2f4f96ac00cb4070148, type: 2}
   amount: 1
 --- !u!222 &6592311806640023500
 CanvasRenderer:
@@ -18730,10 +18682,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4600925086428169855}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  item: {fileID: 0}
+  item: {fileID: 11400000, guid: c702357e020b7224e877216dd429ed47, type: 2}
   amount: 1
 --- !u!114 &7048034938767893525
 MonoBehaviour:
@@ -18956,21 +18908,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &7097504220549393418
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3275789411505853263}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f80ef42dd11f7841afd9d6e7b814f71, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventoryTester
-  inventoryController: {fileID: 4500600134571752369}
-  testItemA: {fileID: 11400000, guid: b8a5a6f6c0b6ba546bd707ecdeffb2e5, type: 2}
-  testItemB: {fileID: 11400000, guid: 2450ec614ba58a947a73dc3b31c35fe2, type: 2}
 --- !u!222 &7102700566975726291
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -23869,7 +23806,6 @@ SceneRoots:
   - {fileID: 1679740136}
   - {fileID: 963607302}
   - {fileID: 859962323}
-  - {fileID: 2044456424}
   - {fileID: 2065748461}
   - {fileID: 5566752256238278299}
   - {fileID: 5710005319379908233}
