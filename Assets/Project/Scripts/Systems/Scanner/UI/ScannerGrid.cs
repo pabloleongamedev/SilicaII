@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Scanner/UI
+ * Script: ScannerGrid
+ * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
+ * Modulo: Gestiona escaneo de elementos, datos escaneables y feedback visual del escaner.
+ * Relaciones: Usa IScannable para escanear objetos sin conocer su implementacion concreta.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 using TMPro;
 

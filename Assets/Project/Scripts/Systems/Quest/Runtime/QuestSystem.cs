@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Quest/Runtime
+ * Script: QuestSystem
+ * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Modulo: Gestiona misiones y progreso a partir de eventos de gameplay como recolectar, refinar o craftear.
+ * Relaciones: Escucha eventos de Inventory/Crafting y publica estado de mision hacia UI u otros sistemas.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -20,6 +28,8 @@ public class QuestSystem : MonoBehaviour
 
     private void OnEnable()
     {
+        // Quest progresa reaccionando a eventos publicados por otros modulos.
+        // Inventory/Crafting no necesitan conocer el estado interno de misiones.
         QuestEvents.OnItemCollected += HandleCollect;
         QuestEvents.OnItemRefined += HandleRefined;
         QuestEvents.OnItemCrafted += HandleCraft;
@@ -35,6 +45,8 @@ public class QuestSystem : MonoBehaviour
     // =========================================
     private void LoadQuest(int index)
     {
+        // QuestData_SO es el dato editable; el progreso runtime se inicializa aqui.
+        // La UI se entera mediante QuestEvents.OnQuestLoaded.
         if (index >= quests.Count)
         {
             Debug.Log("TODAS LAS MISIONES COMPLETADAS");
@@ -77,6 +89,8 @@ public class QuestSystem : MonoBehaviour
     // =========================================
     private void UpdateTasks(ItemData_SO item, int amount, QuestTaskType type)
     {
+        // Una tarea avanza si coinciden tipo e item objetivo.
+        // Se emite un snapshot de progreso para mantener UI desacoplada.
         if (currentQuest == null) return;
         if (currentQuest.tasks == null) return;
 
@@ -104,6 +118,8 @@ public class QuestSystem : MonoBehaviour
     }
     private void CheckQuestComplete()
     {
+        // Al completar se avisa por evento modular y luego se carga la siguiente.
+        // El evento estatico antiguo sigue existiendo solo como compatibilidad.
         for (int i = 0; i < currentQuest.tasks.Count; i++)
         {
             if (progress[i] < currentQuest.tasks[i].requiredAmount)

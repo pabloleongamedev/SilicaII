@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Inventory/Runtime
+ * Script: InventoryController
+ * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Modulo: Gestiona items, cantidades, slots, vistas de inventario y contratos de lectura/escritura para otros sistemas.
+ * Relaciones: Se relaciona con Interaction, Crafting, Delivery, Quest y SaveLoad mediante interfaces, facades y eventos.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 using System;
 using System.Collections.Generic;
@@ -19,6 +27,8 @@ public class InventoryController : MonoBehaviour
 
     private void Awake()
     {
+        // Facade Runtime: crea el Core desde datos editables y traduce eventos
+        // de dominio a eventos consumidos por UI, Quest y Notification.
         grid = new InventoryGrid(config.width, config.height);
         inventorySystem = new InventorySystem(config, grid);
         inventorySystem.OnNotificationRequested += HandleNotificationRequested;
@@ -99,6 +109,7 @@ public class InventoryController : MonoBehaviour
 
     private void HandleNotificationRequested(InventoryFeedback feedback)
     {
+        // Adapter entre Core y UI: InventorySystem no conoce NotificationData.
         var notification = new NotificationData
         {
             message = feedback.message,
@@ -111,6 +122,7 @@ public class InventoryController : MonoBehaviour
 
     private void HandleItemAdded(ItemData_SO item, int amount)
     {
+        // Bridge event-driven: Quest avanza por eventos, no leyendo slots internos.
         InventoryEvents.OnItemAdded?.Invoke(item, amount);
         QuestEvents.OnItemCollected?.Invoke(item, amount);
     }

@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: SaveLoad/Debug
+ * Script: GameDebugger
+ * Rol: Apoyo para depuracion, documentacion o pruebas manuales. No debe ser dependencia de gameplay de produccion.
+ * Modulo: Gestiona datos de partida, guardado/carga y restauracion de estado runtime.
+ * Relaciones: Consulta facades runtime como InventoryController y PlayerInputHandler para persistir/restaurar datos.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 
 #if UNITY_EDITOR

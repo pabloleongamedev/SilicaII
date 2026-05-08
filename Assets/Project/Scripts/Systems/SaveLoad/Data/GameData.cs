@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: SaveLoad/Data
+ * Script: GameData
+ * Rol: Define datos editables o estructuras serializables. No debe ejecutar reglas de gameplay ni controlar escena.
+ * Modulo: Gestiona datos de partida, guardado/carga y restauracion de estado runtime.
+ * Relaciones: Consulta facades runtime como InventoryController y PlayerInputHandler para persistir/restaurar datos.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using System;
 using System.Collections.Generic;
 using UnityEngine;

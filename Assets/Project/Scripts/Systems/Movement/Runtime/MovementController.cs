@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Movement/Runtime
+ * Script: MovementController
+ * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Modulo: Gestiona movimiento horizontal/vertical del jugador mediante estrategias y configuracion editable.
+ * Relaciones: Recibe input desde PlayerInputHandler y expone contexto fisico usado por Jetpack.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -31,6 +39,8 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext
 
     private void Awake()
     {
+        // Composicion Runtime: crea sistemas Core puros y los conecta con Rigidbody.
+        // MovementController es el puente Unity/physics; no deberia contener UI.
         rb = GetComponent<Rigidbody>();
 
         movementSystem = new MovementSystem();
@@ -78,6 +88,8 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext
 
     private void FixedUpdate()
     {
+        // Pipeline fisico: suelo -> estrategia walk/run -> velocidad horizontal ->
+        // vertical/jump -> abilities -> velocidad final del Rigidbody.
         CheckGround();
 
         // Strategy

@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Crafting/Runtime
+ * Script: ChemistryController
+ * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
+ * Relaciones: Se relaciona con Inventory para consumir/producir items y con Quest/Notification mediante eventos de Runtime.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -38,6 +46,8 @@ public class ChemistryController : MonoBehaviour
 
     private void Start()
     {
+        // Chemistry usa Inventory como servicio externo: lee disponibilidad y
+        // solicita transacciones, pero no manipula slots internos.
         read = inventoryController.ReadModel;
         write = inventoryController.WriteModel;
 
@@ -84,6 +94,8 @@ public class ChemistryController : MonoBehaviour
 
     private void Cleanup()
     {
+        // Al cerrar el panel se devuelve el item reservado, evitando perdida de
+        // inventario si el jugador abandona el flujo antes de refinar.
         if (currentCompound == null && toolView.GetItem() == null)
             return;
 
@@ -229,6 +241,8 @@ public class ChemistryController : MonoBehaviour
     // =========================================================
     private void OnRefineClicked()
     {
+        // Runtime orquesta UI + Core + Inventory + Quest:
+        // ChemistrySystem valida, Inventory aplica outputs y Quest recibe evento.
 
         if (currentCompound == null)
         {

@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: SaveLoad/Runtime
+ * Script: GameRestorer
+ * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Modulo: Gestiona datos de partida, guardado/carga y restauracion de estado runtime.
+ * Relaciones: Consulta facades runtime como InventoryController y PlayerInputHandler para persistir/restaurar datos.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using System.Collections;
 using UnityEngine;
 

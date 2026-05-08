@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Movement/Runtime
+ * Script: MouseLook
+ * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Modulo: Gestiona movimiento horizontal/vertical del jugador mediante estrategias y configuracion editable.
+ * Relaciones: Recibe input desde PlayerInputHandler y expone contexto fisico usado por Jetpack.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 using UnityEngine.InputSystem;
 

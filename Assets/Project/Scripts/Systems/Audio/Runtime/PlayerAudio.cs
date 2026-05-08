@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Audio/Runtime
+ * Script: PlayerAudio
+ * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Modulo: Gestiona reproduccion de audio general, UI y sonidos del jugador.
+ * Relaciones: Es usado por UI, Player y Scanner para reproducir clips por nombre o acciones.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 using UnityEngine.InputSystem;
 

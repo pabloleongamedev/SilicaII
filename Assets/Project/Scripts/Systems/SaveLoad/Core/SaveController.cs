@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: SaveLoad/Core
+ * Script: SaveController
+ * Rol: Contiene reglas de dominio reutilizables. Debe evitar referencias directas a UI y depender de interfaces cuando colabora con otros sistemas.
+ * Modulo: Gestiona datos de partida, guardado/carga y restauracion de estado runtime.
+ * Relaciones: Consulta facades runtime como InventoryController y PlayerInputHandler para persistir/restaurar datos.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 using System.IO;
 

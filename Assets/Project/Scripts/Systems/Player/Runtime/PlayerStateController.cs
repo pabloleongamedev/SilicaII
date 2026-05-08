@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Player/Runtime
+ * Script: PlayerStateController
+ * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Modulo: Gestiona estado global del jugador, input y bloqueos de gameplay/UI.
+ * Relaciones: Coordina input, estados UI/gameplay y bloqueos globales usados por otros sistemas.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 
 public enum UIState

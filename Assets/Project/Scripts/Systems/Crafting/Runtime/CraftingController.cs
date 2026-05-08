@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Crafting/Runtime
+ * Script: CraftingController
+ * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
+ * Relaciones: Se relaciona con Inventory para consumir/producir items y con Quest/Notification mediante eventos de Runtime.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,6 +33,8 @@ public class CraftingController : MonoBehaviour
 
     private void Start()
     {
+        // Crafting colabora con Inventory mediante read/write models.
+        // No accede a grids ni slots internos; pide operaciones al facade.
         if (inventoryController == null)
         {
             Debug.LogError("[CraftingController] InventoryController no asignado");
@@ -72,6 +82,8 @@ public class CraftingController : MonoBehaviour
 
     private void OnRecipeSelected(RecipeData_SO recipe)
     {
+        // Al cambiar receta se devuelven items reservados para mantener
+        // consistencia entre Core, Inventory y UI.
         // 🔥 devolver items antes de cambiar
         system.ClearAll(write);
 
@@ -133,6 +145,8 @@ public class CraftingController : MonoBehaviour
     // =========================================================
     private void OnCraftClicked()
     {
+        // Flujo de crafting: validar Core, producir en Inventory, publicar evento
+        // para Quest y limpiar la representacion visual.
         var recipe = system.GetCurrentRecipe();
 
         if (recipe == null)
@@ -195,6 +209,7 @@ public class CraftingController : MonoBehaviour
 
     private NotificationType ToNotificationType(CraftingResultType type)
     {
+        // Runtime adapta resultados de dominio a Notification.
         switch (type)
         {
             case CraftingResultType.Success: return NotificationType.Success;

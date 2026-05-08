@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Movement/Data
+ * Script: MovementConfig_SO
+ * Rol: Define datos editables o estructuras serializables. No debe ejecutar reglas de gameplay ni controlar escena.
+ * Modulo: Gestiona movimiento horizontal/vertical del jugador mediante estrategias y configuracion editable.
+ * Relaciones: Recibe input desde PlayerInputHandler y expone contexto fisico usado por Jetpack.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "MovementConfig", menuName = "Game/Movement Config")]

@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Interaction/Runtime
+ * Script: InteractionDetector
+ * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Modulo: Gestiona deteccion, contexto y ejecucion de interacciones del jugador con objetos del mundo.
+ * Relaciones: Usa IInteractable e InteractionContext para conectar jugador, mundo e Inventory sin dependencias profundas.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -76,6 +84,8 @@ public class InteractionDetector : MonoBehaviour
 
     private void EvaluateBestInteractable()
     {
+        // Selecciona el mejor candidato por distancia y angulo de camara.
+        // PlayerInputHandler consume CurrentInteractable cuando se presiona Interact.
         IInteractable best = null;
         float bestDistance = float.MaxValue;
 

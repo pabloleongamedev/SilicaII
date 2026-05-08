@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Player/Runtime
+ * Script: PlayerInputHandler
+ * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Modulo: Gestiona estado global del jugador, input y bloqueos de gameplay/UI.
+ * Relaciones: Coordina input, estados UI/gameplay y bloqueos globales usados por otros sistemas.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,6 +25,9 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void Awake()
     {
+        // Runtime bridge del jugador: localiza los controladores que reciben input.
+        // Este script no contiene reglas de Inventory/Crafting/Quest; solo traduce
+        // acciones del Input System a llamadas sobre facades y controladores.
         inventoryController = GetComponent<InventoryController>();
         stateController = GetComponent<PlayerStateController>();
         movementController = GetComponent<MovementController>();
@@ -28,6 +39,8 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void Start()
     {
+        // El contexto de interaccion se construye con interfaces de Inventory.
+        // Asi los interactuables no conocen InventorySystem ni sus detalles internos.
         if (inventoryController == null || inventoryController.ReadModel == null || inventoryController.WriteModel == null)
         {
             Debug.LogError("InventorySystem NULL en Start");
@@ -96,6 +109,8 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void ToggleInventory()
     {
+        // PlayerStateController es la fuente de verdad para pantallas abiertas.
+        // Los paneles escuchan GameplayEvents.OnUIStateChanged para mostrarse.
         if (IsBlocked()) return;
 
         var current = stateController.GetState();
@@ -114,6 +129,8 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void OnInteract(InputAction.CallbackContext ctx)
     {
+        // Flujo: input -> detector -> IInteractable.Interact(context).
+        // Esto desacopla al jugador de cada implementacion concreta del mundo.
         if (IsBlocked()) return;
 
         if (!ctx.performed) return;
