@@ -97,8 +97,14 @@ public class InventoryController : MonoBehaviour
         return inventorySystem;
     }
 
-    private void HandleNotificationRequested(NotificationData notification)
+    private void HandleNotificationRequested(InventoryFeedback feedback)
     {
+        var notification = new NotificationData
+        {
+            message = feedback.message,
+            type = ToNotificationType(feedback.type)
+        };
+
         InventoryEvents.OnNotificationRequested?.Invoke(notification);
         GameplayEvents.OnNotification?.Invoke(notification);
     }
@@ -112,5 +118,16 @@ public class InventoryController : MonoBehaviour
     private void HandleItemRemoved(ItemData_SO item, int amount)
     {
         InventoryEvents.OnItemRemoved?.Invoke(item, amount);
+    }
+
+    private NotificationType ToNotificationType(InventoryFeedbackType type)
+    {
+        switch (type)
+        {
+            case InventoryFeedbackType.Success: return NotificationType.Success;
+            case InventoryFeedbackType.Error: return NotificationType.Error;
+            case InventoryFeedbackType.Info: return NotificationType.Info;
+            default: return NotificationType.Warning;
+        }
     }
 }

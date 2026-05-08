@@ -11,7 +11,7 @@ public class InventorySystem : IInventoryWriteModel
     public IInventoryReadModel ReadModel { get; private set; }
     public event Action<ItemData_SO, int> OnItemAdded;
     public event Action<ItemData_SO, int> OnItemRemoved;
-    public event Action<NotificationData> OnNotificationRequested;
+    public event Action<InventoryFeedback> OnNotificationRequested;
 
     public InventorySystem(InventoryConfig_SO config, InventoryGrid grid)
     {
@@ -89,14 +89,14 @@ public class InventorySystem : IInventoryWriteModel
         if (canAdd <= 0)
         {
             if (mode == InventoryNotificationMode.Normal)
-                Notify($"Inventario lleno para {item.itemID}", NotificationType.Warning);
+                Notify($"Inventario lleno para {item.itemID}", InventoryFeedbackType.Warning);
             return 0;
         }
 
         if (canAdd < amount)
         {
             if (mode == InventoryNotificationMode.Normal)
-                Notify($"No hay espacio suficiente para {item.itemID}", NotificationType.Warning);
+                Notify($"No hay espacio suficiente para {item.itemID}", InventoryFeedbackType.Warning);
             return 0;
         }
 
@@ -104,7 +104,7 @@ public class InventorySystem : IInventoryWriteModel
 
         if (added > 0 && mode == InventoryNotificationMode.Normal)
         {
-            Notify($"Has obtenido {item.itemID} x{added}", NotificationType.Success);
+            Notify($"Has obtenido {item.itemID} x{added}", InventoryFeedbackType.Success);
             OnItemAdded?.Invoke(item, added);
         }
 
@@ -153,7 +153,7 @@ public class InventorySystem : IInventoryWriteModel
         if (removedTotal > 0)
         {
             if (mode == InventoryNotificationMode.Normal)
-                Notify($"{item.itemID} x{removedTotal} consumido", NotificationType.Info);
+                Notify($"{item.itemID} x{removedTotal} consumido", InventoryFeedbackType.Info);
 
             OnItemRemoved?.Invoke(item, removedTotal);
         }
@@ -227,7 +227,7 @@ public class InventorySystem : IInventoryWriteModel
         }
 
         if (mode == InventoryNotificationMode.Normal)
-            Notify("Inventario limpiado", NotificationType.Info);
+            Notify("Inventario limpiado", InventoryFeedbackType.Info);
     }
 
     // =========================================================
@@ -259,10 +259,10 @@ public class InventorySystem : IInventoryWriteModel
     // =========================================================
     // NOTIFY
     // =========================================================
-    private void Notify(string message, NotificationType type)
+    private void Notify(string message, InventoryFeedbackType type)
     {
 
-        OnNotificationRequested?.Invoke(new NotificationData
+        OnNotificationRequested?.Invoke(new InventoryFeedback
         {
             message = message,
             type = type
