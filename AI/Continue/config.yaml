@@ -1,0 +1,42 @@
+name: LIAS Unity v2
+version: 0.0.1
+schema: v1
+
+models:
+  - name: DeepSeek Technical Reviewer
+    provider: ollama
+    model: deepseek-r1:14b
+    roles:
+      - chat
+      - edit
+    defaultCompletionOptions:
+      contextLength: 4096
+
+  - name: Qwen Code Implementer
+    provider: ollama
+    model: qwen2.5-coder:14b
+    roles:
+      - chat
+      - edit
+      - autocomplete
+    defaultCompletionOptions:
+      contextLength: 4096
+
+rules:
+  - AI/Documentacion/Reglas/AGENTS.md
+  - AI/Documentacion/Reglas/grounding_rules.md
+  - AI/Documentacion/Reglas/workflow_rules.md
+  - AI/Documentacion/Reglas/forbidden_patterns.md
+
+prompts:
+  - name: architect_review
+    description: Review architecture as Chief Gameplay Architect
+    prompt: AI/Documentacion/Prompts/architect_chatgpt.md
+
+  - name: technical_review
+    description: Review technical risks with DeepSeek
+    prompt: AI/Documentacion/Prompts/reviewer_deepseek.md
+
+  - name: implement_small_change
+    description: Implement a small safe Unity C# change with Qwen
+    prompt: AI/Documentacion/Prompts/programmer_qwen.md
