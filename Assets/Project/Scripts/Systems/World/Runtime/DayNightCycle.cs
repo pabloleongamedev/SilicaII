@@ -1,6 +1,6 @@
 /*
  * Arquitectura: World/Runtime
- * Script: CicloDiaNoche
+ * Script: DayNightCycle
  * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
  * Modulo: Gestiona sistemas ambientales de escena como ciclo dia/noche y lluvia.
  * Relaciones: Opera en escena y puede ser consultado por sistemas visuales o ambientales.
@@ -8,7 +8,7 @@
  */
 using UnityEngine;
 
-public class CicloDiaNoche : MonoBehaviour
+public class DayNightCycle : MonoBehaviour
 {
     [Range(0.0f, 24.0f)] public float hora = 9;
     public Transform sol; 

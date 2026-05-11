@@ -1,6 +1,6 @@
 /*
  * Arquitectura: Notification/Data
- * Script: NotificacionData
+ * Script: NotificationData
  * Rol: Define datos editables o estructuras serializables. No debe ejecutar reglas de gameplay ni controlar escena.
  * Modulo: Gestiona mensajes visuales y sonoros de feedback para el jugador.
  * Relaciones: Escucha GameplayEvents y bloquea temporalmente Interaction UI mientras muestra feedback.

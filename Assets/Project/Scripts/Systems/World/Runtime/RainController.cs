@@ -1,6 +1,6 @@
 /*
  * Arquitectura: World/Runtime
- * Script: ControladorLluvia
+ * Script: RainController
  * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
  * Modulo: Gestiona sistemas ambientales de escena como ciclo dia/noche y lluvia.
  * Relaciones: Opera en escena y puede ser consultado por sistemas visuales o ambientales.
@@ -8,10 +8,10 @@
  */
 using UnityEngine;
 
-public class ControladorLluvia : MonoBehaviour
+public class RainController : MonoBehaviour
 {
     [Header("Referencias")]
-    public CicloDiaNoche scriptCiclo; // Arrastra aquí el objeto que tiene el script del sol
+    public DayNightCycle scriptCiclo; // Arrastra aqui el objeto que tiene el script del sol
     public GameObject objetoLluvia;  // Arrastra aquí tu Particle System de lluvia
 
     [Header("Configuración")]

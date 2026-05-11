@@ -1,6 +1,6 @@
 /*
  * Arquitectura: Crafting/Data
- * Script: SeparationDatabase
+ * Script: SeparationDatabase_SO
  * Rol: Define datos editables o estructuras serializables. No debe ejecutar reglas de gameplay ni controlar escena.
  * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
  * Relaciones: Se relaciona con Inventory para consumir/producir items y con Quest/Notification mediante eventos de Runtime.

@@ -12,7 +12,7 @@ using TMPro;
 public class HUDManager : MonoBehaviour
 {
     [Header("Referencias")]
-    [SerializeField] VitalityBarSegments vitalityBar;
+    [SerializeField] HealthBarSegments vitalityBar;
     [SerializeField] MissionTimer missionTimer;
     
     [Header("Textos de Estado")]

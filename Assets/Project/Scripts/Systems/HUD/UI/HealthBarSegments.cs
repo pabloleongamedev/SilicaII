@@ -1,6 +1,6 @@
 /*
  * Arquitectura: HUD/UI
- * Script: PropulsorBarSegments
+ * Script: HealthBarSegments
  * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
  * Modulo: Gestiona indicadores visuales persistentes de estado, tiempo, vitalidad y propulsor.
  * Relaciones: Presenta datos de runtime sin ser la fuente de reglas de gameplay.
@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class PropulsorBarSegments : MonoBehaviour
+public class HealthBarSegments : MonoBehaviour
 {
     [Header("Configuración Visual")]
     [SerializeField] private List<Image> segments = new List<Image>();

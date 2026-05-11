@@ -1,6 +1,6 @@
 /*
  * Arquitectura: HUD/UI
- * Script: VitalityBarSegments
+ * Script: JetpackBarSegments
  * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
  * Modulo: Gestiona indicadores visuales persistentes de estado, tiempo, vitalidad y propulsor.
  * Relaciones: Presenta datos de runtime sin ser la fuente de reglas de gameplay.
@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class VitalityBarSegments : MonoBehaviour
+public class JetpackBarSegments : MonoBehaviour
 {
     [Header("Configuración Visual")]
     [SerializeField] private List<Image> segments = new List<Image>();
