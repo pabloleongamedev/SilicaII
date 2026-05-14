@@ -1,10 +1,11 @@
 /*
  * Arquitectura: Crafting/Runtime
  * Script: ChemistryController
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Rol: Facade runtime de Chemistry. Coordina UI, ChemistrySystem, metodos de separacion e Inventory.
  * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
- * Relaciones: Se relaciona con Inventory para consumir/producir items y con Quest/Notification mediante eventos de Runtime.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Usa IInventoryReadModel/IInventoryWriteModel para transacciones; escucha GameplayEvents.OnUIStateChanged y publica CraftingEvents propios.
+ * Riesgo arquitectonico mitigado: ya no llama QuestEvents/GameplayEvents directamente; GameplayEventRouter traduce CraftingEvents hacia Quest/Notification.
+ * Uso como referencia: documenta un controlador runtime funcional que aun puede adelgazar separando flujo UI y transacciones.
  */
 using UnityEngine;
 using TMPro;
@@ -285,9 +286,8 @@ public class ChemistryController : MonoBehaviour
             return;
         }
 
-        // 🔥 MISIONES
+        // Evento propio de Crafting: GameplayEventRouter decide si esto avanza Quest.
         CraftingEvents.OnItemRefined?.Invoke(currentCompound.inputItem, 1);
-        QuestEvents.OnItemRefined?.Invoke(currentCompound.inputItem, 1);
 
         // 🔥 limpiar sin rollback
         isCleaning = true;
@@ -311,6 +311,5 @@ public class ChemistryController : MonoBehaviour
         };
 
         CraftingEvents.OnNotificationRequested?.Invoke(notification);
-        GameplayEvents.OnNotification?.Invoke(notification);
     }
 }

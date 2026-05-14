@@ -1,10 +1,11 @@
 /*
  * Arquitectura: Crafting/Runtime
  * Script: ChemistryTable
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Rol: Interactable runtime que abre/cierra el estado UI de chemistry.
  * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
- * Relaciones: Se relaciona con Inventory para consumir/producir items y con Quest/Notification mediante eventos de Runtime.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Implementa IInteractable; usa PlayerStateController para cambiar UIState.Chemistry; actualmente lo encuentra con FindFirstObjectByType.
+ * Riesgo arquitectonico: el interactuable depende de un controlador global de Player; debe recibir estado UI por InteractionContext o referencia serializada/binder.
+ * Uso como referencia: muestra una interaccion simple, pero evidencia el limite pendiente entre Interaction y Player UI State.
  */
 using UnityEngine;
 

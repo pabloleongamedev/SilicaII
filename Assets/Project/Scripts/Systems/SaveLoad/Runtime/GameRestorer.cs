@@ -1,16 +1,21 @@
 /*
  * Arquitectura: SaveLoad/Runtime
  * Script: GameRestorer
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
- * Modulo: Gestiona datos de partida, guardado/carga y restauracion de estado runtime.
- * Relaciones: Consulta facades runtime como InventoryController y PlayerInputHandler para persistir/restaurar datos.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Rol: Adapter runtime de restauracion. Toma GameData activo y lo aplica a objetos de escena.
+ * Modulo: Gestiona restauracion de posicion/rotacion del jugador e inventario guardado.
+ * Relaciones: Lee GameManager.Instance y puede restaurar mediante SaveParticipantRegistry + ItemDatabase_SO.
+ * Riesgo arquitectonico: conserva fallback legacy con FindFirstObjectByType mientras las escenas se migran a participantes explicitos.
+ * Uso como referencia: muestra el puente entre flujo antiguo y SaveParticipants, priorizando dependencias visibles por Inspector.
  */
 using System.Collections;
 using UnityEngine;
 
 public class GameRestorer : MonoBehaviour
 {
+    [Header("Decoupled Restore")]
+    [SerializeField] private SaveParticipantRegistry participantRegistry;
+    [SerializeField] private ItemDatabase_SO itemDatabase;
+
     private void Start()
     {
         StartCoroutine(RestoreDelayed());
@@ -23,6 +28,14 @@ public class GameRestorer : MonoBehaviour
         var gameData = GameManager.Instance?.GetCurrentGameData();
         if (gameData == null)
             yield break;
+
+        if (participantRegistry != null)
+        {
+            participantRegistry.Restore(gameData, itemDatabase);
+            yield break;
+        }
+
+        Debug.LogWarning("[GameRestorer] SaveParticipantRegistry no asignado. Usando restauracion legacy temporal.");
 
         var playerInput = FindFirstObjectByType<PlayerInputHandler>();
         if (playerInput != null)
@@ -43,14 +56,10 @@ public class GameRestorer : MonoBehaviour
         if (string.IsNullOrEmpty(itemID))
             return null;
 
-        var items = Resources.LoadAll<ItemData_SO>(string.Empty);
-        foreach (var item in items)
-        {
-            if (item.itemID == itemID)
-                return item;
-        }
+        if (itemDatabase != null && itemDatabase.TryResolveItem(itemID, out var itemData))
+            return itemData;
 
-        Debug.LogWarning($"[GameRestorer] ItemData no encontrado para itemID: {itemID}");
+        Debug.LogWarning($"[GameRestorer] ItemData no encontrado para itemID: {itemID}. Asigna ItemDatabase_SO para evitar Resources.LoadAll.");
         return null;
     }
 }

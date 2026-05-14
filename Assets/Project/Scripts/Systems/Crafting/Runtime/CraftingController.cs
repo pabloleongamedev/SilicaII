@@ -1,10 +1,11 @@
 /*
  * Arquitectura: Crafting/Runtime
  * Script: CraftingController
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Rol: Facade runtime de Crafting. Coordina UI, CraftingSystem e Inventory mediante contratos.
  * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
- * Relaciones: Se relaciona con Inventory para consumir/producir items y con Quest/Notification mediante eventos de Runtime.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Usa InventoryController solo para obtener IInventoryReadModel/IInventoryWriteModel y publica CraftingEvents propios.
+ * Riesgo arquitectonico mitigado: ya no llama QuestEvents/GameplayEvents directamente; GameplayEventRouter traduce CraftingEvents hacia Quest/Notification.
+ * Uso como referencia: muestra como un Runtime puede orquestar Core + UI sin conocer consumidores externos.
  */
 using UnityEngine;
 using UnityEngine.UI;
@@ -179,9 +180,8 @@ public class CraftingController : MonoBehaviour
             UpdateCraftButton();
             return;
         }
-        // NOTIFICAR CRAFTEO A MISIONES 
+        // Evento propio de Crafting: GameplayEventRouter decide si esto avanza Quest.
         CraftingEvents.OnItemCrafted?.Invoke(recipe.result, recipe.resultAmount);
-        QuestEvents.OnItemCrafted?.Invoke(recipe.result, recipe.resultAmount);
         //  limpiar slots internos
         system.ClearAllNoReturn();
 
@@ -204,7 +204,6 @@ public class CraftingController : MonoBehaviour
         };
 
         CraftingEvents.OnNotificationRequested?.Invoke(notification);
-        GameplayEvents.OnNotification?.Invoke(notification);
     }
 
     private NotificationType ToNotificationType(CraftingResultType type)

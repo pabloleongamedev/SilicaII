@@ -1,16 +1,20 @@
 /*
  * Arquitectura: Audio/Runtime
  * Script: PlayerAudio
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Rol: Adapter runtime de audio del jugador. Traduce input/collision a intenciones de sonido.
  * Modulo: Gestiona reproduccion de audio general, UI y sonidos del jugador.
- * Relaciones: Es usado por UI, Player y Scanner para reproducir clips por nombre o acciones.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Lee InputActionReference y tags de suelo; usa IAudioService via AudioManager asignado o fallback legacy a AudioManager.Instance.
+ * Riesgo arquitectonico: aun usa strings globales; debe migrar a AudioCue_SO para eliminar typos de runtime.
+ * Uso como referencia: separa audio de PlayerInputHandler y abre una frontera hacia servicio de audio explicito.
  */
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerAudio : MonoBehaviour
 {
+    [Header("Audio Service")]
+    [SerializeField] private AudioManager audioManager;
+
     [Header("Input Action")]
     public InputActionReference walkAction;
     public InputActionReference runAction;
@@ -49,18 +53,18 @@ public class PlayerAudio : MonoBehaviour
             string soundToPlay = (currentGroundTag == "MetalGround") ? "PlayerwalkMetalsound" : "Playerwalksound";
             if (!isWalkingSoundPlaying)
             {
-                AudioManager.Instance.Play(soundToPlay);
+                AudioService?.Play(soundToPlay);
                 isWalkingSoundPlaying=true;
             }
         float targetPitch = isRunning ? 1.5f : 1f; // Adjust pitch for running
-        AudioManager.Instance.ChangePitch(soundToPlay, targetPitch);
+        AudioService?.ChangePitch(soundToPlay, targetPitch);
         }
         else
         {
             if (isWalkingSoundPlaying)
             {
-                AudioManager.Instance.Stop("Playerwalksound");
-                AudioManager.Instance.Stop("PlayerwalkMetalsound");
+                AudioService?.Stop("Playerwalksound");
+                AudioService?.Stop("PlayerwalkMetalsound");
                 isWalkingSoundPlaying = false;
             }
         }
@@ -68,14 +72,14 @@ public class PlayerAudio : MonoBehaviour
         {
             if (!isJetpackSoundPlaying)
             {
-                AudioManager.Instance.Play("Playerjetpacksound");
+                AudioService?.Play("Playerjetpacksound");
                 isJetpackSoundPlaying=true;
             }
         }else
         {
             if (isJetpackSoundPlaying)
             {
-                AudioManager.Instance.Stop("Playerjetpacksound");
+                AudioService?.Stop("Playerjetpacksound");
                 isJetpackSoundPlaying = false;
             }
         }
@@ -104,12 +108,14 @@ public class PlayerAudio : MonoBehaviour
                                : "Playerjumpsound";
 
             // 2. Reproducimos el sonido detectado
-            AudioManager.Instance.Play(jumpSound);
+            AudioService?.Play(jumpSound);
 
             // 3. Actualizamos el estado
             isGrounded = true;
             currentGroundTag = collision.gameObject.tag;
         }
     }
+
+    private IAudioService AudioService => audioManager != null ? audioManager : AudioManager.Instance;
     
 }

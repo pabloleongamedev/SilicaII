@@ -1,10 +1,11 @@
 /*
  * Arquitectura: Menu/UI
  * Script: MainMenuManager
- * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
+ * Rol: Controlador UI de menu principal y flujo inicial de partida.
  * Modulo: Gestiona pantallas, configuraciones y flujo del menu.
- * Relaciones: Se conecta con SaveLoad/GameManager para iniciar, cargar y configurar partida.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Cambia paneles UI, refresca SaveSlot y llama GameManager.Instance para cargar/crear partida; crea GameManager si no existe.
+ * Riesgo arquitectonico: UI conoce SaveLoad concreto y crea infraestructura runtime; debe delegar a IMainMenuGameFlow/ISaveSlotService.
+ * Uso como referencia: documenta una UI funcional pero acoplada al flujo de aplicacion.
  */
 using System.Collections;
 using UnityEngine;

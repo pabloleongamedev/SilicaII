@@ -1,10 +1,11 @@
 /*
  * Arquitectura: Interaction/Runtime
  * Script: ItemPickup
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Rol: Interactable runtime de recoleccion. Convierte una interaccion del mundo en una operacion de Inventory.
  * Modulo: Gestiona deteccion, contexto y ejecucion de interacciones del jugador con objetos del mundo.
- * Relaciones: Usa IInteractable e InteractionContext para conectar jugador, mundo e Inventory sin dependencias profundas.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Recibe InteractionContext con IInventoryReadModel/IInventoryWriteModel; luego fuerza refresco de InteractionDetector mediante FindFirstObjectByType.
+ * Riesgo arquitectonico: la operacion de inventario esta desacoplada, pero el refresco del detector usa busqueda global; debe pasar por contexto, evento o detector owner.
+ * Uso como referencia: buen ejemplo parcial de IInteractable, con una dependencia de escena aun pendiente.
  */
 using UnityEngine;
 

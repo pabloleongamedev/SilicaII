@@ -1,10 +1,11 @@
 /*
  * Arquitectura: SaveLoad/Runtime
  * Script: GameManager
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Rol: Facade global temporal de SaveLoad. Orquesta sesion, autosave, carga de escena y persistencia mientras se migra a servicios mas pequenos.
  * Modulo: Gestiona datos de partida, guardado/carga y restauracion de estado runtime.
- * Relaciones: Consulta facades runtime como InventoryController y PlayerInputHandler para persistir/restaurar datos.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Menu/SaveSlot lo usa por GameManager.Instance; puede capturar estado por SaveParticipantRegistry o usar fallback legacy con FindFirstObjectByType.
+ * Riesgo arquitectonico: mezcla singleton, SceneManager, estado de sesion y descubrimiento de objetos; debe dividirse en GameSession, SaveService y SceneLoadService.
+ * Uso como referencia: facade de compatibilidad durante la migracion hacia ISaveParticipant.
  */
 using System.Text;
 using UnityEngine;
@@ -21,6 +22,9 @@ public class GameManager : MonoBehaviour
     [Header("Menu Panels")]
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject optionsPanel;
+
+    [Header("Decoupled Save")]
+    [SerializeField] private SaveParticipantRegistry participantRegistry;
 
     private SaveController saveController;
     private GameData currentGameData;
@@ -225,6 +229,12 @@ public class GameManager : MonoBehaviour
 
         currentGameData.UpdatePlayTime(Mathf.RoundToInt(Time.time - sessionStartTime));
         sessionStartTime = Time.time;
+
+        if (participantRegistry != null)
+        {
+            participantRegistry.Capture(currentGameData);
+            return;
+        }
 
         var playerInput = FindFirstObjectByType<PlayerInputHandler>();
         if (playerInput != null)

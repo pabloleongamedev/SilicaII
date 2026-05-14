@@ -1,10 +1,11 @@
 /*
  * Arquitectura: Inventory/Runtime
  * Script: InventoryController
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Rol: Facade runtime de Inventory. Construye el Core desde configuracion y expone contratos de lectura/escritura.
  * Modulo: Gestiona items, cantidades, slots, vistas de inventario y contratos de lectura/escritura para otros sistemas.
- * Relaciones: Se relaciona con Interaction, Crafting, Delivery, Quest y SaveLoad mediante interfaces, facades y eventos.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Interaction y Crafting consumen IInventoryReadModel/IInventoryWriteModel; UI escucha ReadModel; SaveLoad exporta/importa InventorySaveData.
+ * Riesgo arquitectonico mitigado: ya no publica QuestEvents/GameplayEvents directamente; GameplayEventRouter traduce InventoryEvents hacia Quest/Notification.
+ * Uso como referencia: buen ejemplo de Core desacoplado con facade runtime y eventos propios del sistema.
  */
 using UnityEngine;
 using System;
@@ -117,14 +118,12 @@ public class InventoryController : MonoBehaviour
         };
 
         InventoryEvents.OnNotificationRequested?.Invoke(notification);
-        GameplayEvents.OnNotification?.Invoke(notification);
     }
 
     private void HandleItemAdded(ItemData_SO item, int amount)
     {
-        // Bridge event-driven: Quest avanza por eventos, no leyendo slots internos.
+        // Evento propio de Inventory: GameplayEventRouter decide si esto avanza Quest.
         InventoryEvents.OnItemAdded?.Invoke(item, amount);
-        QuestEvents.OnItemCollected?.Invoke(item, amount);
     }
 
     private void HandleItemRemoved(ItemData_SO item, int amount)

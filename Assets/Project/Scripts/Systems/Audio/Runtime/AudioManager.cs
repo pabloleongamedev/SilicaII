@@ -1,15 +1,16 @@
 /*
  * Arquitectura: Audio/Runtime
  * Script: AudioManager
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Rol: Facade runtime global de audio basado en singleton y nombres de sonido.
  * Modulo: Gestiona reproduccion de audio general, UI y sonidos del jugador.
- * Relaciones: Es usado por UI, Player y Scanner para reproducir clips por nombre o acciones.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: PlayerAudio y ScannerTrigger llaman AudioManager.Instance con strings; UIAudioManager maneja otra ruta de audio UI.
+ * Riesgo arquitectonico: singleton + strings no verificables por compilador; debe envolverse con IAudioService y/o AudioCue_SO.
+ * Uso como referencia: conservar como adapter legacy mientras consumidores migran a un servicio de audio explicito.
  */
 using UnityEngine;
 using System;
 
-public class AudioManager : MonoBehaviour
+public class AudioManager : MonoBehaviour, IAudioService
 {
     public static AudioManager Instance;
     [Header("Sounds List")]

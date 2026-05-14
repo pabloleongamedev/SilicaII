@@ -1,10 +1,11 @@
 /*
  * Arquitectura: Scanner/Runtime
  * Script: ScannerTrigger
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Rol: Adapter runtime visual/audio del escaner. Activa pivot, animacion, textura e input de escaneo.
  * Modulo: Gestiona escaneo de elementos, datos escaneables y feedback visual del escaner.
- * Relaciones: Usa IScannable para escanear objetos sin conocer su implementacion concreta.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Lee InputActionReference, manipula Animator/Renderer y usa IAudioService via AudioManager asignado o fallback legacy.
+ * Riesgo arquitectonico: mezcla feedback visual, input y audio; debe separar ScannerInput, ScannerVisualFeedback e AudioCue_SO.
+ * Uso como referencia: documenta el estado actual antes de extraer responsabilidades en fases posteriores.
  */
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,6 +13,9 @@ using TMPro;
 
 public class ScannerTrigger : MonoBehaviour
 {
+    [Header("Audio Service")]
+    [SerializeField] private AudioManager audioManager;
+
     [Header("Configuracion de input")]
     public InputActionReference scanAction;
     [Header("Configuracion de escaneo")]
@@ -62,9 +66,9 @@ public class ScannerTrigger : MonoBehaviour
         if (PivotScan != null)
         {
             PivotScan.SetActive(true);
-            if (AudioManager.Instance != null)
+            if (AudioService != null)
             {
-            AudioManager.Instance.Play("Scannersound");
+            AudioService.Play("Scannersound");
             }
             if (animator != null)
             {
@@ -84,7 +88,7 @@ public class ScannerTrigger : MonoBehaviour
         if (PivotScan != null)
         {
             PivotScan.SetActive(false);
-            AudioManager.Instance.Stop("Scannersound");
+            AudioService?.Stop("Scannersound");
             if (animator != null)
             {
                 animator.ResetTrigger("StartScan");
@@ -136,4 +140,6 @@ public class ScannerTrigger : MonoBehaviour
             meshRenderer.material.SetTextureOffset("_MainTex", new Vector2(offset, 0));
         }
     }
+
+    private IAudioService AudioService => audioManager != null ? audioManager : AudioManager.Instance;
 }

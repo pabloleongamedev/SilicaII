@@ -1,10 +1,11 @@
 /*
  * Arquitectura: Quest/Events
  * Script: QuestEvents
- * Rol: Canal de comunicacion desacoplado entre sistemas. Permite Observer/Event-driven sin referencias profundas.
+ * Rol: Canal estatico temporal de Quest. Recibe eventos de progreso y publica snapshots hacia UI.
  * Modulo: Gestiona misiones y progreso a partir de eventos de gameplay como recolectar, refinar o craftear.
- * Relaciones: Escucha eventos de Inventory/Crafting y publica estado de mision hacia UI u otros sistemas.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: InventoryController/CraftingController/ChemistryController publican progreso; QuestSystem escucha; QuestUIController escucha carga y tareas.
+ * Riesgo arquitectonico: el payload usa ItemData_SO y productores llaman QuestEvents directamente; debe migrar a adapters y payloads por itemID.
+ * Uso como referencia: muestra Observer/Event-driven, pero tambien la deuda de ownership y payloads fuertemente acoplados.
  */
 using System;
 

@@ -1,10 +1,11 @@
 /*
  * Arquitectura: Menu/UI
  * Script: SaveSlot
- * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
+ * Rol: Vista/controlador de un slot de guardado simplificado.
  * Modulo: Gestiona pantallas, configuraciones y flujo del menu.
- * Relaciones: Se conecta con SaveLoad/GameManager para iniciar, cargar y configurar partida.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Lee SaveInfo desde GameManager.Instance y dispara LoadGame/CreateNewGame sobre el slot unico "1".
+ * Riesgo arquitectonico: mezcla presentacion con flujo de SaveLoad; debe depender de ISaveSlotService o emitir evento hacia MainMenuFlowController.
+ * Uso como referencia: muestra el contrato visual esperado del slot, pero la decision de cargar/crear debe salir de la vista.
  */
 using UnityEngine;
 using TMPro;
