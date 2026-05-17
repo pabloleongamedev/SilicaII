@@ -3,7 +3,7 @@
  * Script: JetpackHUDPresenter
  * Rol: Presenter dedicado del propulsor; observa IJetpackFuelReader y actualiza JetpackBarSegments/textos.
  * Relaciones: UI consume un contrato de lectura de combustible sin conocer JetpackSystem, MovementController ni input.
- * Fase 4: extrae el indicador de jetpack de HUDManager para que cada widget tenga ownership claro.
+ * Fase 4: cada widget HUD tiene ownership claro y no depende de un manager central.
  */
 using TMPro;
 using UnityEngine;
@@ -21,7 +21,7 @@ public class JetpackHUDPresenter : MonoBehaviour
 
     private void Awake()
     {
-        fuelReader = fuelReaderBehaviour as IJetpackFuelReader;
+        fuelReader = ResolveFuelReader(fuelReaderBehaviour);
 
         if (jetpackBar == null)
             jetpackBar = GetComponentInChildren<JetpackBarSegments>(true);
@@ -102,11 +102,26 @@ public class JetpackHUDPresenter : MonoBehaviour
         if (fuelReader != null)
             return;
 
+        fuelReader = ResolveFuelReader(fuelReaderBehaviour);
+        if (fuelReader != null)
+            return;
+
         var localMovement = GetComponentInParent<MovementController>();
         if (localMovement != null)
             fuelReader = localMovement;
 
         if (fuelReader == null)
             Debug.LogWarning("[JetpackHUDPresenter] Asigna un MonoBehaviour que implemente IJetpackFuelReader por Inspector.", this);
+    }
+
+    private IJetpackFuelReader ResolveFuelReader(MonoBehaviour candidate)
+    {
+        if (candidate == null)
+            return null;
+
+        if (candidate is IJetpackFuelReader directReader)
+            return directReader;
+
+        return candidate.GetComponent<IJetpackFuelReader>();
     }
 }

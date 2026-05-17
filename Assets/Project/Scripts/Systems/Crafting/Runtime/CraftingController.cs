@@ -4,7 +4,7 @@
  * Rol: Facade runtime de Crafting. Coordina UI, CraftingSystem e Inventory mediante contratos.
  * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
  * Relaciones: Usa InventoryController solo para obtener IInventoryReadModel/IInventoryWriteModel y publica CraftingEvents propios.
- * Riesgo arquitectonico mitigado: ya no llama QuestEvents/GameplayEvents directamente; GameplayEventRouter traduce CraftingEvents hacia Quest/Notification.
+ * Riesgo arquitectonico mitigado: ya no llama QuestEvents directamente; GameplayEventRouter traduce CraftingEvents hacia Quest/Notification.
  * Uso como referencia: muestra como un Runtime puede orquestar Core + UI sin conocer consumidores externos.
  */
 using UnityEngine;

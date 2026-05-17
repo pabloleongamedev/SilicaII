@@ -61,7 +61,7 @@ public class HealthBehaviour : MonoBehaviour, IDamageable
 
     private void HandleHealthChanged(int current, int max)
     {
-        // Adapter Runtime -> UI: HUDManager puede escuchar esta senal sin conocer HealthComponent interno.
+        // Adapter Runtime -> UI: HealthHUDPresenter escucha esta senal sin conocer HealthComponent interno.
         OnHealthChanged?.Invoke(current, max);
     }
 

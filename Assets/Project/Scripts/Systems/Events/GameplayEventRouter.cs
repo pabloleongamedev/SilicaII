@@ -25,7 +25,8 @@ public static class GameplayEventRouter
 
     public static void Install()
     {
-        Uninstall();
+        if (installed)
+            Uninstall();
 
         InventoryEvents.OnItemAddedByID += ForwardItemCollectedToQuest;
         InventoryEvents.OnNotificationRequested += ForwardNotification;
@@ -38,6 +39,9 @@ public static class GameplayEventRouter
 
     public static void Uninstall()
     {
+        if (!installed)
+            return;
+
         InventoryEvents.OnItemAddedByID -= ForwardItemCollectedToQuest;
         InventoryEvents.OnNotificationRequested -= ForwardNotification;
         CraftingEvents.OnItemCraftedByID -= ForwardItemCraftedToQuest;

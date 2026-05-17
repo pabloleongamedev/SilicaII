@@ -3,7 +3,7 @@
  * Script: JetpackBarSegments
  * Rol: Presenta informacion de combustible recibida desde Movement Runtime.
  * Modulo: Gestiona segmentos visuales del jetpack.
- * Relaciones: HUDManager consulta MovementController.GetJetpackRatio y pasa el ratio a esta vista; la vista no modifica combustible ni input.
+ * Relaciones: JetpackHUDPresenter puede pasarle el ratio, o la barra puede escuchar un IJetpackFuelReader asignado por Inspector.
  * Nota de escena: si la lista Segments queda vacia en Inspector, se autocompleta con Image hijos para evitar una barra sin pintar.
  * Feedback: parpadea cuando el ratio baja, porque ese evento visual representa consumo de energia, no una regla del JetpackSystem.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
@@ -14,6 +14,9 @@ using System.Collections.Generic;
 
 public class JetpackBarSegments : MonoBehaviour
 {
+    [Header("Fuente Opcional")]
+    [SerializeField] private MonoBehaviour fuelReaderBehaviour;
+
     [Header("Configuracion Visual")]
     [SerializeField] private List<Image> segments = new List<Image>();
     [SerializeField] private Color colorTop = new Color(0f, 1f, 1f, 1f);
@@ -26,10 +29,28 @@ public class JetpackBarSegments : MonoBehaviour
     private readonly Color redColor = new Color(1f, 180f / 255f, 171f / 255f, 1f);
     private float lastFuelRatio = 1f;
     private float consumeBlinkUntil;
+    private IJetpackFuelReader fuelReader;
 
     private void Awake()
     {
         AutoPopulateSegmentsIfNeeded();
+        BindFuelReaderIfAvailable();
+    }
+
+    private void OnEnable()
+    {
+        BindFuelReaderIfAvailable();
+    }
+
+    private void OnDisable()
+    {
+        UnbindFuelReader();
+    }
+
+    private void Update()
+    {
+        if (fuelReader != null)
+            UpdateVisuals(fuelReader.GetFuelRatio());
     }
 
     public void UpdateVisuals(float fuelRatio)
@@ -88,5 +109,36 @@ public class JetpackBarSegments : MonoBehaviour
             if (image != null && image.gameObject != gameObject)
                 segments.Add(image);
         }
+    }
+
+    private void BindFuelReaderIfAvailable()
+    {
+        fuelReader = ResolveFuelReader(fuelReaderBehaviour);
+
+        if (fuelReader == null)
+            return;
+
+        fuelReader.OnFuelRatioChanged -= UpdateVisuals;
+        fuelReader.OnFuelRatioChanged += UpdateVisuals;
+        UpdateVisuals(fuelReader.GetFuelRatio());
+    }
+
+    private void UnbindFuelReader()
+    {
+        if (fuelReader == null)
+            return;
+
+        fuelReader.OnFuelRatioChanged -= UpdateVisuals;
+    }
+
+    private IJetpackFuelReader ResolveFuelReader(MonoBehaviour candidate)
+    {
+        if (candidate == null)
+            return null;
+
+        if (candidate is IJetpackFuelReader directReader)
+            return directReader;
+
+        return candidate.GetComponent<IJetpackFuelReader>();
     }
 }

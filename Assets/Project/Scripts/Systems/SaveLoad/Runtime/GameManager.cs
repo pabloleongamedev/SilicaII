@@ -55,8 +55,9 @@ public class GameManager : MonoBehaviour,
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(transform.root.gameObject);
         BuildServices();
+        SaveLoadUseCaseRegistry.Register(this, this);
         SaveParticipantRegistry.OnRegistryAvailable += HandleRegistryAvailable;
     }
 
@@ -81,6 +82,7 @@ public class GameManager : MonoBehaviour,
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             SaveParticipantRegistry.OnRegistryAvailable -= HandleRegistryAvailable;
+            SaveLoadUseCaseRegistry.Unregister(this, this);
         }
     }
 

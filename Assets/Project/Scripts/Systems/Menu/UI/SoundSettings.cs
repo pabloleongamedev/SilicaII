@@ -3,7 +3,7 @@
  * Script: SoundSettings
  * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
  * Modulo: Gestiona pantallas, configuraciones y flujo del menu.
- * Relaciones: Se conecta con SaveLoad/GameManager para iniciar, cargar y configurar partida.
+ * Relaciones: Lee IGameSettingsReader/Writer desde un GameSettingsService asignable por Inspector.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using UnityEngine;
@@ -19,16 +19,31 @@ public class SoundSettings : MonoBehaviour
     [SerializeField] private string musicVolumeParameter = "MusicVol";
     [SerializeField] private string sfxVolumeParameter = "SFXVol";
 
+    [Header("Settings Service")]
+    [SerializeField] private MonoBehaviour settingsServiceBehaviour;
+
+    private IGameSettingsReader settingsReader;
+    private IGameSettingsWriter settingsWriter;
+
+    private void Awake()
+    {
+        ResolveSettingsService();
+    }
+
     private void Start()
     {
+        ResolveSettingsService();
         ApplySound();
     }
 
     public void ApplySound()
     {
-        DebugSetMixerVolume(masterVolumeParameter, GameSettings.Instance.MasterVolume);
-        DebugSetMixerVolume(musicVolumeParameter, GameSettings.Instance.MusicVolume);
-        DebugSetMixerVolume(sfxVolumeParameter, GameSettings.Instance.EffectsVolume);
+        if (settingsReader == null)
+            return;
+
+        DebugSetMixerVolume(masterVolumeParameter, settingsReader.MasterVolume);
+        DebugSetMixerVolume(musicVolumeParameter, settingsReader.MusicVolume);
+        DebugSetMixerVolume(sfxVolumeParameter, settingsReader.EffectsVolume);
     }
 
     public void PreviewMusicVolume(float value)
@@ -46,7 +61,8 @@ public class SoundSettings : MonoBehaviour
     segments = Mathf.Clamp(segments, 1f, 10f);
 
     float normalizedVolume = segments / 10f;
-    GameSettings.Instance.MasterVolume = normalizedVolume;
+    if (settingsWriter != null)
+        settingsWriter.MasterVolume = normalizedVolume;
 
     DebugSetMixerVolume(masterVolumeParameter, normalizedVolume);
 }
@@ -65,6 +81,21 @@ public class SoundSettings : MonoBehaviour
         Debug.Log(
             $"[AUDIO DEBUG] Param: {parameterName} | Normalized: {normalizedVolume} | dB: {volumeInDb} | SetOK: {setOk} | GetOK: {getOk} | Current: {currentValue}"
         );
+    }
+
+    private void ResolveSettingsService()
+    {
+        if (settingsServiceBehaviour == null)
+            settingsServiceBehaviour = GetComponentInParent<GameSettingsService>();
+
+        if (settingsServiceBehaviour == null)
+            settingsServiceBehaviour = gameObject.AddComponent<GameSettingsService>();
+
+        settingsReader = settingsServiceBehaviour as IGameSettingsReader;
+        settingsWriter = settingsServiceBehaviour as IGameSettingsWriter;
+
+        if (settingsReader == null)
+            Debug.LogWarning("[SoundSettings] Asigna un GameSettingsService para aplicar volumenes sin usar GameSettings.Instance.", this);
     }
     
 

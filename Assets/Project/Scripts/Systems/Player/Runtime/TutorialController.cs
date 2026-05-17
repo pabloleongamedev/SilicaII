@@ -19,7 +19,11 @@ public class TutorialController : MonoBehaviour
 
     private void Awake()
     {
+        if (gameStateController == null)
+            gameStateController = GetComponent<GameStateController>();
 
+        if (gameStateController == null)
+            gameStateController = GetComponentInParent<GameStateController>();
     }
 
     private void Start()
@@ -29,8 +33,15 @@ public class TutorialController : MonoBehaviour
 
     private IEnumerator StartTutorial()
     {
-        if (gameStateController == null){
-            Debug.LogError("GameStateController no asignado en el Inspector.");
+        if (gameStateController == null)
+        {
+            Debug.LogWarning("[TutorialController] GameStateController no asignado. Asignalo por Inspector o ubica TutorialController junto al GameStateController.", this);
+            yield break;
+        }
+
+        if (controlesImage == null)
+        {
+            Debug.LogWarning("[TutorialController] Controls Image no asignado.", this);
             yield break;
         }
         Debug.Log("INICIANDO TUTORIAL");

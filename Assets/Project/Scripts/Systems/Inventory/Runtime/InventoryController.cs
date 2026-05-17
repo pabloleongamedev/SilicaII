@@ -4,7 +4,7 @@
  * Rol: Facade runtime de Inventory. Construye el Core desde configuracion y expone contratos de lectura/escritura.
  * Modulo: Gestiona items, cantidades, slots, vistas de inventario y contratos de lectura/escritura para otros sistemas.
  * Relaciones: Interaction y Crafting consumen IInventoryReadModel/IInventoryWriteModel; UI escucha ReadModel; SaveLoad exporta/importa InventorySaveData.
- * Riesgo arquitectonico mitigado: ya no publica QuestEvents/GameplayEvents directamente; GameplayEventRouter traduce InventoryEvents hacia Quest/Notification.
+ * Riesgo arquitectonico mitigado: ya no publica QuestEvents directamente; GameplayEventRouter traduce InventoryEvents hacia Quest/Notification.
  * Uso como referencia: buen ejemplo de Core desacoplado con facade runtime y eventos propios del sistema.
  */
 using UnityEngine;

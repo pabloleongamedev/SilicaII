@@ -989,48 +989,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &922606270335529295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5482591449658361198}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a22baeb9c5cbcea4189cdc0cd25c5de9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SilicaII.Systems::InventorySaveParticipant
-  inventory: {fileID: 0}
---- !u!114 &1660091794399154592
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8156641081782952949}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5b4f62d7a25dd04eae5abd58e452c51, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SilicaII.Systems::GameRestorer
-  participantRegistry: {fileID: 3366727754306379031}
-  itemDatabase: {fileID: 11400000, guid: 6092e80cbdf00b947b3bcddbdf047829, type: 2}
---- !u!4 &2024149857150927532
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5482591449658361198}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.7081995, y: 0, z: -2.9246502}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5884115666112490643}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2498574360761770269
 GameObject:
   m_ObjectHideFlags: 0
@@ -1172,21 +1130,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5884115666112490643}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &3338495074642062512
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8156641081782952949}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -53.1979, y: 0, z: 18.602549}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5884115666112490643}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3366727754306379031
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1233,21 +1176,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4138923204275000488
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8055811033259721631}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.7081995, y: 0, z: -2.9246502}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5884115666112490643}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &4290721001516152563
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1548,23 +1476,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!1 &5482591449658361198
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2024149857150927532}
-  - component: {fileID: 922606270335529295}
-  m_Layer: 0
-  m_Name: InventorySaveParticipant
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!1 &5657728451595749274
 GameObject:
   m_ObjectHideFlags: 0
@@ -1633,10 +1544,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3153643010255134346}
-  - {fileID: 3338495074642062512}
-  - {fileID: 4138923204275000488}
   - {fileID: 4432538031085504787}
-  - {fileID: 2024149857150927532}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6291795760797406524
@@ -1763,40 +1671,6 @@ MonoBehaviour:
   mainMenuPanel: {fileID: 1459206413}
   optionsPanel: {fileID: 2498574361926638359}
   participantRegistry: {fileID: 3366727754306379031}
---- !u!1 &8055811033259721631
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4138923204275000488}
-  - component: {fileID: 8711482596085699890}
-  m_Layer: 0
-  m_Name: PlayerSaveParticipant
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &8156641081782952949
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3338495074642062512}
-  - component: {fileID: 1660091794399154592}
-  m_Layer: 0
-  m_Name: GameRestorer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!222 &8361686901121428948
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1821,19 +1695,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5657728452760337969}
   m_CullTransparentMesh: 1
---- !u!114 &8711482596085699890
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8055811033259721631}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68ca7373139fd0c4f957a0f8129330e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SilicaII.Systems::PlayerSaveParticipant
-  player: {fileID: 0}
 --- !u!114 &8814253761815430599
 MonoBehaviour:
   m_ObjectHideFlags: 0

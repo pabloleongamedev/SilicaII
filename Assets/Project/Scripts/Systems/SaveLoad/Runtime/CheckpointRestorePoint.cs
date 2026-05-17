@@ -2,8 +2,8 @@
  * Arquitectura: SaveLoad/Runtime
  * Script: CheckpointRestorePoint
  * Rol: Interactable runtime de restauracion manual. Puede usarse con sistema de interaccion, trigger en mundo o boton UI.
- * Relaciones: Implementa IInteractable; consume IRestoreCheckpointUseCase asignable por Inspector.
- * Riesgo arquitectonico mitigado: no conoce GameManager; requiere asignar un adapter por Inspector.
+ * Relaciones: Implementa IInteractable; consume IRestoreCheckpointUseCase por Inspector o SaveLoadUseCaseRegistry.
+ * Riesgo arquitectonico mitigado: no conoce GameManager; habla con un contrato de caso de uso.
  * Uso como referencia: separa la intencion "restaurar checkpoint" del guardado automatico y la expone al sistema de interaccion.
  */
 using UnityEngine;
@@ -58,6 +58,8 @@ public class CheckpointRestorePoint : MonoBehaviour, IInteractable
         if (Time.time - lastRestoreTime < cooldownSeconds)
             return;
 
+        ResolveUseCase();
+
         if (restoreCheckpointUseCase == null)
         {
             Debug.LogWarning("[CheckpointRestorePoint] No existe IRestoreCheckpointUseCase activo para restaurar checkpoint.", this);
@@ -80,5 +82,14 @@ public class CheckpointRestorePoint : MonoBehaviour, IInteractable
         lastRestoreTime = Time.time;
         Debug.Log($"[CheckpointRestorePoint] Restaurando checkpoint desde slot {slotID}.", this);
         restoreCheckpointUseCase.RestoreCheckpoint(slotID, reloadScene);
+    }
+
+    private void ResolveUseCase()
+    {
+        if (restoreCheckpointUseCase == null)
+            restoreCheckpointUseCase = restoreCheckpointUseCaseBehaviour as IRestoreCheckpointUseCase;
+
+        if (restoreCheckpointUseCase == null)
+            restoreCheckpointUseCase = SaveLoadUseCaseRegistry.RestoreCheckpointUseCase;
     }
 }

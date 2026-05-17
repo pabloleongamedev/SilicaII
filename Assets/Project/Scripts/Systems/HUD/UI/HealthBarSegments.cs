@@ -3,7 +3,7 @@
  * Script: HealthBarSegments
  * Rol: Presenta informacion de salud recibida desde Runtime; no calcula dano ni estado de juego.
  * Modulo: Gestiona segmentos visuales de vida.
- * Relaciones: HUDManager le pasa HealthBehaviour.HealthRatio/OnHealthChanged y dispara TriggerDamageBlink cuando HealthBehaviour.OnDamaged ocurre.
+ * Relaciones: HealthHUDPresenter puede pasarle HealthBehaviour.HealthRatio, o la barra puede escuchar HealthBehaviour asignado por Inspector.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using System.Collections.Generic;
@@ -12,6 +12,9 @@ using UnityEngine.UI;
 
 public class HealthBarSegments : MonoBehaviour
 {
+    [Header("Fuente Opcional")]
+    [SerializeField] private HealthBehaviour health;
+
     [Header("Configuracion Visual")]
     [SerializeField] private List<Image> segments = new List<Image>();
     [SerializeField] private Color colorTop = new Color(0f, 1f, 1f, 1f);
@@ -23,6 +26,22 @@ public class HealthBarSegments : MonoBehaviour
     private readonly Color redColor = new Color(1f, 180f / 255f, 171f / 255f, 1f);
     private float currentHealthRatio = 1f;
     private float damageBlinkUntil;
+
+    private void Awake()
+    {
+        BindHealthIfAvailable();
+    }
+
+    private void OnEnable()
+    {
+        BindHealthIfAvailable();
+        Render(currentHealthRatio);
+    }
+
+    private void OnDisable()
+    {
+        UnbindHealth();
+    }
 
     private void Update()
     {
@@ -39,6 +58,37 @@ public class HealthBarSegments : MonoBehaviour
     public void TriggerDamageBlink()
     {
         damageBlinkUntil = Time.time + damageBlinkDuration;
+    }
+
+    private void BindHealthIfAvailable()
+    {
+        if (health == null)
+            return;
+
+        health.OnHealthChanged -= HandleHealthChanged;
+        health.OnDamaged -= HandleDamaged;
+        health.OnHealthChanged += HandleHealthChanged;
+        health.OnDamaged += HandleDamaged;
+        UpdateVisuals(health.HealthRatio);
+    }
+
+    private void UnbindHealth()
+    {
+        if (health == null)
+            return;
+
+        health.OnHealthChanged -= HandleHealthChanged;
+        health.OnDamaged -= HandleDamaged;
+    }
+
+    private void HandleHealthChanged(int current, int max)
+    {
+        UpdateVisuals(max <= 0 ? 0f : Mathf.Clamp01((float)current / max));
+    }
+
+    private void HandleDamaged(DamageContext context)
+    {
+        TriggerDamageBlink();
     }
 
     private void Render(float healthRatio)

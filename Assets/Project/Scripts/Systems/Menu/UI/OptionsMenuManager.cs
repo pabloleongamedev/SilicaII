@@ -3,7 +3,7 @@
  * Script: OptionsMenuManager
  * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
  * Modulo: Gestiona pantallas, configuraciones y flujo del menu.
- * Relaciones: Se conecta con SaveLoad/GameManager para iniciar, cargar y configurar partida.
+ * Relaciones: Usa IGameSettingsReader/IGameSettingsWriter para no depender de GameSettings.Instance.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using UnityEngine;
@@ -28,8 +28,20 @@ public class OptionsMenuManager : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private SoundSettings soundSettings;
 
+    [Header("Settings Service")]
+    [SerializeField] private MonoBehaviour settingsServiceBehaviour;
+
+    private IGameSettingsReader settingsReader;
+    private IGameSettingsWriter settingsWriter;
+
+    private void Awake()
+    {
+        ResolveSettingsService();
+    }
+
     private void Start()
     {
+        ResolveSettingsService();
         ConfigureMasterSlider();
         LoadSettingsIntoUI();
 
@@ -47,20 +59,25 @@ public class OptionsMenuManager : MonoBehaviour
 
     private void LoadSettingsIntoUI()
     {
-        brightnessSlider.value = GameSettings.Instance.Brightness;
-        musicSlider.value = GameSettings.Instance.MusicVolume;
-        effectsSlider.value = GameSettings.Instance.EffectsVolume;
-        masterVolumeSlider.value = GameSettings.Instance.GetMasterVolumeSegments();
+        if (settingsReader == null)
+            return;
+
+        brightnessSlider.value = settingsReader.Brightness;
+        musicSlider.value = settingsReader.MusicVolume;
+        effectsSlider.value = settingsReader.EffectsVolume;
+        masterVolumeSlider.value = settingsReader.GetMasterVolumeSegments();
     }
 
     private void ApplySettings()
     {
-        GameSettings.Instance.Brightness = brightnessSlider.value;
-        GameSettings.Instance.MusicVolume = musicSlider.value;
-        GameSettings.Instance.EffectsVolume = effectsSlider.value;
-        GameSettings.Instance.SetMasterVolumeFromSegments(masterVolumeSlider.value);
+        if (settingsWriter == null)
+            return;
 
-        GameSettings.Instance.Save();
+        settingsWriter.Brightness = brightnessSlider.value;
+        settingsWriter.MusicVolume = musicSlider.value;
+        settingsWriter.EffectsVolume = effectsSlider.value;
+        settingsWriter.SetMasterVolumeFromSegments(masterVolumeSlider.value);
+        settingsWriter.Save();
 
         if (soundSettings != null)
         {
@@ -70,7 +87,10 @@ public class OptionsMenuManager : MonoBehaviour
 
     private void ResetSettings()
     {
-        GameSettings.Instance.ResetToDefaults();
+        if (settingsWriter == null)
+            return;
+
+        settingsWriter.ResetToDefaults();
         LoadSettingsIntoUI();
 
         if (soundSettings != null)
@@ -82,5 +102,20 @@ public class OptionsMenuManager : MonoBehaviour
     private void CloseOptionsPanel()
     {
         optionsPanel.SetActive(false);
+    }
+
+    private void ResolveSettingsService()
+    {
+        if (settingsServiceBehaviour == null)
+            settingsServiceBehaviour = GetComponentInParent<GameSettingsService>();
+
+        if (settingsServiceBehaviour == null)
+            settingsServiceBehaviour = gameObject.AddComponent<GameSettingsService>();
+
+        settingsReader = settingsServiceBehaviour as IGameSettingsReader;
+        settingsWriter = settingsServiceBehaviour as IGameSettingsWriter;
+
+        if (settingsReader == null || settingsWriter == null)
+            Debug.LogWarning("[OptionsMenuManager] Asigna un GameSettingsService que implemente IGameSettingsReader/IGameSettingsWriter.", this);
     }
 }

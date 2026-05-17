@@ -3,7 +3,7 @@
  * Script: PlayerAudio
  * Rol: Adapter runtime de audio del jugador. Traduce input/collision a intenciones de sonido.
  * Modulo: Gestiona reproduccion de audio general, UI y sonidos del jugador.
- * Relaciones: Lee InputActionReference y tags de suelo; usa IAudioService via AudioManager asignado o fallback legacy a AudioManager.Instance.
+ * Relaciones: Lee InputActionReference y tags de suelo; usa IAudioService asignado por Inspector.
  * Riesgo arquitectonico: aun usa strings globales; debe migrar a AudioCue_SO para eliminar typos de runtime.
  * Uso como referencia: separa audio de PlayerInputHandler y abre una frontera hacia servicio de audio explicito.
  */
@@ -13,7 +13,7 @@ using UnityEngine.InputSystem;
 public class PlayerAudio : MonoBehaviour
 {
     [Header("Audio Service")]
-    [SerializeField] private AudioManager audioManager;
+    [SerializeField] private MonoBehaviour audioServiceBehaviour;
 
     [Header("Input Action")]
     public InputActionReference walkAction;
@@ -23,8 +23,17 @@ public class PlayerAudio : MonoBehaviour
     private bool isJetpackSoundPlaying = false;
     private string currentGroundTag = "Ground";
     private bool isGrounded = false; // This should be set based on your player's grounded state
+    private IAudioService audioService;
+    private bool hasLoggedMissingAudioService;
+
+    private void Awake()
+    {
+        ResolveAudioService();
+    }
+
     private void OnEnable()
     {
+        ResolveAudioService();
         walkAction.action.Enable();
         if (runAction != null)
         {
@@ -116,6 +125,29 @@ public class PlayerAudio : MonoBehaviour
         }
     }
 
-    private IAudioService AudioService => audioManager != null ? audioManager : AudioManager.Instance;
+    private IAudioService AudioService
+    {
+        get
+        {
+            if (audioService == null)
+                ResolveAudioService();
+
+            return audioService;
+        }
+    }
+
+    private void ResolveAudioService()
+    {
+        audioService = audioServiceBehaviour as IAudioService;
+
+        if (audioService == null && audioServiceBehaviour != null)
+            Debug.LogWarning("[PlayerAudio] El Audio Service asignado no implementa IAudioService.", this);
+
+        if (audioService == null && !hasLoggedMissingAudioService)
+        {
+            hasLoggedMissingAudioService = true;
+            Debug.LogWarning("[PlayerAudio] Asigna un AudioManager u otro IAudioService por Inspector.", this);
+        }
+    }
     
 }

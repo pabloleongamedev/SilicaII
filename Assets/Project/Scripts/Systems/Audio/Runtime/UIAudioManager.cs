@@ -3,7 +3,7 @@
  * Script: UIAudioManager
  * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
  * Modulo: Gestiona reproduccion de audio general, UI y sonidos del jugador.
- * Relaciones: Es usado por UI, Player y Scanner para reproducir clips por nombre o acciones.
+ * Relaciones: Puede leer IGameSettingsReader por Inspector para aplicar volumen inicial sin depender de GameSettings.Instance.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using UnityEngine;
@@ -27,10 +27,14 @@ public class UIAudioManager : MonoBehaviour
 
     [SerializeField] private AudioMixerGroup sfxMixerGroup; // asignar en el Inspector
     [SerializeField] private bool applyVolumeFromSettings = true; // si quieres que el AudioSource también ajuste su .volume
+    [SerializeField] private MonoBehaviour settingsReaderBehaviour;
 
+    private IGameSettingsReader settingsReader;
     
     private void Start()
 {
+    ResolveSettingsReader();
+
     // Si no hay AudioSource, intentar obtenerlo (ya lo haces en Awake)
     if (uiAudioSource == null)
         uiAudioSource = GetComponent<AudioSource>();
@@ -40,10 +44,10 @@ public class UIAudioManager : MonoBehaviour
         uiAudioSource.outputAudioMixerGroup = sfxMixerGroup;
 
     // Aplicar volumen inicial opcionalmente (efecto combinado Master * Effects)
-    if (applyVolumeFromSettings && uiAudioSource != null)
+    if (applyVolumeFromSettings && uiAudioSource != null && settingsReader != null)
     {
-        float master = GameSettings.Instance.MasterVolume; // 0.1 - 1
-        float sfx   = GameSettings.Instance.EffectsVolume; // 0 - 1
+        float master = settingsReader.MasterVolume; // 0.1 - 1
+        float sfx   = settingsReader.EffectsVolume; // 0 - 1
         uiAudioSource.volume = Mathf.Clamp01(master * sfx);
     }
 
@@ -112,5 +116,19 @@ public class UIAudioManager : MonoBehaviour
             return;
 
         uiAudioSource.PlayOneShot(clip);
+    }
+
+    private void ResolveSettingsReader()
+    {
+        if (settingsReaderBehaviour == null)
+            settingsReaderBehaviour = GetComponentInParent<GameSettingsService>();
+
+        if (settingsReaderBehaviour == null)
+            settingsReaderBehaviour = gameObject.AddComponent<GameSettingsService>();
+
+        settingsReader = settingsReaderBehaviour as IGameSettingsReader;
+
+        if (applyVolumeFromSettings && settingsReader == null)
+            Debug.LogWarning("[UIAudioManager] Asigna GameSettingsService para aplicar volumen inicial de UI.", this);
     }
 }

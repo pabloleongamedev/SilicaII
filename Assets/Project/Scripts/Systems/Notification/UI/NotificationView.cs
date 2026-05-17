@@ -4,7 +4,7 @@
  * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
  * Modulo: Gestiona mensajes visuales y sonoros de feedback para el jugador.
  * Relaciones: NotificationManager escucha NotificationEvents; esta vista publica NotificationEvents.OnNotificationStateChanged mientras muestra feedback.
- * Fase 2: Notification ya no depende del bus global GameplayEvents.
+ * Fase 2: Notification depende de su canal propio de dominio.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using UnityEngine;

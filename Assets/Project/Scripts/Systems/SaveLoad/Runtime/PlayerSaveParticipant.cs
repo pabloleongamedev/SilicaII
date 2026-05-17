@@ -1,82 +1,45 @@
 /*
  * Arquitectura: SaveLoad/Runtime
  * Script: PlayerSaveParticipant
- * Rol: Participante legacy de guardado para transform y estado runtime principal del jugador.
- * Relaciones: Mantiene compatibilidad con escenas que ya lo tienen asignado; los nuevos participantes dedicados son PlayerTransformSaveParticipant, PlayerVitalsSaveParticipant, JetpackSaveParticipant y MissionTimerSaveParticipant.
- * Fase desacople: no usa busquedas globales; queda solo como compatibilidad si sus referencias estan asignadas/locales.
+ * Rol: Participante unico de guardado del Player. Es el adapter Unity/Inspector y delega en secciones no-MonoBehaviour.
+ * Relaciones: SaveParticipantRegistry lo ejecuta como ISaveParticipant; internamente compone transform, vitals, inventory, jetpack y mission timer.
+ * Riesgo arquitectonico mitigado: un solo componente visible no significa una sola responsabilidad interna.
+ * Uso como referencia: esta misma estructura puede replicarse en EnemySaveParticipant, WorldSaveParticipant o QuestSaveParticipant.
  */
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerSaveParticipant : MonoBehaviour, ISaveParticipant
 {
+    [Header("Player References")]
     [SerializeField] private PlayerInputHandler player;
     [SerializeField] private HealthBehaviour health;
+    [SerializeField] private InventoryController inventory;
     [SerializeField] private MovementController movement;
     [SerializeField] private MissionTimer missionTimer;
+
+    private readonly List<ISaveSection> sections = new List<ISaveSection>();
 
     private void Awake()
     {
         ResolveLocalReferences();
+        BuildSections();
     }
 
     public void Capture(GameData gameData)
     {
-        if (gameData == null || player == null)
-        {
-            WarnMissingPlayer();
-            return;
-        }
+        EnsureSections();
 
-        gameData.playerData.SetPosition(player.transform.position);
-        gameData.playerData.SetRotation(player.transform.rotation);
-
-        if (health != null)
-        {
-            gameData.playerData.health = health.CurrentHealth;
-            gameData.playerData.maxHealth = health.MaxHealth;
-        }
-
-        if (movement != null)
-            gameData.playerData.jetpackFuel = movement.GetJetpackFuel();
-
-        if (missionTimer != null)
-        {
-            gameData.missionTimeRemaining = missionTimer.CurrentTime;
-            gameData.missionDuration = missionTimer.MissionDuration;
-        }
+        foreach (var section in sections)
+            section.Capture(gameData);
     }
 
     public void Restore(GameData gameData, IItemResolver itemResolver)
     {
-        if (gameData == null || player == null)
-        {
-            WarnMissingPlayer();
-            return;
-        }
+        EnsureSections();
 
-        var position = gameData.playerData.GetPosition();
-        var rotation = gameData.playerData.GetRotation();
-
-        if (player.TryGetComponent<Rigidbody>(out var rigidBody))
-        {
-            rigidBody.linearVelocity = Vector3.zero;
-            rigidBody.angularVelocity = Vector3.zero;
-            rigidBody.position = position;
-            rigidBody.rotation = rotation;
-        }
-        else
-        {
-            player.transform.SetPositionAndRotation(position, rotation);
-        }
-
-        if (health != null)
-            health.RestoreHealth(gameData.playerData.health, gameData.playerData.maxHealth);
-
-        if (movement != null)
-            movement.RestoreJetpackFuel(gameData.playerData.jetpackFuel);
-
-        if (missionTimer != null && gameData.missionTimeRemaining >= 0f)
-            missionTimer.RestoreTime(gameData.missionTimeRemaining);
+        foreach (var section in sections)
+            section.Restore(gameData, itemResolver);
     }
 
     private void ResolveLocalReferences()
@@ -84,22 +47,35 @@ public class PlayerSaveParticipant : MonoBehaviour, ISaveParticipant
         if (player == null)
             player = GetComponent<PlayerInputHandler>();
 
-        if (player != null)
-        {
-            if (health == null)
-                health = player.GetComponent<HealthBehaviour>();
+        if (health == null)
+            health = GetComponent<HealthBehaviour>();
 
-            if (movement == null)
-                movement = player.GetComponent<MovementController>();
-        }
+        if (inventory == null)
+            inventory = GetComponent<InventoryController>();
+
+        if (movement == null)
+            movement = GetComponent<MovementController>();
 
         if (missionTimer == null)
             missionTimer = GetComponent<MissionTimer>();
     }
 
-    private void WarnMissingPlayer()
+    private void EnsureSections()
     {
-        if (player == null)
-            Debug.LogWarning("[PlayerSaveParticipant] Asigna PlayerInputHandler por Inspector o ubica el participante en el Player.", this);
+        if (sections.Count > 0)
+            return;
+
+        ResolveLocalReferences();
+        BuildSections();
+    }
+
+    private void BuildSections()
+    {
+        sections.Clear();
+        sections.Add(new PlayerTransformSaveSection(player, this));
+        sections.Add(new PlayerVitalsSaveSection(health, this));
+        sections.Add(new PlayerInventorySaveSection(inventory, this));
+        sections.Add(new PlayerJetpackSaveSection(movement, this));
+        sections.Add(new PlayerMissionTimerSaveSection(missionTimer, this));
     }
 }

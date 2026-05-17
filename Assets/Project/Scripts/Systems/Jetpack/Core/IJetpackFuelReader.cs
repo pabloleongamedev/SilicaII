@@ -2,7 +2,7 @@
  * Arquitectura: Jetpack/Core
  * Script: IJetpackFuelReader
  * Rol: Contrato de lectura para UI/SaveLoad. Expone combustible sin revelar JetpackSystem ni MovementController.
- * Relaciones: MovementController implementa esta interfaz; JetpackHUDPresenter/HUDManager pueden observar el ratio sin acoplarse al sistema de vuelo.
+ * Relaciones: MovementController implementa esta interfaz; JetpackHUDPresenter observa el ratio sin acoplarse al sistema de vuelo.
  */
 using System;
 

@@ -2,8 +2,8 @@
  * Arquitectura: Events/UIState
  * Script: UIStateEvents
  * Rol: Canal explicito para cambios de estado de UI.
- * Relaciones: PlayerStateController publica aqui; paneles de UI escuchan este canal sin depender del bus global GameplayEvents.
- * Fase 2: reemplaza el subconjunto UI de GameplayEvents para que cada dominio tenga ownership claro.
+ * Relaciones: PlayerStateController publica aqui; paneles de UI escuchan este canal de dominio sin bus global.
+ * Fase 2: cada dominio tiene ownership claro de sus eventos.
  */
 using System;
 

@@ -15,6 +15,10 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
 
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
+
+    [Header("Rigidbody Presentation")]
+    [SerializeField] private bool useRigidbodyInterpolation = true;
+
     private Rigidbody rb;
 
     private MovementSystem movementSystem;
@@ -45,6 +49,7 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
         // Composicion Runtime: crea sistemas Core puros y los conecta con Rigidbody.
         // MovementController es el puente Unity/physics; no deberia contener UI.
         rb = GetComponent<Rigidbody>();
+        ConfigureRigidbodyPresentation();
 
         movementSystem = new MovementSystem();
         verticalSystem = new VerticalMovementSystem(config.gravity, config.jumpForce);
@@ -60,6 +65,14 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
         movementSystem.SetStrategy(walkStrategy);
 
         rb.freezeRotation = true;
+    }
+
+    private void ConfigureRigidbodyPresentation()
+    {
+        // La camara vive bajo el Player y renderiza en el frame visual, mientras el movimiento fisico corre en FixedUpdate.
+        // Interpolate suaviza la posicion presentada entre ticks fisicos y evita tirones visibles al sprintar.
+        if (useRigidbodyInterpolation)
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
     }
 
     public void SetMoveInput(Vector2 input)
@@ -203,6 +216,11 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
     }
 
     public float GetJetpackFuel()
+    {
+        return GetCurrentFuel();
+    }
+
+    public float GetCurrentFuel()
     {
         if (jetpackSystem == null)
             return 0f;

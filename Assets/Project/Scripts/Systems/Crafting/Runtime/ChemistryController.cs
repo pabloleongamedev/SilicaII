@@ -4,7 +4,7 @@
  * Rol: Facade runtime de Chemistry. Coordina UI, ChemistrySystem, metodos de separacion e Inventory.
  * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
  * Relaciones: Usa IInventoryReadModel/IInventoryWriteModel para transacciones; escucha UIStateEvents.OnUIStateChanged y publica CraftingEvents propios.
- * Riesgo arquitectonico mitigado: ya no llama QuestEvents/GameplayEvents directamente; GameplayEventRouter traduce CraftingEvents hacia Quest/Notification.
+ * Riesgo arquitectonico mitigado: ya no llama QuestEvents directamente; GameplayEventRouter traduce CraftingEvents hacia Quest/Notification.
  * Uso como referencia: documenta un controlador runtime funcional que aun puede adelgazar separando flujo UI y transacciones.
  */
 using UnityEngine;

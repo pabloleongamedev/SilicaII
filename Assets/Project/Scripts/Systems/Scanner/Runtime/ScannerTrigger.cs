@@ -3,7 +3,7 @@
  * Script: ScannerTrigger
  * Rol: Adapter runtime visual/audio del escaner. Activa pivot, animacion, textura e input de escaneo.
  * Modulo: Gestiona escaneo de elementos, datos escaneables y feedback visual del escaner.
- * Relaciones: Lee InputActionReference, manipula Animator/Renderer y usa IAudioService via AudioManager asignado o fallback legacy.
+ * Relaciones: Lee InputActionReference, manipula Animator/Renderer y usa IAudioService asignado por Inspector.
  * Riesgo arquitectonico: mezcla feedback visual, input y audio; debe separar ScannerInput, ScannerVisualFeedback e AudioCue_SO.
  * Uso como referencia: documenta el estado actual antes de extraer responsabilidades en fases posteriores.
  */
@@ -14,7 +14,7 @@ using TMPro;
 public class ScannerTrigger : MonoBehaviour
 {
     [Header("Audio Service")]
-    [SerializeField] private AudioManager audioManager;
+    [SerializeField] private MonoBehaviour audioServiceBehaviour;
 
     [Header("Configuracion de input")]
     public InputActionReference scanAction;
@@ -26,8 +26,13 @@ public class ScannerTrigger : MonoBehaviour
     public GameObject canvasName;
     public TextMeshProUGUI elementNameText;
     public GameObject objectActual;
+    private IAudioService audioService;
+    private bool hasLoggedMissingAudioService;
+
     private void Awake()
     {
+        ResolveAudioService();
+
         if (PivotScan != null)
         {
         animator = PivotScan.GetComponent<Animator>();
@@ -38,6 +43,7 @@ public class ScannerTrigger : MonoBehaviour
     }
     private void OnEnable()
     {
+        ResolveAudioService();
         scanAction.action.Enable();
     }
 
@@ -141,5 +147,28 @@ public class ScannerTrigger : MonoBehaviour
         }
     }
 
-    private IAudioService AudioService => audioManager != null ? audioManager : AudioManager.Instance;
+    private IAudioService AudioService
+    {
+        get
+        {
+            if (audioService == null)
+                ResolveAudioService();
+
+            return audioService;
+        }
+    }
+
+    private void ResolveAudioService()
+    {
+        audioService = audioServiceBehaviour as IAudioService;
+
+        if (audioService == null && audioServiceBehaviour != null)
+            Debug.LogWarning("[ScannerTrigger] El Audio Service asignado no implementa IAudioService.", this);
+
+        if (audioService == null && !hasLoggedMissingAudioService)
+        {
+            hasLoggedMissingAudioService = true;
+            Debug.LogWarning("[ScannerTrigger] Asigna AudioManager u otro IAudioService por Inspector.", this);
+        }
+    }
 }

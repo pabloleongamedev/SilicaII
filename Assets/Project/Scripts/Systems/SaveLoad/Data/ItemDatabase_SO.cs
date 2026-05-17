@@ -2,7 +2,7 @@
  * Arquitectura: SaveLoad/Data
  * Script: ItemDatabase_SO
  * Rol: Database explicita para resolver items guardados por ID.
- * Relaciones: Implementa IItemResolver; GameRestorer y participantes de Inventory lo usan para restaurar InventorySaveData.
+ * Relaciones: Implementa IItemResolver; PlayerInventorySaveSection lo usa para restaurar InventorySaveData.
  * Riesgo arquitectonico mitigado: elimina la necesidad de Resources.LoadAll y hace visibles las dependencias de data en Inspector.
  */
 using System.Collections.Generic;

@@ -3,8 +3,8 @@
  * Script: AudioManager
  * Rol: Facade runtime global de audio basado en singleton y nombres de sonido.
  * Modulo: Gestiona reproduccion de audio general, UI y sonidos del jugador.
- * Relaciones: PlayerAudio y ScannerTrigger llaman AudioManager.Instance con strings; UIAudioManager maneja otra ruta de audio UI.
- * Riesgo arquitectonico: singleton + strings no verificables por compilador; debe envolverse con IAudioService y/o AudioCue_SO.
+ * Relaciones: Implementa IAudioService para PlayerAudio, ScannerTrigger u otros consumidores asignables por Inspector.
+ * Riesgo arquitectonico: mantiene singleton interno de compatibilidad y strings no verificables por compilador; debe migrar a AudioCue_SO.
  * Uso como referencia: conservar como adapter legacy mientras consumidores migran a un servicio de audio explicito.
  */
 using UnityEngine;
@@ -27,7 +27,7 @@ public class AudioManager : MonoBehaviour, IAudioService
             Destroy(gameObject);
             return;
         }
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(transform.root.gameObject);
 
         foreach (Sound s in sounds)
         {
