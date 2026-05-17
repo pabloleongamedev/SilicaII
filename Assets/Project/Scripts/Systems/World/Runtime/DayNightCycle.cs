@@ -1,60 +1,101 @@
 /*
  * Arquitectura: World/Runtime
  * Script: DayNightCycle
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
- * Modulo: Gestiona sistemas ambientales de escena como ciclo dia/noche y lluvia.
- * Relaciones: Opera en escena y puede ser consultado por sistemas visuales o ambientales.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Rol: Presenter ambiental del sol/luz. La hora canonica puede venir de WorldTimeService.
+ * Relaciones: Consume IWorldTimeSource; mantiene compatibilidad local si aun no existe WorldTimeService en escena.
+ * Uso como referencia: WorldTimeService decide tiempo, DayNightCycle solo presenta rotacion e intensidad.
  */
+using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class DayNightCycle : MonoBehaviour
+public class DayNightCycle : MonoBehaviour, IWorldTimeSource
 {
-    [Range(0.0f, 24.0f)] public float hora = 9;
-    public Transform sol; 
-    public float DuracionDelDiaEnMinutos = 24f;
+    [Header("Time Source")]
+    [SerializeField] private MonoBehaviour timeSourceBehaviour;
+    [FormerlySerializedAs("hora")]
+    [SerializeField, Range(0f, 24f)] private float fallbackHour = 9f;
+    [FormerlySerializedAs("DuracionDelDiaEnMinutos")]
+    [SerializeField] private float fallbackDayDurationMinutes = 24f;
 
-    private Light luzSol; // Para no usar GetComponent en cada frame
-    private float solX;
+    [Header("Sun Presentation")]
+    [FormerlySerializedAs("sol")]
+    [SerializeField] private Transform sun;
 
-    void Start()
+    private IWorldTimeSource timeSource;
+    private Light sunLight;
+
+    public event Action<float> OnHourChanged;
+
+    public float CurrentHour => timeSource != null ? timeSource.CurrentHour : fallbackHour;
+    public float DayDurationMinutes => timeSource != null ? timeSource.DayDurationMinutes : fallbackDayDurationMinutes;
+
+    private void Awake()
     {
-        if (sol != null)
-        {
-            luzSol = sol.GetComponent<Light>();
-        }
+        ResolveTimeSource();
+
+        if (sun != null)
+            sunLight = sun.GetComponent<Light>();
+    }
+
+    private void OnEnable()
+    {
+        ResolveTimeSource();
+
+        if (timeSource != null)
+            timeSource.OnHourChanged += HandleHourChanged;
+    }
+
+    private void OnDisable()
+    {
+        if (timeSource != null)
+            timeSource.OnHourChanged -= HandleHourChanged;
     }
 
     private void Update()
     {
-        // Agregamos 'f' a los números para que la división sea decimal
-        // La fórmula es: (24h / (60min * Duración))
-        hora += Time.deltaTime * (24f / (60f * DuracionDelDiaEnMinutos));
-
-        if (hora >= 24)
+        if (timeSource == null)
         {
-            hora = 0;
+            AdvanceFallback(Time.deltaTime);
+            RenderSun(fallbackHour);
         }
-
-        RotacionSol();
     }
 
-    void RotacionSol()
+    private void HandleHourChanged(float hour)
     {
-        solX = 15 * hora;
-        
-        if (sol != null) 
-        {
-            sol.localEulerAngles = new Vector3(solX, 0, 0);
+        RenderSun(hour);
+        OnHourChanged?.Invoke(hour);
+    }
 
-            // Control de intensidad de luz
-            if (luzSol != null)
-            {
-                if (hora < 6 || hora > 18)
-                    luzSol.intensity = 0; 
-                else
-                    luzSol.intensity = 1; 
-            }
-        }
+    private void RenderSun(float hour)
+    {
+        if (sun == null)
+            return;
+
+        sun.localEulerAngles = new Vector3(15f * hour, 0f, 0f);
+
+        if (sunLight != null)
+            sunLight.intensity = hour < 6f || hour > 18f ? 0f : 1f;
+    }
+
+    private void AdvanceFallback(float deltaTime)
+    {
+        if (fallbackDayDurationMinutes <= 0f)
+            return;
+
+        fallbackHour += deltaTime * (24f / (60f * fallbackDayDurationMinutes));
+
+        if (fallbackHour >= 24f)
+            fallbackHour = 0f;
+
+        OnHourChanged?.Invoke(fallbackHour);
+    }
+
+    private void ResolveTimeSource()
+    {
+        if (timeSourceBehaviour == null)
+            timeSourceBehaviour = GetComponent<WorldTimeService>();
+
+        timeSource = timeSourceBehaviour as IWorldTimeSource;
     }
 }

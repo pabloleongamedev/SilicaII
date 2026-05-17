@@ -1,42 +1,81 @@
 /*
  * Arquitectura: World/Runtime
  * Script: RainController
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
- * Modulo: Gestiona sistemas ambientales de escena como ciclo dia/noche y lluvia.
- * Relaciones: Opera en escena y puede ser consultado por sistemas visuales o ambientales.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Rol: Presenter/controlador de lluvia basado en una fuente de tiempo desacoplada.
+ * Relaciones: Consume IWorldTimeSource y publica WeatherEvents.OnRainStateChanged cuando cambia el clima.
+ * Uso como referencia: no lee campos publicos de DayNightCycle; la fuente de tiempo se asigna por Inspector.
  */
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class RainController : MonoBehaviour
 {
     [Header("Referencias")]
-    public DayNightCycle scriptCiclo; // Arrastra aqui el objeto que tiene el script del sol
-    public GameObject objetoLluvia;  // Arrastra aquí tu Particle System de lluvia
+    [SerializeField] private MonoBehaviour timeSourceBehaviour;
+    [FormerlySerializedAs("scriptCiclo")]
+    [SerializeField] private DayNightCycle legacyTimeSource;
+    [FormerlySerializedAs("objetoLluvia")]
+    [SerializeField] private GameObject rainObject;
 
-    [Header("Configuración")]
-    [Range(0.0f, 23.0f)] public float horaInicioLluvia = 14f; 
-    public float duracionLluviaEnMinutos = 1f; 
+    [Header("Configuracion")]
+    [FormerlySerializedAs("horaInicioLluvia")]
+    [SerializeField, Range(0f, 23f)] private float rainStartHour = 14f;
+    [FormerlySerializedAs("duracionLluviaEnMinutos")]
+    [SerializeField] private float rainDurationMinutes = 1f;
 
-    void Update()
+    private IWorldTimeSource timeSource;
+    private bool isRaining;
+
+    private void Awake()
     {
-        if (scriptCiclo == null || objetoLluvia == null) return;
+        ResolveTimeSource();
+    }
 
-        // Calculamos cuánto dura la lluvia en "horas de juego"
-        // Como tu día dura 24 min reales, 1 min real = 1 hora de juego.
-        float duracionEnHorasJuego = (duracionLluviaEnMinutos / scriptCiclo.DuracionDelDiaEnMinutos) * 24f;
-        float horaFinLluvia = horaInicioLluvia + duracionEnHorasJuego;
+    private void OnEnable()
+    {
+        ResolveTimeSource();
 
-        // Comprobamos la hora del script del ciclo
-        float horaActual = scriptCiclo.hora;
+        if (timeSource != null)
+            timeSource.OnHourChanged += EvaluateRain;
+    }
 
-        if (horaActual >= horaInicioLluvia && horaActual <= horaFinLluvia)
-        {
-            if (!objetoLluvia.activeSelf) objetoLluvia.SetActive(true);
-        }
-        else
-        {
-            if (objetoLluvia.activeSelf) objetoLluvia.SetActive(false);
-        }
+    private void OnDisable()
+    {
+        if (timeSource != null)
+            timeSource.OnHourChanged -= EvaluateRain;
+    }
+
+    private void Update()
+    {
+        if (timeSource != null)
+            EvaluateRain(timeSource.CurrentHour);
+    }
+
+    private void EvaluateRain(float currentHour)
+    {
+        if (rainObject == null || timeSource == null)
+            return;
+
+        float durationInWorldHours = (rainDurationMinutes / Mathf.Max(0.01f, timeSource.DayDurationMinutes)) * 24f;
+        float rainEndHour = rainStartHour + durationInWorldHours;
+        bool shouldRain = currentHour >= rainStartHour && currentHour <= rainEndHour;
+
+        if (isRaining == shouldRain)
+            return;
+
+        isRaining = shouldRain;
+        rainObject.SetActive(isRaining);
+        WeatherEvents.OnRainStateChanged?.Invoke(isRaining);
+    }
+
+    private void ResolveTimeSource()
+    {
+        if (timeSourceBehaviour == null && legacyTimeSource != null)
+            timeSourceBehaviour = legacyTimeSource;
+
+        if (timeSourceBehaviour == null)
+            timeSourceBehaviour = GetComponentInParent<WorldTimeService>();
+
+        timeSource = timeSourceBehaviour as IWorldTimeSource;
     }
 }

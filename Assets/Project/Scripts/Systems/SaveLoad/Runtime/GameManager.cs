@@ -5,7 +5,7 @@
  * Modulo: Gestiona la sesion activa y coordina servicios de guardado, carga, slots, autosave y restauracion de escena.
  * Relaciones: Implementa ISaveCheckpointUseCase, IRestoreCheckpointUseCase, ISaveSlotReader, IGameSessionLoader e IGameDataProvider.
  * Riesgo arquitectonico mitigado: la logica real vive en SaveService/LoadService/SaveSlotService/SceneRestoreCoordinator/AutosaveController.
- * Uso como referencia: la UI y los interactables deben consumir interfaces por Inspector; GameManager.Instance queda limitado a debug/compatibilidad legacy.
+ * Uso como referencia: la UI/interactables consumen interfaces y las cargas de escena pasan por ISceneLoader.
  */
 using System.Text;
 using UnityEngine;
@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour,
     IGameSessionLoader,
     IGameDataProvider
 {
-    public static GameManager Instance { get; private set; }
+    private static GameManager activeInstance;
 
     [Header("Auto Save")]
     [SerializeField] private float autoSaveInterval = 3600f;
@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour,
     [Header("Decoupled Save")]
     [SerializeField] private SaveParticipantRegistry participantRegistry;
     [SerializeField] private ItemDatabase_SO itemDatabase;
+    [SerializeField] private MonoBehaviour sceneLoaderBehaviour;
 
     private SaveController saveController;
     private SaveService saveService;
@@ -38,6 +39,7 @@ public class GameManager : MonoBehaviour,
     private SaveSlotService saveSlotService;
     private SceneRestoreCoordinator sceneRestoreCoordinator;
     private AutosaveController autosaveController;
+    private ISceneLoader sceneLoader;
 
     private GameData currentGameData;
     private string currentSlotID = "1";
@@ -48,16 +50,16 @@ public class GameManager : MonoBehaviour,
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (activeInstance != null && activeInstance != this)
         {
             Destroy(gameObject);
             return;
         }
 
-        Instance = this;
+        activeInstance = this;
         DontDestroyOnLoad(transform.root.gameObject);
+        sceneLoader = ResolveSceneLoader();
         BuildServices();
-        SaveLoadUseCaseRegistry.Register(this, this);
         SaveParticipantRegistry.OnRegistryAvailable += HandleRegistryAvailable;
     }
 
@@ -78,11 +80,11 @@ public class GameManager : MonoBehaviour,
 
     private void OnDestroy()
     {
-        if (Instance == this)
+        if (activeInstance == this)
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             SaveParticipantRegistry.OnRegistryAvailable -= HandleRegistryAvailable;
-            SaveLoadUseCaseRegistry.Unregister(this, this);
+            activeInstance = null;
         }
     }
 
@@ -120,7 +122,7 @@ public class GameManager : MonoBehaviour,
 
         if (reloadScene)
         {
-            SceneManager.LoadScene(currentGameData.currentScene);
+            ResolveSceneLoader().LoadScene(currentGameData.currentScene);
             return;
         }
 
@@ -135,7 +137,7 @@ public class GameManager : MonoBehaviour,
         autosaveController.Reset();
         isInGame = false;
 
-        SceneManager.LoadScene(currentGameData.currentScene);
+        ResolveSceneLoader().LoadScene(currentGameData.currentScene);
     }
 
     public void SaveGame()
@@ -337,5 +339,19 @@ public class GameManager : MonoBehaviour,
             itemDatabase = registry.ItemDatabase;
 
         sceneRestoreCoordinator.SetSceneDependencies(participantRegistry, itemDatabase);
+    }
+
+    private ISceneLoader ResolveSceneLoader()
+    {
+        if (sceneLoader == null)
+            sceneLoader = sceneLoaderBehaviour as ISceneLoader;
+
+        if (sceneLoader == null && sceneLoaderBehaviour != null)
+            Debug.LogWarning("[GameManager] El Scene Loader asignado no implementa ISceneLoader.", this);
+
+        if (sceneLoader == null)
+            sceneLoader = new UnitySceneLoader();
+
+        return sceneLoader;
     }
 }

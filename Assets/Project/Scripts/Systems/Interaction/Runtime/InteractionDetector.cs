@@ -50,7 +50,8 @@ public class InteractionDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent<IInteractable>(out var interactable))
+        var interactable = ResolveInteractable(other);
+        if (interactable != null)
         {
             if (!interactables.Contains(interactable))
                 interactables.Add(interactable);
@@ -59,10 +60,16 @@ public class InteractionDetector : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.TryGetComponent<IInteractable>(out var interactable))
-        {
+        var interactable = ResolveInteractable(other);
+        if (interactable != null)
             interactables.Remove(interactable);
-        }
+    }
+
+    private IInteractable ResolveInteractable(Collider other)
+    {
+        // Los colliders suelen vivir en hijos visuales/fisicos. Buscar en padres
+        // mantiene Interaction desacoplado sin exigir que cada collider tenga el script.
+        return other.GetComponentInParent<IInteractable>();
     }
     /// <summary>
     /// Limpia referencias inválidas

@@ -1,13 +1,15 @@
 /*
  * Arquitectura: Scanner/Core
  * Script: IScannable
- * Rol: Contiene reglas de dominio reutilizables. Debe evitar referencias directas a UI y depender de interfaces cuando colabora con otros sistemas.
- * Modulo: Gestiona escaneo de elementos, datos escaneables y feedback visual del escaner.
- * Relaciones: Usa IScannable para escanear objetos sin conocer su implementacion concreta.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Rol: Contrato de dominio para objetos que pueden ser escaneados mediante el sistema de interaccion.
+ * Modulo: Gestiona validacion de escaneo y exposicion de resultados detectables.
+ * Relaciones: ScannableObject implementa este contrato; ScannerTrigger solo lo recibe como contexto de feedback visual.
+ * Uso como referencia: Scanner no conoce Inventory, Notification UI ni Player; solo expone datos escaneables.
  */
 public interface IScannable
 {
-    ElementData GetScanData();
+    bool CanScan();
+    ScanDefinition_SO GetScanDefinition();
+    string GetScanInteractionText();
     void OnScanned();
 }

@@ -4,21 +4,30 @@
  * Rol: Adapter runtime de audio del jugador. Traduce input/collision a intenciones de sonido.
  * Modulo: Gestiona reproduccion de audio general, UI y sonidos del jugador.
  * Relaciones: Lee InputActionReference y tags de suelo; usa IAudioService asignado por Inspector.
- * Riesgo arquitectonico: aun usa strings globales; debe migrar a AudioCue_SO para eliminar typos de runtime.
+ * Riesgo arquitectonico mitigado: nuevos sonidos se asignan como AudioCue_SO; los ids string quedan como fallback temporal.
  * Uso como referencia: separa audio de PlayerInputHandler y abre una frontera hacia servicio de audio explicito.
  */
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 public class PlayerAudio : MonoBehaviour
 {
     [Header("Audio Service")]
+    [FormerlySerializedAs("audioManager")]
     [SerializeField] private MonoBehaviour audioServiceBehaviour;
 
     [Header("Input Action")]
-    public InputActionReference walkAction;
-    public InputActionReference runAction;
-    public InputActionReference jetPackAction;
+    [SerializeField] private InputActionReference walkAction;
+    [SerializeField] private InputActionReference runAction;
+    [SerializeField] private InputActionReference jetPackAction;
+
+    [Header("Audio Cues")]
+    [SerializeField] private AudioCue_SO walkCue;
+    [SerializeField] private AudioCue_SO metalWalkCue;
+    [SerializeField] private AudioCue_SO jumpCue;
+    [SerializeField] private AudioCue_SO metalJumpCue;
+    [SerializeField] private AudioCue_SO jetpackCue;
     private bool isWalkingSoundPlaying = false;
     private bool isJetpackSoundPlaying = false;
     private string currentGroundTag = "Ground";
@@ -34,7 +43,8 @@ public class PlayerAudio : MonoBehaviour
     private void OnEnable()
     {
         ResolveAudioService();
-        walkAction.action.Enable();
+        if (walkAction != null)
+            walkAction.action.Enable();
         if (runAction != null)
         {
             runAction.action.Enable();
@@ -54,15 +64,16 @@ public class PlayerAudio : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float inputMovement = walkAction.action.ReadValue<Vector2>().magnitude;
-        bool isRunning = runAction.action.IsPressed();
-        bool isJetPackActive = jetPackAction.action.IsPressed();
+        float inputMovement = walkAction != null ? walkAction.action.ReadValue<Vector2>().magnitude : 0f;
+        bool isRunning = runAction != null && runAction.action.IsPressed();
+        bool isJetPackActive = jetPackAction != null && jetPackAction.action.IsPressed();
         if (inputMovement > 0.1f && isGrounded)
         {
             string soundToPlay = (currentGroundTag == "MetalGround") ? "PlayerwalkMetalsound" : "Playerwalksound";
+            AudioCue_SO cueToPlay = currentGroundTag == "MetalGround" ? metalWalkCue : walkCue;
             if (!isWalkingSoundPlaying)
             {
-                AudioService?.Play(soundToPlay);
+                PlayCue(cueToPlay, soundToPlay);
                 isWalkingSoundPlaying=true;
             }
         float targetPitch = isRunning ? 1.5f : 1f; // Adjust pitch for running
@@ -81,7 +92,7 @@ public class PlayerAudio : MonoBehaviour
         {
             if (!isJetpackSoundPlaying)
             {
-                AudioService?.Play("Playerjetpacksound");
+                PlayCue(jetpackCue, "Playerjetpacksound");
                 isJetpackSoundPlaying=true;
             }
         }else
@@ -112,12 +123,14 @@ public class PlayerAudio : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("MetalGround"))
         {
             // 1. Elegimos el sonido de salto/aterrizaje según la etiqueta
-            string jumpSound = (collision.gameObject.CompareTag("MetalGround"))
+            bool isMetal = collision.gameObject.CompareTag("MetalGround");
+            string jumpSound = isMetal
                                ? "PlayerJumpMetalsound"
                                : "Playerjumpsound";
+            AudioCue_SO jumpCueToPlay = isMetal ? metalJumpCue : jumpCue;
 
             // 2. Reproducimos el sonido detectado
-            AudioService?.Play(jumpSound);
+            PlayCue(jumpCueToPlay, jumpSound);
 
             // 3. Actualizamos el estado
             isGrounded = true;
@@ -138,6 +151,9 @@ public class PlayerAudio : MonoBehaviour
 
     private void ResolveAudioService()
     {
+        if (audioServiceBehaviour == null)
+            audioServiceBehaviour = FindLocalAudioServiceBehaviour();
+
         audioService = audioServiceBehaviour as IAudioService;
 
         if (audioService == null && audioServiceBehaviour != null)
@@ -146,8 +162,40 @@ public class PlayerAudio : MonoBehaviour
         if (audioService == null && !hasLoggedMissingAudioService)
         {
             hasLoggedMissingAudioService = true;
-            Debug.LogWarning("[PlayerAudio] Asigna un AudioManager u otro IAudioService por Inspector.", this);
+            Debug.LogWarning("[PlayerAudio] Asigna un AudioService u otro IAudioService por Inspector.", this);
         }
+    }
+
+    private void PlayCue(AudioCue_SO cue, string fallbackID)
+    {
+        if (cue != null)
+        {
+            AudioService?.Play(cue);
+            return;
+        }
+
+        AudioService?.Play(fallbackID);
+    }
+
+    private MonoBehaviour FindLocalAudioServiceBehaviour()
+    {
+        var localBehaviours = GetComponentsInChildren<MonoBehaviour>(true);
+
+        foreach (var behaviour in localBehaviours)
+        {
+            if (behaviour != null && behaviour is IAudioService)
+                return behaviour;
+        }
+
+        var parentBehaviours = GetComponentsInParent<MonoBehaviour>(true);
+
+        foreach (var behaviour in parentBehaviours)
+        {
+            if (behaviour != null && behaviour is IAudioService)
+                return behaviour;
+        }
+
+        return null;
     }
     
 }

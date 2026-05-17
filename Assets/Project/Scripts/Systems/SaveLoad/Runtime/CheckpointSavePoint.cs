@@ -2,7 +2,7 @@
  * Arquitectura: SaveLoad/Runtime
  * Script: CheckpointSavePoint
  * Rol: Interactable runtime de guardado manual. Puede usarse con sistema de interaccion, trigger en mundo o boton UI.
- * Relaciones: Implementa IInteractable; consume ISaveCheckpointUseCase por Inspector o SaveLoadUseCaseRegistry.
+ * Relaciones: Implementa IInteractable; consume ISaveCheckpointUseCase por Inspector mediante SaveLoadSceneBinding u otro provider.
  * Riesgo arquitectonico mitigado: no conoce GameManager; habla con un contrato de caso de uso.
  * Uso como referencia: separa la intencion "guardar checkpoint" del flujo automatico de autosave y la expone al sistema de interaccion.
  */
@@ -82,6 +82,6 @@ public class CheckpointSavePoint : MonoBehaviour, IInteractable
             saveCheckpointUseCase = saveCheckpointUseCaseBehaviour as ISaveCheckpointUseCase;
 
         if (saveCheckpointUseCase == null)
-            saveCheckpointUseCase = SaveLoadUseCaseRegistry.SaveCheckpointUseCase;
+            saveCheckpointUseCase = GetComponentInParent<ISaveCheckpointUseCase>();
     }
 }

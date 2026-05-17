@@ -1118,7 +1118,7 @@ MonoBehaviour:
   playerTag: Player
   cooldownSeconds: 1
   interactionText: Presiona E para guardar checkpoint
-  saveCheckpointUseCaseBehaviour: {fileID: 2679060577072785885}
+  saveCheckpointUseCaseBehaviour: {fileID: 6001123171761844001}
   createSaveDataIfMissing: 1
 --- !u!1 &963607301
 GameObject:
@@ -1612,7 +1612,7 @@ MonoBehaviour:
   restoreOnTriggerEnter: 1
   playerTag: Player
   cooldownSeconds: 1
-  restoreCheckpointUseCaseBehaviour: {fileID: 0}
+  restoreCheckpointUseCaseBehaviour: {fileID: 6001123171761844001}
   useCurrentSlot: 1
   fallbackSlotID: 1
   reloadScene: 0
@@ -3693,7 +3693,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 96ce81937ca809a4d8638cad19924433, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VitalityBarSegments
+  m_EditorClassIdentifier: SilicaII.Systems::HealthBarSegments
   health: {fileID: 8270189695560625002}
   segments:
   - {fileID: 6445788274392717551}
@@ -5107,21 +5107,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1167940083730884563
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8607226114772532050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05003fade96e89f4bbf6b463b2b19b7e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ScannerGrid
-  canvasElementName: {fileID: 7530459918718508605}
-  elementNameText: {fileID: 3282515766339289332}
-  height: 1.5
 --- !u!114 &1169008264587058583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6745,6 +6730,19 @@ MonoBehaviour:
   optionsPanel: {fileID: 0}
   participantRegistry: {fileID: 2679060577072785885}
   itemDatabase: {fileID: 11400000, guid: 6092e80cbdf00b947b3bcddbdf047829, type: 2}
+--- !u!114 &6001123171761844001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5780435400246955831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a444c10e4f8a4c94a8c7f2d7e15a0004, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SilicaII.Systems::SaveLoadSceneBinding
+  saveLoadProviderBehaviour: {fileID: 1921123171761844479}
 --- !u!222 &1927087070845540670
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9040,7 +9038,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43c7ebeeb1b71c74dbd94f466662ee0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAudio
-  audioManager: {fileID: 6619128525771919497}
+  audioServiceBehaviour: {fileID: 6619128525771919497}
   walkAction: {fileID: -1680190386980627800, guid: d978929666caf6f43982baf97a023ff8, type: 3}
   runAction: {fileID: -7471211009204490832, guid: d978929666caf6f43982baf97a023ff8, type: 3}
   jetPackAction: {fileID: 1120369429361536294, guid: d978929666caf6f43982baf97a023ff8, type: 3}
@@ -9906,18 +9904,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &3025579109633262523
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3275789411505853263}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89209ed33f162604980794cbe6f1556c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
 --- !u!114 &3044617806153453669
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10402,10 +10388,9 @@ GameObject:
   - component: {fileID: 583649277040597453}
   - component: {fileID: 7122569838719793116}
   - component: {fileID: 2148371597417229815}
-  - component: {fileID: 3025579109633262523}
+  - component: {fileID: 4500600134571752369}
   - component: {fileID: 4731813635617707229}
   - component: {fileID: 8270189695560625001}
-  - component: {fileID: 4500600134571752369}
   - component: {fileID: 3044617806153453669}
   - component: {fileID: 4411547220594217273}
   - component: {fileID: 2682811921948513039}
@@ -13129,14 +13114,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5711a2948596b643b6c48c0cc92f942, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScannerTrigger
-  audioManager: {fileID: 0}
-  scanAction: {fileID: 2584591009235624263, guid: d978929666caf6f43982baf97a023ff8, type: 3}
-  PivotScan: {fileID: 3594630744036881946}
-  audioScanner: {fileID: 8578943209442788729}
-  canvasName: {fileID: 0}
-  elementNameText: {fileID: 0}
-  objectActual: {fileID: 0}
-  scanDuration: 2
+  audioServiceBehaviour: {fileID: 0}
+  pivotScan: {fileID: 3594630744036881946}
+  scannerAudioSource: {fileID: 8578943209442788729}
+  startScanTrigger: StartScan
+  visualDuration: 0.6
+  textureScrollSpeed: 2
+--- !u!114 &4500600134571752369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3275789411505853263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da08ff357bd31a1458e545cced81fbea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SilicaII.Systems::InventoryController
+  config: {fileID: 11400000, guid: 53d14ad7068ba3f4c974cf53c546b232, type: 2}
+  inventoryView: {fileID: 142851993286727077}
+  listView: {fileID: 1024174498404474587}
 --- !u!224 &4435908697032997183
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13226,21 +13224,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &4500600134571752369
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3275789411505853263}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da08ff357bd31a1458e545cced81fbea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerInventoryBridge
-  config: {fileID: 11400000, guid: 53d14ad7068ba3f4c974cf53c546b232, type: 2}
-  inventoryView: {fileID: 142851993286727077}
-  listView: {fileID: 1024174498404474587}
 --- !u!114 &4521693446147947864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16581,6 +16564,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5028791478426552624}
   - component: {fileID: 1921123171761844479}
+  - component: {fileID: 6001123171761844001}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -17543,7 +17527,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d9649a020dc4b341b0d70b63ab28391, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::JetpackBarSegments
-  fuelReaderBehaviour: {fileID: 3025579109633262523}
+  fuelReaderBehaviour: {fileID: 8270189695560625001}
   segments: []
   colorTop: {r: 0, g: 1, b: 1, a: 1}
   colorBottom: {r: 1, g: 0.7058824, b: 0.67058825, a: 1}
@@ -22369,7 +22353,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f96c7b376694d09ba90b345265a9254, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::JetpackHUDPresenter
-  fuelReaderBehaviour: {fileID: 3025579109633262523}
+  fuelReaderBehaviour: {fileID: 8270189695560625001}
   jetpackBar: {fileID: 6230336039872282526}
   statusText: {fileID: 4636036960511294201}
   diagnosticText: {fileID: 5221507797337183377}
@@ -22942,7 +22926,6 @@ GameObject:
   - component: {fileID: 6745257768670795324}
   - component: {fileID: 5465597555271483054}
   - component: {fileID: 6945913808494095212}
-  - component: {fileID: 1167940083730884563}
   m_Layer: 0
   m_Name: ScanEfect
   m_TagString: Untagged

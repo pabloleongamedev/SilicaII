@@ -3,12 +3,11 @@
  * Script: PauseMenuManager
  * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
  * Modulo: Gestiona pantallas, configuraciones y flujo del menu.
- * Relaciones: Se conecta con SaveLoad/GameManager para iniciar, cargar y configurar partida.
+ * Relaciones: Usa ISceneLoader para volver al menu sin depender de SceneManager directo.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 
 public class PauseMenuManager : MonoBehaviour
 {
@@ -18,12 +17,16 @@ public class PauseMenuManager : MonoBehaviour
     public bool IsPaused => isPaused;
 
     [SerializeField] private PlayerStateController playerStateController;
+    [SerializeField] private MonoBehaviour sceneLoaderBehaviour;
+    [SerializeField] private string menuSceneName = "Menu";
 
     private InputSystem_Actions inputActions;
+    private ISceneLoader sceneLoader;
 
     void Awake()
     {
         inputActions = new InputSystem_Actions();
+        sceneLoader = ResolveSceneLoader();
         
     }
 
@@ -72,7 +75,7 @@ public class PauseMenuManager : MonoBehaviour
         Time.timeScale = 1f;
         if (playerStateController != null)
             playerStateController.SetState(UIState.None);
-        SceneManager.LoadScene("Menu");
+        ResolveSceneLoader().LoadScene(menuSceneName);
     }
 
     public void OpenOptions()
@@ -93,5 +96,19 @@ public class PauseMenuManager : MonoBehaviour
     {
         Debug.Log("Saliendo del juego...");
         Application.Quit();
+    }
+
+    private ISceneLoader ResolveSceneLoader()
+    {
+        if (sceneLoader == null)
+            sceneLoader = sceneLoaderBehaviour as ISceneLoader;
+
+        if (sceneLoader == null && sceneLoaderBehaviour != null)
+            Debug.LogWarning("[PauseMenuManager] El Scene Loader asignado no implementa ISceneLoader.", this);
+
+        if (sceneLoader == null)
+            sceneLoader = new UnitySceneLoader();
+
+        return sceneLoader;
     }
 }

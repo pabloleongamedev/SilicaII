@@ -1,4 +1,3 @@
 ﻿<Solution>
   <Project Path="SilicaII.Systems.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
 </Solution>

@@ -9,6 +9,7 @@ public interface IGameSettingsReader
     float MusicVolume { get; }
     float EffectsVolume { get; }
     float MasterVolume { get; }
+    bool Fullscreen { get; }
 
     int GetMasterVolumeSegments();
 }

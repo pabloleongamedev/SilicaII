@@ -1,10 +1,9 @@
 /*
  * Arquitectura: Menu/UI
  * Script: GraphicsSettings
- * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
- * Modulo: Gestiona pantallas, configuraciones y flujo del menu.
- * Relaciones: Se conecta con SaveLoad/GameManager para iniciar, cargar y configurar partida.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Rol: Presenter/controlador de configuracion visual. Lee y escribe por interfaces, no por PlayerPrefs directo.
+ * Relaciones: Consume GameSettingsService o cualquier IGameSettingsReader/Writer asignado por Inspector.
+ * Riesgo arquitectonico mitigado: si la persistencia cambia, esta UI no conoce PlayerPrefs ni singletons.
  */
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,41 +11,105 @@ using UnityEngine.UI;
 public class GraphicsSettings : MonoBehaviour
 {
     [Header("UI References")]
-    public Slider brightnessSlider;
-    public Toggle fullscreenToggle;
-    public Image brightnessOverlay;
+    [SerializeField] private Slider brightnessSlider;
+    [SerializeField] private Toggle fullscreenToggle;
+    [SerializeField] private Image brightnessOverlay;
 
-    void Start()
+    [Header("Settings Service")]
+    [SerializeField] private MonoBehaviour settingsServiceBehaviour;
+
+    private IGameSettingsReader settingsReader;
+    private IGameSettingsWriter settingsWriter;
+
+    private void Awake()
     {
-        // Cargar valores guardados
-        fullscreenToggle.isOn = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
-        brightnessSlider.value = PlayerPrefs.GetFloat("Brightness", 0.8f);
-
-        ApplyBrightness(brightnessSlider.value);
-        ApplyFullscreen(fullscreenToggle.isOn);
-
-        // Conectar eventos
-        brightnessSlider.onValueChanged.AddListener(ApplyBrightness);
-        fullscreenToggle.onValueChanged.AddListener(ApplyFullscreen);
+        ResolveSettingsService();
     }
 
-    void ApplyBrightness(float value)
+    private void Start()
     {
-        if (brightnessOverlay != null)
-        {
-            Color c = brightnessOverlay.color;
-            c.a = 1f - value; // más brillo = menos opacidad
-            brightnessOverlay.color = c;
-        }
-
-        PlayerPrefs.SetFloat("Brightness", value);
-        PlayerPrefs.Save();
+        ResolveSettingsService();
+        RenderFromSettings();
+        Subscribe();
     }
 
-    void ApplyFullscreen(bool isFullscreen)
+    private void OnDestroy()
+    {
+        if (brightnessSlider != null)
+            brightnessSlider.onValueChanged.RemoveListener(ApplyBrightness);
+
+        if (fullscreenToggle != null)
+            fullscreenToggle.onValueChanged.RemoveListener(ApplyFullscreen);
+    }
+
+    private void RenderFromSettings()
+    {
+        if (settingsReader == null)
+            return;
+
+        if (brightnessSlider != null)
+            brightnessSlider.value = settingsReader.Brightness;
+
+        if (fullscreenToggle != null)
+            fullscreenToggle.isOn = settingsReader.Fullscreen;
+
+        ApplyBrightnessVisual(settingsReader.Brightness);
+        Screen.fullScreen = settingsReader.Fullscreen;
+    }
+
+    private void Subscribe()
+    {
+        if (brightnessSlider != null)
+            brightnessSlider.onValueChanged.AddListener(ApplyBrightness);
+
+        if (fullscreenToggle != null)
+            fullscreenToggle.onValueChanged.AddListener(ApplyFullscreen);
+    }
+
+    private void ApplyBrightness(float value)
+    {
+        ApplyBrightnessVisual(value);
+
+        if (settingsWriter == null)
+            return;
+
+        settingsWriter.Brightness = value;
+        settingsWriter.Save();
+    }
+
+    private void ApplyBrightnessVisual(float value)
+    {
+        if (brightnessOverlay == null)
+            return;
+
+        Color color = brightnessOverlay.color;
+        color.a = 1f - Mathf.Clamp01(value);
+        brightnessOverlay.color = color;
+    }
+
+    private void ApplyFullscreen(bool isFullscreen)
     {
         Screen.fullScreen = isFullscreen;
-        PlayerPrefs.SetInt("Fullscreen", isFullscreen ? 1 : 0);
-        PlayerPrefs.Save();
+
+        if (settingsWriter == null)
+            return;
+
+        settingsWriter.Fullscreen = isFullscreen;
+        settingsWriter.Save();
+    }
+
+    private void ResolveSettingsService()
+    {
+        if (settingsServiceBehaviour == null)
+            settingsServiceBehaviour = GetComponentInParent<GameSettingsService>();
+
+        if (settingsServiceBehaviour == null)
+            settingsServiceBehaviour = gameObject.AddComponent<GameSettingsService>();
+
+        settingsReader = settingsServiceBehaviour as IGameSettingsReader;
+        settingsWriter = settingsServiceBehaviour as IGameSettingsWriter;
+
+        if (settingsReader == null || settingsWriter == null)
+            Debug.LogWarning("[GraphicsSettings] Asigna un GameSettingsService que implemente IGameSettingsReader/IGameSettingsWriter.", this);
     }
 }

@@ -28,6 +28,7 @@ public class GameSettings : IGameSettingsReader, IGameSettingsWriter
     private const string MusicVolumeKey = "MusicVolume";
     private const string EffectsVolumeKey = "EffectsVolume";
     private const string MasterVolumeKey = "MasterVolume";
+    private const string FullscreenKey = "Fullscreen";
 
     // Valores actuales
     public float Brightness { get; set; }
@@ -36,12 +37,14 @@ public class GameSettings : IGameSettingsReader, IGameSettingsWriter
 
     // MasterVolume se guarda normalizado entre 0.1f y 1f
     public float MasterVolume { get; set; }
+    public bool Fullscreen { get; set; }
 
     // Valores por defecto
     public const float DefaultBrightness = 0.75f;
     public const float DefaultMusic = 0.5f;
     public const float DefaultEffects = 0.5f;
     public const float DefaultMaster = 1f;
+    public const bool DefaultFullscreen = true;
 
     // Rangos válidos
     public const float MinBrightness = 0f;
@@ -72,6 +75,7 @@ public class GameSettings : IGameSettingsReader, IGameSettingsWriter
         PlayerPrefs.SetFloat(MusicVolumeKey, MusicVolume);
         PlayerPrefs.SetFloat(EffectsVolumeKey, EffectsVolume);
         PlayerPrefs.SetFloat(MasterVolumeKey, MasterVolume);
+        PlayerPrefs.SetInt(FullscreenKey, Fullscreen ? 1 : 0);
         PlayerPrefs.Save();
     }
 
@@ -100,6 +104,8 @@ public class GameSettings : IGameSettingsReader, IGameSettingsWriter
             MinMasterVolume,
             MaxMasterVolume
         );
+
+        Fullscreen = PlayerPrefs.GetInt(FullscreenKey, DefaultFullscreen ? 1 : 0) == 1;
     }
 
     public void ResetToDefaults()
@@ -108,6 +114,7 @@ public class GameSettings : IGameSettingsReader, IGameSettingsWriter
         MusicVolume = DefaultMusic;
         EffectsVolume = DefaultEffects;
         MasterVolume = DefaultMaster;
+        Fullscreen = DefaultFullscreen;
     }
 
     // Convierte el valor guardado (0.1f a 1f) al valor visual del slider (1 a 10)

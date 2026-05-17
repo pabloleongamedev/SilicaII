@@ -9,6 +9,7 @@ public interface IGameSettingsWriter
     float MusicVolume { set; }
     float EffectsVolume { set; }
     float MasterVolume { set; }
+    bool Fullscreen { set; }
 
     void SetMasterVolumeFromSegments(float segments);
     void Save();

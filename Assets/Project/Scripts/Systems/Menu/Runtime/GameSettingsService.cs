@@ -36,6 +36,12 @@ public class GameSettingsService : MonoBehaviour, IGameSettingsReader, IGameSett
         set => Settings.MasterVolume = value;
     }
 
+    public bool Fullscreen
+    {
+        get => Settings.Fullscreen;
+        set => Settings.Fullscreen = value;
+    }
+
     public int GetMasterVolumeSegments()
     {
         return Settings.GetMasterVolumeSegments();

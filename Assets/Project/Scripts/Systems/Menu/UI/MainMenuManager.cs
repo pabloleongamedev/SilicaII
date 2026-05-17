@@ -3,14 +3,13 @@
  * Script: MainMenuManager
  * Rol: Controlador UI de menu principal y flujo inicial de partida.
  * Modulo: Gestiona paneles, seleccion inicial y entrada al flujo de partida.
- * Relaciones: Usa ISaveSlotReader/IGameSessionLoader asignables por Inspector; SaveSlot muestra el estado del slot.
+ * Relaciones: Usa ISaveSlotReader/IGameSessionLoader e ISceneLoader asignables por Inspector; SaveSlot muestra el estado del slot.
  * Riesgo arquitectonico mitigado: no conoce GameManager; requiere asignar servicios por Inspector.
  * Uso como referencia: la UI delega casos de uso y evita conocer SaveController, disco o GameData.
  */
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour
@@ -36,15 +35,20 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private MonoBehaviour saveSlotReaderBehaviour;
     [SerializeField] private MonoBehaviour gameSessionLoaderBehaviour;
 
+    [Header("Scene Loading")]
+    [SerializeField] private MonoBehaviour sceneLoaderBehaviour;
+
     private const string UniqueSlot = "1";
 
     private ISaveSlotReader saveSlotReader;
     private IGameSessionLoader gameSessionLoader;
+    private ISceneLoader sceneLoader;
 
     private void Awake()
     {
         saveSlotReader = saveSlotReaderBehaviour as ISaveSlotReader;
         gameSessionLoader = gameSessionLoaderBehaviour as IGameSessionLoader;
+        sceneLoader = ResolveSceneLoader();
     }
 
     private void Start()
@@ -114,7 +118,7 @@ public class MainMenuManager : MonoBehaviour
             loadingImage.SetActive(true);
 
         yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene(fallbackSceneIndex);
+        ResolveSceneLoader().LoadScene(fallbackSceneIndex);
     }
 
     private void SwitchPanel(GameObject targetPanel, Button firstButton)
@@ -148,5 +152,19 @@ public class MainMenuManager : MonoBehaviour
 
         if (saveSlotReader == null || gameSessionLoader == null)
             Debug.LogWarning("[MainMenuManager] Asigna ISaveSlotReader e IGameSessionLoader por Inspector para desacoplar Menu de SaveLoad.", this);
+    }
+
+    private ISceneLoader ResolveSceneLoader()
+    {
+        if (sceneLoader == null)
+            sceneLoader = sceneLoaderBehaviour as ISceneLoader;
+
+        if (sceneLoader == null && sceneLoaderBehaviour != null)
+            Debug.LogWarning("[MainMenuManager] El Scene Loader asignado no implementa ISceneLoader.", this);
+
+        if (sceneLoader == null)
+            sceneLoader = new UnitySceneLoader();
+
+        return sceneLoader;
     }
 }
