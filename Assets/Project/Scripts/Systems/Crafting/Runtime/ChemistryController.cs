@@ -3,7 +3,7 @@
  * Script: ChemistryController
  * Rol: Facade runtime de Chemistry. Coordina UI, ChemistrySystem, metodos de separacion e Inventory.
  * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
- * Relaciones: Usa IInventoryReadModel/IInventoryWriteModel para transacciones; escucha GameplayEvents.OnUIStateChanged y publica CraftingEvents propios.
+ * Relaciones: Usa IInventoryReadModel/IInventoryWriteModel para transacciones; escucha UIStateEvents.OnUIStateChanged y publica CraftingEvents propios.
  * Riesgo arquitectonico mitigado: ya no llama QuestEvents/GameplayEvents directamente; GameplayEventRouter traduce CraftingEvents hacia Quest/Notification.
  * Uso como referencia: documenta un controlador runtime funcional que aun puede adelgazar separando flujo UI y transacciones.
  */
@@ -67,12 +67,12 @@ public class ChemistryController : MonoBehaviour
 
     private void OnEnable()
     {
-        GameplayEvents.OnUIStateChanged += HandleStateChanged;
+        UIStateEvents.OnUIStateChanged += HandleStateChanged;
     }
 
     private void OnDisable()
     {
-        GameplayEvents.OnUIStateChanged -= HandleStateChanged;
+        UIStateEvents.OnUIStateChanged -= HandleStateChanged;
     }
 
     private void OnDestroy()
@@ -286,8 +286,8 @@ public class ChemistryController : MonoBehaviour
             return;
         }
 
-        // Evento propio de Crafting: GameplayEventRouter decide si esto avanza Quest.
-        CraftingEvents.OnItemRefined?.Invoke(currentCompound.inputItem, 1);
+        // Evento propio de Crafting: publica ItemData_SO legacy y itemID runtime para sistemas desacoplados.
+        CraftingEvents.PublishItemRefined(currentCompound.inputItem, 1);
 
         // 🔥 limpiar sin rollback
         isCleaning = true;

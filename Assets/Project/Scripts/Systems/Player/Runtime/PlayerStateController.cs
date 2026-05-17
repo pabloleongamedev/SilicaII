@@ -49,7 +49,7 @@ public class PlayerStateController : MonoBehaviour
             mouseLook.enabled = !isUI;
 
         // 🔥 ESTA LÍNEA ES LA QUE TE FALTABA
-        GameplayEvents.OnUIStateChanged?.Invoke(currentState);
+        UIStateEvents.OnUIStateChanged?.Invoke(currentState);
     }
 
     public UIState GetState() => currentState;

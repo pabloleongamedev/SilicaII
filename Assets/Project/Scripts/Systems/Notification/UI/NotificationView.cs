@@ -3,7 +3,8 @@
  * Script: NotificationView
  * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
  * Modulo: Gestiona mensajes visuales y sonoros de feedback para el jugador.
- * Relaciones: Escucha GameplayEvents y bloquea temporalmente Interaction UI mientras muestra feedback.
+ * Relaciones: NotificationManager escucha NotificationEvents; esta vista publica NotificationEvents.OnNotificationStateChanged mientras muestra feedback.
+ * Fase 2: Notification ya no depende del bus global GameplayEvents.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using UnityEngine;
@@ -42,7 +43,7 @@ public class NotificationView : MonoBehaviour
         panelNotification.SetActive(true);
 
         // 🔥 bloquear interaction UI
-        GameplayEvents.OnNotificationStateChanged?.Invoke(true);
+        NotificationEvents.OnNotificationStateChanged?.Invoke(true);
 
         text.text = data.message;
 
@@ -55,6 +56,6 @@ public class NotificationView : MonoBehaviour
         panelNotification.SetActive(false);
 
         // 🔥 liberar interaction UI
-        GameplayEvents.OnNotificationStateChanged?.Invoke(false);
+        NotificationEvents.OnNotificationStateChanged?.Invoke(false);
     }
 }

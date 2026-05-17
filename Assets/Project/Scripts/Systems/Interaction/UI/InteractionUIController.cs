@@ -22,7 +22,7 @@ public class InteractionUIController : MonoBehaviour
         if (detector != null)
             detector.OnInteractableChanged += HandleChanged;
 
-        GameplayEvents.OnNotificationStateChanged += HandleNotification;
+        NotificationEvents.OnNotificationStateChanged += HandleNotification;
     }
 
     private void OnDisable()
@@ -30,7 +30,7 @@ public class InteractionUIController : MonoBehaviour
         if (detector != null)
             detector.OnInteractableChanged -= HandleChanged;
 
-        GameplayEvents.OnNotificationStateChanged -= HandleNotification;
+        NotificationEvents.OnNotificationStateChanged -= HandleNotification;
     }
 
     private void HandleNotification(bool isActive)

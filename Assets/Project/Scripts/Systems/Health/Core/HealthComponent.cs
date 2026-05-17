@@ -27,17 +27,18 @@ public class HealthComponent : IDamageable
 
     public void ReceiveDamage(in DamageContext context)
     {
-        if (IsDead)
+        if (IsDead || context.Amount <= 0)
             return;
 
-        Current -= context.Amount;
+        // Core mantiene el estado canonico de salud. La UI escucha OnHealthChanged,
+        // pero no decide reglas de dano ni game over.
+        Current = Mathf.Max(Current - context.Amount, 0);
 
         OnDamaged?.Invoke(context);
         OnHealthChanged?.Invoke(Current, Max);
 
-        if (Current <= 0)
+        if (IsDead)
         {
-            Current = 0;
             OnDied?.Invoke();
         }
     }
@@ -49,5 +50,17 @@ public class HealthComponent : IDamageable
 
         Current = Mathf.Min(Current + amount, Max);
         OnHealthChanged?.Invoke(Current, Max);
+    }
+
+    public void RestoreState(int current, int max)
+    {
+        Max = Mathf.Max(1, max);
+        Current = Mathf.Clamp(current, 0, Max);
+        OnHealthChanged?.Invoke(Current, Max);
+    }
+
+    public float GetHealthRatio()
+    {
+        return Max <= 0 ? 0f : Mathf.Clamp01((float)Current / Max);
     }
 }

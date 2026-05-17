@@ -180,8 +180,8 @@ public class CraftingController : MonoBehaviour
             UpdateCraftButton();
             return;
         }
-        // Evento propio de Crafting: GameplayEventRouter decide si esto avanza Quest.
-        CraftingEvents.OnItemCrafted?.Invoke(recipe.result, recipe.resultAmount);
+        // Evento propio de Crafting: publica ItemData_SO legacy y itemID runtime para sistemas desacoplados.
+        CraftingEvents.PublishItemCrafted(recipe.result, recipe.resultAmount);
         //  limpiar slots internos
         system.ClearAllNoReturn();
 

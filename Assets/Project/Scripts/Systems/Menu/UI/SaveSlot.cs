@@ -2,63 +2,74 @@
  * Arquitectura: Menu/UI
  * Script: SaveSlot
  * Rol: Vista/controlador de un slot de guardado simplificado.
- * Modulo: Gestiona pantallas, configuraciones y flujo del menu.
- * Relaciones: Lee SaveInfo desde GameManager.Instance y dispara LoadGame/CreateNewGame sobre el slot unico "1".
- * Riesgo arquitectonico: mezcla presentacion con flujo de SaveLoad; debe depender de ISaveSlotService o emitir evento hacia MainMenuFlowController.
- * Uso como referencia: muestra el contrato visual esperado del slot, pero la decision de cargar/crear debe salir de la vista.
+ * Modulo: Gestiona el estado visual de Continuar/Nueva Partida.
+ * Relaciones: Lee ISaveSlotReader y dispara IGameSessionLoader sobre el slot unico "1".
+ * Riesgo arquitectonico mitigado: no conoce GameManager; requiere asignar servicios por Inspector.
+ * Uso como referencia: la vista conoce intenciones de aplicacion, no detalles de JSON, disco ni singleton.
  */
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
-/// <summary>
-/// SaveSlot: Botón para continuar o crear nueva partida.
-/// Sistema simplificado de una única partida guardada.
-/// 
-/// FUNCIONALIDAD:
-/// - Botón "Continuar" si hay partida guardada
-/// - Botón "Nueva Partida" si no hay guardado
-/// - Usa siempre slot "1" (una única partida)
-/// </summary>
 public class SaveSlot : MonoBehaviour
 {
-    [Header("Configuración")]
+    [Header("Configuracion")]
     [SerializeField] private TextMeshProUGUI textLabel;
-    [SerializeField] private TextMeshProUGUI infoLabel; // Opcional: muestra tiempo de juego
+    [SerializeField] private TextMeshProUGUI infoLabel;
+    [SerializeField] private MonoBehaviour saveSlotReaderBehaviour;
+    [SerializeField] private MonoBehaviour gameSessionLoaderBehaviour;
 
-    // Siempre usar slot "1" (partida única)
-    private const string UNIQUE_SLOT = "1";
-    private bool hasData = false;
+    private const string UniqueSlot = "1";
+
+    private bool hasData;
     private SaveInfo saveInfo;
+    private ISaveSlotReader saveSlotReader;
+    private IGameSessionLoader gameSessionLoader;
 
-    void Start()
+    private void Awake()
     {
-        // Asegurarse de que GameManager esté inicializado
-        if (GameManager.Instance == null)
-        {
-            Debug.LogError("[SaveSlot] GameManager no encontrado en la escena");
-            enabled = false;
-            return;
-        }
-
-        //RefreshSlot();
+        saveSlotReader = saveSlotReaderBehaviour as ISaveSlotReader;
+        gameSessionLoader = gameSessionLoaderBehaviour as IGameSessionLoader;
     }
 
-    /// <summary>
-    /// Refresca el estado consultando GameManager
-    /// </summary>
+    private void Start()
+    {
+        ResolveSerializedServices();
+    }
+
     public void RefreshSlot()
     {
-        if (GameManager.Instance == null)
+        ResolveSerializedServices();
+
+        if (saveSlotReader == null)
             return;
 
-        hasData = GameManager.Instance.HasSaveFile(UNIQUE_SLOT);
-        saveInfo = GameManager.Instance.GetSaveInfo(UNIQUE_SLOT);
+        hasData = saveSlotReader.HasSaveFile(UniqueSlot);
+        saveInfo = saveSlotReader.GetSaveInfo(UniqueSlot);
         UpdateSlotVisual();
     }
 
-    /// <summary>
-    /// Actualiza la UI del botón según si hay guardado o no
-    /// </summary>
+    public void OnSlotPressed()
+    {
+        ResolveSerializedServices();
+
+        if (gameSessionLoader == null)
+        {
+            Debug.LogWarning("[SaveSlot] No existe IGameSessionLoader para cargar o crear partida.", this);
+            return;
+        }
+
+        if (hasData)
+        {
+            Debug.Log("[SaveSlot] Cargando partida guardada...");
+            gameSessionLoader.LoadGame(UniqueSlot);
+        }
+        else
+        {
+            Debug.Log("[SaveSlot] Creando nueva partida...");
+            gameSessionLoader.CreateNewGame(UniqueSlot);
+        }
+    }
+
     private void UpdateSlotVisual()
     {
         if (textLabel == null)
@@ -69,40 +80,26 @@ public class SaveSlot : MonoBehaviour
 
         if (hasData && saveInfo != null)
         {
-            // Hay guardado: mostrar "Continuar"
             textLabel.text = "Continuar";
-            
+
             if (infoLabel != null)
-            {
                 infoLabel.text = $"{saveInfo.playTime} | {saveInfo.lastSaveTime}";
-            }
+
+            return;
         }
-        else
-        {
-            // Sin guardado: mostrar "Nueva Partida"
-            textLabel.text = "Nueva Partida";
-            
-            if (infoLabel != null)
-            {
-                infoLabel.text = "Sin partida guardada";
-            }
-        }
+
+        textLabel.text = "Nueva Partida";
+
+        if (infoLabel != null)
+            infoLabel.text = "Sin partida guardada";
     }
 
-    /// <summary>
-    /// Se llama cuando el usuario presiona el botón
-    /// </summary>
-    public void OnSlotPressed()
+    private void ResolveSerializedServices()
     {
-        if (hasData)
-        {
-            Debug.Log($"[SaveSlot] Cargando partida guardada...");
-            GameManager.Instance.LoadGame(UNIQUE_SLOT);
-        }
-        else
-        {
-            Debug.Log($"[SaveSlot] Creando nueva partida...");
-            GameManager.Instance.CreateNewGame(UNIQUE_SLOT);
-        }
+        if (saveSlotReader == null)
+            saveSlotReader = saveSlotReaderBehaviour as ISaveSlotReader;
+
+        if (gameSessionLoader == null)
+            gameSessionLoader = gameSessionLoaderBehaviour as IGameSessionLoader;
     }
 }

@@ -115,7 +115,7 @@ public class DeliveryBoxInteractable : MonoBehaviour, IInteractable
     {
         Debug.Log("[DeliveryBox] " + msg);
 
-        GameplayEvents.OnNotification?.Invoke(new NotificationData
+        NotificationEvents.OnNotification?.Invoke(new NotificationData
         {
             message = msg,
             type = type

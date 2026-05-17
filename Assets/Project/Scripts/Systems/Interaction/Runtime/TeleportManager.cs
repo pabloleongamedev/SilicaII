@@ -138,7 +138,7 @@ public class TeleportManager : MonoBehaviour, IInteractable
     {
         Debug.Log("[Teleport] " + msg);
 
-        GameplayEvents.OnNotification?.Invoke(new NotificationData
+        NotificationEvents.OnNotification?.Invoke(new NotificationData
         {
             message = msg,
             type = type

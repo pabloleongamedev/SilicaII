@@ -51,8 +51,16 @@ public class JetpackSystem
             currentFuel = maxFuel;
     }
 
+    public void RestoreFuel(float amount)
+    {
+        currentFuel = maxFuel <= 0f ? 0f : UnityEngine.Mathf.Clamp(amount, 0f, maxFuel);
+    }
+
     public float GetFuelRatio()
     {
+        if (maxFuel <= 0f)
+            return 0f;
+
         return currentFuel / maxFuel;
     }
 

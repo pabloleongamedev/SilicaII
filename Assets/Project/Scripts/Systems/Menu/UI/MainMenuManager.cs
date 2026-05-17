@@ -2,10 +2,10 @@
  * Arquitectura: Menu/UI
  * Script: MainMenuManager
  * Rol: Controlador UI de menu principal y flujo inicial de partida.
- * Modulo: Gestiona pantallas, configuraciones y flujo del menu.
- * Relaciones: Cambia paneles UI, refresca SaveSlot y llama GameManager.Instance para cargar/crear partida; crea GameManager si no existe.
- * Riesgo arquitectonico: UI conoce SaveLoad concreto y crea infraestructura runtime; debe delegar a IMainMenuGameFlow/ISaveSlotService.
- * Uso como referencia: documenta una UI funcional pero acoplada al flujo de aplicacion.
+ * Modulo: Gestiona paneles, seleccion inicial y entrada al flujo de partida.
+ * Relaciones: Usa ISaveSlotReader/IGameSessionLoader asignables por Inspector; SaveSlot muestra el estado del slot.
+ * Riesgo arquitectonico mitigado: no conoce GameManager; requiere asignar servicios por Inspector.
+ * Uso como referencia: la UI delega casos de uso y evita conocer SaveController, disco o GameData.
  */
 using System.Collections;
 using UnityEngine;
@@ -32,11 +32,24 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private float delay = 4f;
     [SerializeField] private int fallbackSceneIndex = 1;
 
+    [Header("SaveLoad Use Cases")]
+    [SerializeField] private MonoBehaviour saveSlotReaderBehaviour;
+    [SerializeField] private MonoBehaviour gameSessionLoaderBehaviour;
+
     private const string UniqueSlot = "1";
+
+    private ISaveSlotReader saveSlotReader;
+    private IGameSessionLoader gameSessionLoader;
+
+    private void Awake()
+    {
+        saveSlotReader = saveSlotReaderBehaviour as ISaveSlotReader;
+        gameSessionLoader = gameSessionLoaderBehaviour as IGameSessionLoader;
+    }
 
     private void Start()
     {
-        EnsureGameManager();
+        ResolveSerializedServices();
         ShowMainMenu();
     }
 
@@ -47,16 +60,16 @@ public class MainMenuManager : MonoBehaviour
 
     public void ShowPlayMenu()
     {
-        EnsureGameManager();
+        ResolveSerializedServices();
 
-        if (playPanel != null)
-        {
-            SwitchPanel(playPanel, playFirstButton);
+        if (playPanel == null)
+            return;
 
-            var saveSlot = playPanel.GetComponentInChildren<SaveSlot>(true);
-            if (saveSlot != null)
-                saveSlot.RefreshSlot();
-        }
+        SwitchPanel(playPanel, playFirstButton);
+
+        var saveSlot = playPanel.GetComponentInChildren<SaveSlot>(true);
+        if (saveSlot != null)
+            saveSlot.RefreshSlot();
     }
 
     public void ShowOptions()
@@ -71,12 +84,18 @@ public class MainMenuManager : MonoBehaviour
 
     public void StartGame()
     {
-        EnsureGameManager();
+        ResolveSerializedServices();
 
-        if (GameManager.Instance.HasSaveFile(UniqueSlot))
-            GameManager.Instance.LoadGame(UniqueSlot);
+        if (saveSlotReader == null || gameSessionLoader == null)
+        {
+            Debug.LogWarning("[MainMenuManager] Faltan ISaveSlotReader/IGameSessionLoader para iniciar partida.", this);
+            return;
+        }
+
+        if (saveSlotReader.HasSaveFile(UniqueSlot))
+            gameSessionLoader.LoadGame(UniqueSlot);
         else
-            GameManager.Instance.CreateNewGame(UniqueSlot);
+            gameSessionLoader.CreateNewGame(UniqueSlot);
     }
 
     public void LoadSceneFromButton()
@@ -119,12 +138,15 @@ public class MainMenuManager : MonoBehaviour
             panel.SetActive(active);
     }
 
-    private void EnsureGameManager()
+    private void ResolveSerializedServices()
     {
-        if (GameManager.Instance != null)
-            return;
+        if (saveSlotReader == null)
+            saveSlotReader = saveSlotReaderBehaviour as ISaveSlotReader;
 
-        var gameManagerObject = new GameObject("GameManager");
-        gameManagerObject.AddComponent<GameManager>();
+        if (gameSessionLoader == null)
+            gameSessionLoader = gameSessionLoaderBehaviour as IGameSessionLoader;
+
+        if (saveSlotReader == null || gameSessionLoader == null)
+            Debug.LogWarning("[MainMenuManager] Asigna ISaveSlotReader e IGameSessionLoader por Inspector para desacoplar Menu de SaveLoad.", this);
     }
 }

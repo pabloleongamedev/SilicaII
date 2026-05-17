@@ -3,7 +3,8 @@
  * Script: NotificationAudioController
  * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
  * Modulo: Gestiona mensajes visuales y sonoros de feedback para el jugador.
- * Relaciones: Escucha GameplayEvents y bloquea temporalmente Interaction UI mientras muestra feedback.
+ * Relaciones: Escucha NotificationEvents.OnNotification para reproducir feedback sonoro desacoplado de UIState/GameState.
+ * Fase 2: Audio de notificacion queda conectado al canal de Notification, no al bus global.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using UnityEngine;
@@ -26,12 +27,12 @@ public class NotificationAudioController : MonoBehaviour
 
     private void OnEnable()
     {
-        GameplayEvents.OnNotification += HandleNotification;
+        NotificationEvents.OnNotification += HandleNotification;
     }
 
     private void OnDisable()
     {
-        GameplayEvents.OnNotification -= HandleNotification;
+        NotificationEvents.OnNotification -= HandleNotification;
     }
 
     private void HandleNotification(NotificationData data)

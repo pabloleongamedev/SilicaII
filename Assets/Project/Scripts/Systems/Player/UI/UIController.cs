@@ -14,12 +14,12 @@ public class UIController : MonoBehaviour
 
     private void OnEnable()
     {
-        GameplayEvents.OnUIStateChanged += HandleState;
+        UIStateEvents.OnUIStateChanged += HandleState;
     }
 
     private void OnDisable()
     {
-        GameplayEvents.OnUIStateChanged -= HandleState;
+        UIStateEvents.OnUIStateChanged -= HandleState;
     }
 
     private void HandleState(UIState state)

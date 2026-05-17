@@ -100,7 +100,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void NotifyAnyInput()
     {
-        GameplayEvents.OnAnyInput?.Invoke();
+        InputActivityEvents.OnAnyInput?.Invoke();
     }
 
     // =========================================================
@@ -110,7 +110,7 @@ public class PlayerInputHandler : MonoBehaviour
     private void ToggleInventory()
     {
         // PlayerStateController es la fuente de verdad para pantallas abiertas.
-        // Los paneles escuchan GameplayEvents.OnUIStateChanged para mostrarse.
+        // Los paneles escuchan UIStateEvents.OnUIStateChanged para mostrarse.
         if (IsBlocked()) return;
 
         var current = stateController.GetState();

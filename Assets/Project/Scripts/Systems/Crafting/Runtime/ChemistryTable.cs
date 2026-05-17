@@ -3,20 +3,15 @@
  * Script: ChemistryTable
  * Rol: Interactable runtime que abre/cierra el estado UI de chemistry.
  * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
- * Relaciones: Implementa IInteractable; usa PlayerStateController para cambiar UIState.Chemistry; actualmente lo encuentra con FindFirstObjectByType.
- * Riesgo arquitectonico: el interactuable depende de un controlador global de Player; debe recibir estado UI por InteractionContext o referencia serializada/binder.
+ * Relaciones: Implementa IInteractable; usa PlayerStateController asignado por Inspector para cambiar UIState.Chemistry.
+ * Riesgo arquitectonico mitigado: elimina busqueda global; la dependencia de estado UI queda visible en escena.
  * Uso como referencia: muestra una interaccion simple, pero evidencia el limite pendiente entre Interaction y Player UI State.
  */
 using UnityEngine;
 
 public class ChemistryTable : MonoBehaviour, IInteractable
 {
-    private PlayerStateController playerState;
-
-    private void Awake()
-    {
-        playerState = FindFirstObjectByType<PlayerStateController>();
-    }
+    [SerializeField] private PlayerStateController playerState;
 
     public void Interact(InteractionContext context)
     {

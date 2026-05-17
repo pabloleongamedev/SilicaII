@@ -36,8 +36,9 @@ public class JetpackAbility : IAbility
     {
         bool isGrounded = movement.IsGrounded();
 
-        // recarga siempre
-        jetpack.Tick(isGrounded, deltaTime);
+        // Core rule: no recargar en el mismo tick en que el jugador esta consumiendo jetpack.
+        // HUDManager lee GetJetpackRatio desde MovementController, por eso el ratio debe reflejar consumo real.
+        jetpack.Tick(isGrounded && !isActive, deltaTime);
 
         if (!isActive)
             return;

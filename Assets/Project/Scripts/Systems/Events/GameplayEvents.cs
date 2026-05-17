@@ -1,11 +1,10 @@
 /*
  * Arquitectura: Events
  * Script: GameplayEvents
- * Rol: Bus global temporal para UI state, notificaciones, estado de juego e input.
- * Modulo: Agrupa eventos transversales que todavia no tienen ownership por sistema.
- * Relaciones: PlayerStateController publica UIState; UI/Crafting/Inventory/Delivery/Teleport publican notificaciones; NotificationManager escucha feedback.
- * Riesgo arquitectonico: mezcla varios dominios en un unico bus estatico; debe separarse en UIStateEvents, NotificationEvents e InputActivityEvents o servicios runtime.
- * Uso como referencia: mantenerlo como compatibilidad mientras se crean canales con responsabilidad explicita.
+ * Rol: Fachada legacy de compatibilidad para codigo o escenas que aun no migraron a eventos por dominio.
+ * Modulo: Delegar nuevos desarrollos a UIStateEvents, NotificationEvents, GameStateEvents e InputActivityEvents.
+ * Relaciones: No debe recibir nuevos consumidores; existe para reducir riesgo mientras se migran referencias viejas.
+ * Fase 2: el bus global queda documentado como deprecated y los canales nuevos tienen ownership explicito.
  */
 using System;
 

@@ -3,13 +3,13 @@
  * Script: MovementController
  * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
  * Modulo: Gestiona movimiento horizontal/vertical del jugador mediante estrategias y configuracion editable.
- * Relaciones: Recibe input desde PlayerInputHandler y expone contexto fisico usado por Jetpack.
+ * Relaciones: Recibe input desde PlayerInputHandler, expone contexto fisico usado por Jetpack e implementa IJetpackFuelReader para HUD/SaveLoad.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class MovementController : MonoBehaviour, IJetpackMovementContext
+public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpackFuelReader
 {
     [SerializeField] private MovementConfig_SO config;
 
@@ -32,6 +32,9 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext
     private bool isSprinting;
     private float groundedTimer;
     private bool inputEnabled = true;
+    private float lastPublishedFuelRatio = -1f;
+
+    public event System.Action<float> OnFuelRatioChanged;
 
     // fuerzas externas (abilities)
     private float externalVerticalForce;
@@ -108,6 +111,7 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext
 
         // ABILITIES
         abilitySystem.Tick(Time.fixedDeltaTime);
+        PublishFuelRatioIfChanged();
 
         // aplicar fuerzas finales
         Vector3 finalVelocity = currentVelocity + externalHorizontalForce;
@@ -186,18 +190,44 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext
 
     public float GetJetpackRatio()
     {
+        return GetFuelRatio();
+    }
+
+    public float GetFuelRatio()
+    {
+        // API segura para UI: los presenters consumen IJetpackFuelReader sin conocer JetpackSystem.
+        if (jetpackSystem == null)
+            return 0f;
+
         return jetpackSystem.GetFuelRatio();
     }
 
     public float GetJetpackFuel()
     {
+        if (jetpackSystem == null)
+            return 0f;
+
         return jetpackSystem.GetCurrentFuel();
     }
 
     public void RechargeJetpack(float amount)
     {
+        if (jetpackSystem == null)
+            return;
+
         jetpackSystem.Recharge(amount);
+        PublishFuelRatioIfChanged(true);
     }
+
+    public void RestoreJetpackFuel(float amount)
+    {
+        if (jetpackSystem == null)
+            return;
+
+        jetpackSystem.RestoreFuel(amount);
+        PublishFuelRatioIfChanged(true);
+    }
+
     public float GetCurrentHeight()
     {
         return transform.position.y;
@@ -206,5 +236,16 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext
     public Vector3 GetForward()
     {
         return transform.forward;
+    }
+
+    private void PublishFuelRatioIfChanged(bool force = false)
+    {
+        float ratio = GetFuelRatio();
+
+        if (!force && Mathf.Approximately(ratio, lastPublishedFuelRatio))
+            return;
+
+        lastPublishedFuelRatio = ratio;
+        OnFuelRatioChanged?.Invoke(ratio);
     }
 }

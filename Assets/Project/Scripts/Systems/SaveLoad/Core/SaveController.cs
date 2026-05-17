@@ -50,8 +50,14 @@ public class SaveController
     /// <summary>
     /// Guarda GameData en un archivo JSON
     /// </summary>
-    public void SaveGame(GameData gameData, string slotID)
+    public bool SaveGame(GameData gameData, string slotID)
     {
+        if (gameData == null)
+        {
+            Debug.LogWarning("[SaveController] No se puede guardar GameData null");
+            return false;
+        }
+
         gameData.slotID = slotID;
         gameData.lastSaveTime = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -65,10 +71,12 @@ public class SaveController
             // Escribir archivo
             File.WriteAllText(filePath, json);
             Debug.Log($"[SaveController] Partida guardada en: {filePath}");
+            return true;
         }
         catch (System.Exception e)
         {
             Debug.LogError($"[SaveController] Error al guardar partida: {e.Message}");
+            return false;
         }
     }
 

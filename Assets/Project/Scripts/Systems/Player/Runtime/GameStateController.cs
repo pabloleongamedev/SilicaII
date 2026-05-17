@@ -31,7 +31,7 @@ public class GameStateController : MonoBehaviour
 
         Debug.Log("GAME STATE CAMBIADO A: " + currentState);
 
-        GameplayEvents.OnGameStateChanged?.Invoke(currentState);
+        GameStateEvents.OnGameStateChanged?.Invoke(currentState);
     }
 
     public bool IsBlocked()

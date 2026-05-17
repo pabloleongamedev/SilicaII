@@ -1,11 +1,12 @@
 /*
  * Arquitectura: SaveLoad/Runtime
  * Script: GameRestorer
- * Rol: Adapter runtime de restauracion. Toma GameData activo y lo aplica a objetos de escena.
- * Modulo: Gestiona restauracion de posicion/rotacion del jugador e inventario guardado.
- * Relaciones: Lee GameManager.Instance y puede restaurar mediante SaveParticipantRegistry + ItemDatabase_SO.
- * Riesgo arquitectonico: conserva fallback legacy con FindFirstObjectByType mientras las escenas se migran a participantes explicitos.
- * Uso como referencia: muestra el puente entre flujo antiguo y SaveParticipants, priorizando dependencias visibles por Inspector.
+ * Rol: Adapter runtime de restauracion. Toma GameData activo y lo entrega a SceneRestoreCoordinator.
+ * Modulo: Coordina restauracion diferida cuando una escena termina de inicializarse.
+ * Relaciones: Consume IGameDataProvider por Inspector; SaveParticipantRegistry es la ruta oficial de restauracion.
+ * Riesgo arquitectonico mitigado: ya no duplica restauracion manual; comparte la misma ruta que GameManager.
+ * Nota: restoreOnStart debe activarse solo en escenas que no sean restauradas por GameManager.OnSceneLoaded.
+ * Uso como referencia: muestra como un MonoBehaviour de escena consume contratos y delega en servicios.
  */
 using System.Collections;
 using UnityEngine;
@@ -13,10 +14,27 @@ using UnityEngine;
 public class GameRestorer : MonoBehaviour
 {
     [Header("Decoupled Restore")]
+    [SerializeField] private bool restoreOnStart = false;
+    [SerializeField] private MonoBehaviour gameDataProviderBehaviour;
     [SerializeField] private SaveParticipantRegistry participantRegistry;
     [SerializeField] private ItemDatabase_SO itemDatabase;
 
+    private IGameDataProvider gameDataProvider;
+    private SceneRestoreCoordinator restoreCoordinator;
+
+    private void Awake()
+    {
+        gameDataProvider = gameDataProviderBehaviour as IGameDataProvider;
+        restoreCoordinator = new SceneRestoreCoordinator(participantRegistry, itemDatabase);
+    }
+
     private void Start()
+    {
+        if (restoreOnStart)
+            StartCoroutine(RestoreDelayed());
+    }
+
+    public void RestoreCurrentGameData()
     {
         StartCoroutine(RestoreDelayed());
     }
@@ -25,41 +43,14 @@ public class GameRestorer : MonoBehaviour
     {
         yield return null;
 
-        var gameData = GameManager.Instance?.GetCurrentGameData();
+        var gameData = gameDataProvider?.GetCurrentGameData();
         if (gameData == null)
-            yield break;
-
-        if (participantRegistry != null)
         {
-            participantRegistry.Restore(gameData, itemDatabase);
+            Debug.LogWarning("[GameRestorer] No existe IGameDataProvider asignado o no hay GameData activo.", this);
             yield break;
         }
 
-        Debug.LogWarning("[GameRestorer] SaveParticipantRegistry no asignado. Usando restauracion legacy temporal.");
-
-        var playerInput = FindFirstObjectByType<PlayerInputHandler>();
-        if (playerInput != null)
-        {
-            playerInput.transform.SetPositionAndRotation(
-                gameData.playerData.GetPosition(),
-                gameData.playerData.GetRotation()
-            );
-        }
-
-        var inventory = FindFirstObjectByType<InventoryController>();
-        if (inventory != null)
-            inventory.ImportSaveData(gameData.inventoryItems, ResolveItem);
-    }
-
-    private ItemData_SO ResolveItem(string itemID)
-    {
-        if (string.IsNullOrEmpty(itemID))
-            return null;
-
-        if (itemDatabase != null && itemDatabase.TryResolveItem(itemID, out var itemData))
-            return itemData;
-
-        Debug.LogWarning($"[GameRestorer] ItemData no encontrado para itemID: {itemID}. Asigna ItemDatabase_SO para evitar Resources.LoadAll.");
-        return null;
+        restoreCoordinator.SetSceneDependencies(participantRegistry, itemDatabase);
+        restoreCoordinator.Restore(gameData);
     }
 }

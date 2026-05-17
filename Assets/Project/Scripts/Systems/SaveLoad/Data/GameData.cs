@@ -30,6 +30,8 @@ public class GameData
 
     [Header("Progreso")]
     public string currentScene = "MainMenu";
+    public float missionTimeRemaining = -1f;
+    public float missionDuration = -1f;
     public List<string> scannedElements = new List<string>();
 
     [Header("Estado del Mundo")]
@@ -48,6 +50,8 @@ public class GameData
             playTimeSeconds = 0,
             playerData = PlayerSaveData.CreateDefault(),
             currentScene = "Pablo_TestMechanics",
+            missionTimeRemaining = -1f,
+            missionDuration = -1f,
             inventoryItems = new List<InventorySaveData>(),
             scannedElements = new List<string>(),
             collectedItems = new List<string>(),

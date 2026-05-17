@@ -3,9 +3,9 @@
  * Script: ItemPickup
  * Rol: Interactable runtime de recoleccion. Convierte una interaccion del mundo en una operacion de Inventory.
  * Modulo: Gestiona deteccion, contexto y ejecucion de interacciones del jugador con objetos del mundo.
- * Relaciones: Recibe InteractionContext con IInventoryReadModel/IInventoryWriteModel; luego fuerza refresco de InteractionDetector mediante FindFirstObjectByType.
- * Riesgo arquitectonico: la operacion de inventario esta desacoplada, pero el refresco del detector usa busqueda global; debe pasar por contexto, evento o detector owner.
- * Uso como referencia: buen ejemplo parcial de IInteractable, con una dependencia de escena aun pendiente.
+ * Relaciones: Recibe InteractionContext con IInventoryReadModel/IInventoryWriteModel y no conoce detector, Player ni UI.
+ * Riesgo arquitectonico mitigado: elimina busqueda global; el detector debe reaccionar por su ciclo normal al destruirse el objeto.
+ * Uso como referencia: IInteractable recibe dependencias por contexto y ejecuta una operacion de dominio pequena.
  */
 using UnityEngine;
 
@@ -25,10 +25,6 @@ public class ItemPickup : MonoBehaviour, IInteractable
         context.InventoryWrite.AddItem(item, amount);
 
         // IMPORTANTE: limpiar interacción ANTES de destruir
-        var detector = FindFirstObjectByType<InteractionDetector>();
-        if (detector != null)
-            detector.ForceRefresh();
-
         Destroy(gameObject);
     }
     public string GetInteractionText()

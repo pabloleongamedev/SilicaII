@@ -3,7 +3,8 @@
  * Script: QuestSystem
  * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
  * Modulo: Gestiona misiones y progreso a partir de eventos de gameplay como recolectar, refinar o craftear.
- * Relaciones: Escucha eventos de Inventory/Crafting y publica estado de mision hacia UI u otros sistemas.
+ * Relaciones: Escucha QuestEvents con itemID y publica estado de mision hacia UI u otros sistemas.
+ * Fase 5: Quest compara por itemID para no depender de la misma instancia ItemData_SO que Inventory/Crafting.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using UnityEngine;
@@ -68,31 +69,32 @@ public class QuestSystem : MonoBehaviour
     }
 
     // =========================================
-    private void HandleCollect(ItemData_SO item, int amount)
+    private void HandleCollect(string itemID, int amount)
     {
         if (!isInitialized) return;
-        UpdateTasks(item, amount, QuestTaskType.Collect);
+        UpdateTasks(itemID, amount, QuestTaskType.Collect);
     }
 
-    private void HandleRefined(ItemData_SO item, int amount)
+    private void HandleRefined(string itemID, int amount)
     {
         if (!isInitialized) return;
-        UpdateTasks(item, amount, QuestTaskType.Refine);
+        UpdateTasks(itemID, amount, QuestTaskType.Refine);
     }
 
-    private void HandleCraft(ItemData_SO item, int amount)
+    private void HandleCraft(string itemID, int amount)
     {
         if (!isInitialized) return;
-        UpdateTasks(item, amount, QuestTaskType.Craft);
+        UpdateTasks(itemID, amount, QuestTaskType.Craft);
     }
 
     // =========================================
-    private void UpdateTasks(ItemData_SO item, int amount, QuestTaskType type)
+    private void UpdateTasks(string itemID, int amount, QuestTaskType type)
     {
-        // Una tarea avanza si coinciden tipo e item objetivo.
+        // Una tarea avanza si coinciden tipo e itemID objetivo.
         // Se emite un snapshot de progreso para mantener UI desacoplada.
         if (currentQuest == null) return;
         if (currentQuest.tasks == null) return;
+        if (string.IsNullOrEmpty(itemID)) return;
 
         for (int i = 0; i < currentQuest.tasks.Count; i++)
         {
@@ -102,7 +104,7 @@ public class QuestSystem : MonoBehaviour
                 continue;
 
             if (task.type != type) continue;
-            if (task.targetItem != item) continue;
+            if (task.targetItem.itemID != itemID) continue;
 
             int required = task.requiredAmount;
             progress[i] = Mathf.Min(progress[i] + amount, required);

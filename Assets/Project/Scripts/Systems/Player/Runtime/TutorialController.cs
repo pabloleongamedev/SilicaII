@@ -19,10 +19,7 @@ public class TutorialController : MonoBehaviour
 
     private void Awake()
     {
-        if (gameStateController == null)
-        {
-            Debug.LogError("GameStateController no asignado en el Inspector.");
-        }
+
     }
 
     private void Start()
@@ -32,9 +29,10 @@ public class TutorialController : MonoBehaviour
 
     private IEnumerator StartTutorial()
     {
-        if (gameStateController == null)
+        if (gameStateController == null){
+            Debug.LogError("GameStateController no asignado en el Inspector.");
             yield break;
-
+        }
         Debug.Log("INICIANDO TUTORIAL");
 
         // 🔥 BLOQUEAR

@@ -1,22 +1,27 @@
 /*
  * Arquitectura: SaveLoad/Runtime
  * Script: GameManager
- * Rol: Facade global temporal de SaveLoad. Orquesta sesion, autosave, carga de escena y persistencia mientras se migra a servicios mas pequenos.
- * Modulo: Gestiona datos de partida, guardado/carga y restauracion de estado runtime.
- * Relaciones: Menu/SaveSlot lo usa por GameManager.Instance; puede capturar estado por SaveParticipantRegistry o usar fallback legacy con FindFirstObjectByType.
- * Riesgo arquitectonico: mezcla singleton, SceneManager, estado de sesion y descubrimiento de objetos; debe dividirse en GameSession, SaveService y SceneLoadService.
- * Uso como referencia: facade de compatibilidad durante la migracion hacia ISaveParticipant.
+ * Rol: Fachada global temporal de SaveLoad. Mantiene compatibilidad con escenas actuales y delega reglas a servicios pequenos.
+ * Modulo: Gestiona la sesion activa y coordina servicios de guardado, carga, slots, autosave y restauracion de escena.
+ * Relaciones: Implementa ISaveCheckpointUseCase, IRestoreCheckpointUseCase, ISaveSlotReader, IGameSessionLoader e IGameDataProvider.
+ * Riesgo arquitectonico mitigado: la logica real vive en SaveService/LoadService/SaveSlotService/SceneRestoreCoordinator/AutosaveController.
+ * Uso como referencia: la UI y los interactables deben consumir interfaces por Inspector; GameManager.Instance queda limitado a debug/compatibilidad legacy.
  */
 using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour,
+    ISaveCheckpointUseCase,
+    IRestoreCheckpointUseCase,
+    ISaveSlotReader,
+    IGameSessionLoader,
+    IGameDataProvider
 {
     public static GameManager Instance { get; private set; }
 
     [Header("Auto Save")]
-    [SerializeField] private float autoSaveInterval = 60f;
+    [SerializeField] private float autoSaveInterval = 3600f;
     [SerializeField] private bool enableAutoSave = true;
 
     [Header("Menu Panels")]
@@ -25,13 +30,21 @@ public class GameManager : MonoBehaviour
 
     [Header("Decoupled Save")]
     [SerializeField] private SaveParticipantRegistry participantRegistry;
+    [SerializeField] private ItemDatabase_SO itemDatabase;
 
     private SaveController saveController;
+    private SaveService saveService;
+    private LoadService loadService;
+    private SaveSlotService saveSlotService;
+    private SceneRestoreCoordinator sceneRestoreCoordinator;
+    private AutosaveController autosaveController;
+
     private GameData currentGameData;
     private string currentSlotID = "1";
-    private float timeSinceLastSave;
     private float sessionStartTime;
     private bool isInGame;
+
+    public string CurrentSlotID => currentSlotID;
 
     private void Awake()
     {
@@ -43,7 +56,8 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        saveController = new SaveController();
+        BuildServices();
+        SaveParticipantRegistry.OnRegistryAvailable += HandleRegistryAvailable;
     }
 
     private void Start()
@@ -57,19 +71,17 @@ public class GameManager : MonoBehaviour
         if (!isInGame || !enableAutoSave || currentGameData == null)
             return;
 
-        timeSinceLastSave += Time.deltaTime;
-
-        if (timeSinceLastSave >= autoSaveInterval)
-        {
+        if (autosaveController != null && autosaveController.Tick(Time.deltaTime))
             AutoSave();
-            timeSinceLastSave = 0f;
-        }
     }
 
     private void OnDestroy()
     {
         if (Instance == this)
+        {
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            SaveParticipantRegistry.OnRegistryAvailable -= HandleRegistryAvailable;
+        }
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -79,11 +91,19 @@ public class GameManager : MonoBehaviour
 
         currentGameData.currentScene = scene.name;
         isInGame = scene.name != "Menu";
+
+        if (isInGame)
+            RestoreRuntimeData();
     }
 
     public void LoadGame(string slotID)
     {
-        GameData loadedData = saveController.LoadGame(slotID);
+        LoadGame(slotID, true);
+    }
+
+    public void LoadGame(string slotID, bool reloadScene)
+    {
+        GameData loadedData = loadService.LoadGame(slotID);
 
         if (loadedData == null)
         {
@@ -94,9 +114,15 @@ public class GameManager : MonoBehaviour
         currentGameData = loadedData;
         currentSlotID = slotID;
         sessionStartTime = Time.time;
-        timeSinceLastSave = 0f;
+        autosaveController.Reset();
 
-        SceneManager.LoadScene(currentGameData.currentScene);
+        if (reloadScene)
+        {
+            SceneManager.LoadScene(currentGameData.currentScene);
+            return;
+        }
+
+        RestoreRuntimeData();
     }
 
     public void CreateNewGame(string slotID)
@@ -104,7 +130,7 @@ public class GameManager : MonoBehaviour
         currentGameData = GameData.CreateNewGame(slotID);
         currentSlotID = slotID;
         sessionStartTime = Time.time;
-        timeSinceLastSave = 0f;
+        autosaveController.Reset();
         isInGame = false;
 
         SceneManager.LoadScene(currentGameData.currentScene);
@@ -112,29 +138,39 @@ public class GameManager : MonoBehaviour
 
     public void SaveGame()
     {
+        TrySaveGame(false);
+    }
+
+    public bool TrySaveGame(bool createIfMissing)
+    {
         if (currentGameData == null)
         {
-            Debug.LogWarning("[GameManager] No hay partida activa para guardar");
-            return;
+            if (!createIfMissing)
+            {
+                Debug.LogWarning("[GameManager] No hay partida activa para guardar");
+                return false;
+            }
+
+            CreateRuntimeGameDataForCurrentScene(currentSlotID);
         }
 
         UpdateRuntimeData();
-        saveController.SaveGame(currentGameData, currentSlotID);
+        return saveService.SaveGame(currentGameData, currentSlotID);
     }
 
     public bool HasSaveFile(string slotID)
     {
-        return saveController.HasSaveFile(slotID);
+        return saveSlotService.HasSaveFile(slotID);
     }
 
     public SaveInfo GetSaveInfo(string slotID)
     {
-        return saveController.GetSaveInfo(slotID);
+        return saveSlotService.GetSaveInfo(slotID);
     }
 
     public SaveInfo[] GetAllSaveInfos()
     {
-        return saveController.GetAllSaveInfos();
+        return saveSlotService.GetAllSaveInfos();
     }
 
     public void RefreshSaveStates()
@@ -150,6 +186,21 @@ public class GameManager : MonoBehaviour
     public string GetCurrentSlotID()
     {
         return currentSlotID;
+    }
+
+    public bool TrySaveCheckpoint(bool createIfMissing)
+    {
+        return TrySaveGame(createIfMissing);
+    }
+
+    public bool HasCheckpoint(string slotID)
+    {
+        return HasSaveFile(slotID);
+    }
+
+    public void RestoreCheckpoint(string slotID, bool reloadScene)
+    {
+        LoadGame(slotID, reloadScene);
     }
 
     public void UpdatePlayerPosition(Vector3 position)
@@ -217,7 +268,40 @@ public class GameManager : MonoBehaviour
     private void AutoSave()
     {
         UpdateRuntimeData();
-        saveController.SaveGame(currentGameData, currentSlotID);
+        saveService.SaveGame(currentGameData, currentSlotID);
+    }
+
+    private void BuildServices()
+    {
+        saveController = new SaveController();
+        saveService = new SaveService(saveController);
+        loadService = new LoadService(saveController);
+        saveSlotService = new SaveSlotService(saveController);
+        sceneRestoreCoordinator = new SceneRestoreCoordinator(participantRegistry, itemDatabase);
+        autosaveController = new AutosaveController(autoSaveInterval);
+    }
+
+    private void CreateRuntimeGameDataForCurrentScene(string slotID)
+    {
+        var scene = SceneManager.GetActiveScene();
+
+        currentSlotID = string.IsNullOrEmpty(slotID) ? "1" : slotID;
+        currentGameData = GameData.CreateNewGame(currentSlotID);
+        currentGameData.currentScene = scene.name;
+        sessionStartTime = Time.time;
+        autosaveController.Reset();
+        isInGame = scene.name != "Menu";
+
+        Debug.Log($"[GameManager] Partida runtime creada para guardar escena actual: {scene.name}");
+    }
+
+    private void RestoreRuntimeData()
+    {
+        if (currentGameData == null)
+            return;
+
+        SyncSceneCoordinator();
+        sceneRestoreCoordinator.Restore(currentGameData);
     }
 
     private void UpdateRuntimeData()
@@ -230,21 +314,26 @@ public class GameManager : MonoBehaviour
         currentGameData.UpdatePlayTime(Mathf.RoundToInt(Time.time - sessionStartTime));
         sessionStartTime = Time.time;
 
-        if (participantRegistry != null)
-        {
-            participantRegistry.Capture(currentGameData);
+        SyncSceneCoordinator();
+        sceneRestoreCoordinator.Capture(currentGameData);
+    }
+
+    private void SyncSceneCoordinator()
+    {
+        // Ruta oficial: SaveParticipantRegistry se asigna por Inspector o se anuncia al cargar la escena.
+        sceneRestoreCoordinator.SetSceneDependencies(participantRegistry, itemDatabase);
+    }
+
+    private void HandleRegistryAvailable(SaveParticipantRegistry registry)
+    {
+        if (registry == null)
             return;
-        }
 
-        var playerInput = FindFirstObjectByType<PlayerInputHandler>();
-        if (playerInput != null)
-        {
-            currentGameData.playerData.SetPosition(playerInput.transform.position);
-            currentGameData.playerData.SetRotation(playerInput.transform.rotation);
-        }
+        participantRegistry = registry;
 
-        var inventory = FindFirstObjectByType<InventoryController>();
-        if (inventory != null)
-            currentGameData.inventoryItems = inventory.ExportSaveData();
+        if (registry.ItemDatabase != null)
+            itemDatabase = registry.ItemDatabase;
+
+        sceneRestoreCoordinator.SetSceneDependencies(participantRegistry, itemDatabase);
     }
 }

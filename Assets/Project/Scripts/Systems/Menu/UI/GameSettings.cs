@@ -1,14 +1,14 @@
 /*
  * Arquitectura: Menu/UI
  * Script: GameSettings
- * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
+ * Rol: Servicio de configuracion persistente basado en PlayerPrefs.
  * Modulo: Gestiona pantallas, configuraciones y flujo del menu.
- * Relaciones: Se conecta con SaveLoad/GameManager para iniciar, cargar y configurar partida.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Implementa IGameSettingsReader/IGameSettingsWriter para que UI/audio puedan migrar fuera de GameSettings.Instance.
+ * Uso como referencia: el singleton queda como acceso legacy; los consumidores nuevos deben depender de interfaces.
  */
 using UnityEngine;
 
-public class GameSettings
+public class GameSettings : IGameSettingsReader, IGameSettingsWriter
 {
     private static GameSettings instance;
 

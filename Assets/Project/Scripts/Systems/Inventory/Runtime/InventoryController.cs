@@ -122,13 +122,13 @@ public class InventoryController : MonoBehaviour
 
     private void HandleItemAdded(ItemData_SO item, int amount)
     {
-        // Evento propio de Inventory: GameplayEventRouter decide si esto avanza Quest.
-        InventoryEvents.OnItemAdded?.Invoke(item, amount);
+        // Evento propio de Inventory: publica ItemData_SO legacy y itemID runtime para sistemas desacoplados.
+        InventoryEvents.PublishItemAdded(item, amount);
     }
 
     private void HandleItemRemoved(ItemData_SO item, int amount)
     {
-        InventoryEvents.OnItemRemoved?.Invoke(item, amount);
+        InventoryEvents.PublishItemRemoved(item, amount);
     }
 
     private NotificationType ToNotificationType(InventoryFeedbackType type)
