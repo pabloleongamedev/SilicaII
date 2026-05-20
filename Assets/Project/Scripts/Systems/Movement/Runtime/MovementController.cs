@@ -15,9 +15,13 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
 
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius = 0.25f;
 
     [Header("Rigidbody Presentation")]
     [SerializeField] private bool useRigidbodyInterpolation = true;
+
+    [Header("Movement Events")]
+    [SerializeField] private float minLandingHeightDelta = 0.2f;
 
     private Rigidbody rb;
 
@@ -34,11 +38,22 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
     private bool isGrounded;
     private bool isJumpDown;
     private bool isSprinting;
+    private bool isJetpackActive;
     private float groundedTimer;
+    private float lastGroundedCheckHeight;
+    private float maxAirborneCheckHeight;
     private bool inputEnabled = true;
     private float lastPublishedFuelRatio = -1f;
+    private string currentGroundTag = "Ground";
+    private bool hasGroundStateInitialized;
+    private readonly Collider[] groundHits = new Collider[8];
 
     public event System.Action<float> OnFuelRatioChanged;
+    public event System.Action<Vector2> OnMoveInputChanged;
+    public event System.Action<bool> OnSprintChanged;
+    public event System.Action<string> OnLanded;
+    public event System.Action<bool> OnJetpackActiveChanged;
+    public event System.Action<bool, string> OnGroundStateChanged;
 
     // fuerzas externas (abilities)
     private float externalVerticalForce;
@@ -64,7 +79,7 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
 
         movementSystem.SetStrategy(walkStrategy);
 
-        rb.freezeRotation = true;
+        ConfigureRigidbodyConstraints();
     }
 
     private void ConfigureRigidbodyPresentation()
@@ -75,14 +90,29 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
             rb.interpolation = RigidbodyInterpolation.Interpolate;
     }
 
+    private void ConfigureRigidbodyConstraints()
+    {
+        // La camara controla el yaw visual del Player en Update. La fisica no debe
+        // corregir rotacion, porque eso genera micro saltos entre Update y FixedUpdate.
+        rb.freezeRotation = true;
+    }
+
     public void SetMoveInput(Vector2 input)
     {
+        if (moveInput == input)
+            return;
+
         moveInput = input;
+        OnMoveInputChanged?.Invoke(moveInput);
     }
 
     public void SetSprint(bool isSprinting)
     {
+        if (this.isSprinting == isSprinting)
+            return;
+
         this.isSprinting = isSprinting;
+        OnSprintChanged?.Invoke(this.isSprinting);
 
         if (isGrounded)
             movementSystem.SetStrategy(isSprinting ? runStrategy : walkStrategy);
@@ -94,7 +124,12 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
     }
     public void SetJetpack(bool isActive)
     {
+        if (isJetpackActive == isActive)
+            return;
+
+        isJetpackActive = isActive;
         jetpackAbility.SetActive(isActive);
+        OnJetpackActiveChanged?.Invoke(isJetpackActive);
     }
 
     public void SetInputEnabled(bool value)
@@ -147,22 +182,89 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
 
     private void CheckGround()
     {
-        float rayDistance = config.groundCheckDistance;
+        Vector3 checkPosition = groundCheck != null ? groundCheck.position : transform.position;
+        int hitCount = Physics.OverlapSphereNonAlloc(
+            checkPosition,
+            groundCheckRadius,
+            groundHits,
+            Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Ignore);
 
-        if (Physics.Raycast(groundCheck.position, Vector3.down, out RaycastHit hit, rayDistance))
+        for (int i = 0; i < hitCount; i++)
         {
-            float angle = Vector3.Angle(hit.normal, Vector3.up);
+            Collider hit = groundHits[i];
 
-            if (angle <= config.maxGroundAngle)
-            {
-                isGrounded = true;
-                groundedTimer = config.groundedGraceTime;
-                return;
-            }
+            if (hit == null || hit.attachedRigidbody == rb || hit.transform.IsChildOf(transform))
+                continue;
+
+            groundedTimer = config.groundedGraceTime;
+            UpdateGroundState(true, hit.tag);
+            return;
         }
 
         groundedTimer -= Time.fixedDeltaTime;
-        isGrounded = groundedTimer > 0f;
+        bool hasGroundGrace = groundedTimer > 0f;
+        UpdateGroundState(hasGroundGrace, hasGroundGrace ? currentGroundTag : "Ground");
+    }
+
+    private void UpdateGroundState(bool grounded, string groundTag)
+    {
+        float currentGroundCheckHeight = GetGroundCheckHeight();
+
+        if (!hasGroundStateInitialized)
+        {
+            hasGroundStateInitialized = true;
+            isGrounded = grounded;
+            currentGroundTag = groundTag;
+            lastGroundedCheckHeight = currentGroundCheckHeight;
+            maxAirborneCheckHeight = currentGroundCheckHeight;
+            OnGroundStateChanged?.Invoke(isGrounded, currentGroundTag);
+            return;
+        }
+
+        if (isGrounded == grounded && currentGroundTag == groundTag)
+        {
+            if (!isGrounded)
+                maxAirborneCheckHeight = Mathf.Max(maxAirborneCheckHeight, currentGroundCheckHeight);
+
+            return;
+        }
+
+        bool wasGrounded = isGrounded;
+
+        if (wasGrounded && !grounded)
+        {
+            lastGroundedCheckHeight = currentGroundCheckHeight;
+            maxAirborneCheckHeight = currentGroundCheckHeight;
+        }
+
+        if (!wasGrounded && !grounded)
+        {
+            maxAirborneCheckHeight = Mathf.Max(maxAirborneCheckHeight, currentGroundCheckHeight);
+        }
+
+        isGrounded = grounded;
+        currentGroundTag = groundTag;
+        OnGroundStateChanged?.Invoke(isGrounded, currentGroundTag);
+
+        if (!wasGrounded && isGrounded && HasMeaningfulAirborneHeight())
+            OnLanded?.Invoke(currentGroundTag);
+
+        if (isGrounded)
+        {
+            lastGroundedCheckHeight = currentGroundCheckHeight;
+            maxAirborneCheckHeight = currentGroundCheckHeight;
+        }
+    }
+
+    private bool HasMeaningfulAirborneHeight()
+    {
+        return maxAirborneCheckHeight - lastGroundedCheckHeight >= minLandingHeightDelta;
+    }
+
+    private float GetGroundCheckHeight()
+    {
+        return groundCheck != null ? groundCheck.position.y : transform.position.y;
     }
     public float GetMaxJetpackHeight()
     {
@@ -189,6 +291,21 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
     public bool IsSprinting()
     {
         return isSprinting;
+    }
+
+    public Vector2 GetMoveInput()
+    {
+        return moveInput;
+    }
+
+    public bool IsJetpackActive()
+    {
+        return isJetpackActive;
+    }
+
+    public string GetGroundTag()
+    {
+        return currentGroundTag;
     }
 
     public float GetJetpackBoost()

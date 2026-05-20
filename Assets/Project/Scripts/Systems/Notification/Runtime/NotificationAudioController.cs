@@ -1,32 +1,23 @@
 /*
  * Arquitectura: Notification/Runtime
  * Script: NotificationAudioController
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
+ * Rol: Adaptador de audio de notificaciones.
  * Modulo: Gestiona mensajes visuales y sonoros de feedback para el jugador.
- * Relaciones: Escucha NotificationEvents.OnNotification para reproducir feedback sonoro desacoplado de UIState/GameState.
- * Fase 2: Audio de notificacion queda conectado al canal de Notification, no al bus global.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Relaciones: Escucha NotificationEvents.OnNotification y solicita AudioCueKey al IAudioService central.
+ * Uso como referencia: no guarda clips propios; AudioCueLibrary_SO centraliza las referencias.
  */
 using UnityEngine;
 
 public class NotificationAudioController : MonoBehaviour
 {
-    [Header("Audio")]
-    [SerializeField] private AudioSource audioSource;
+    [Header("Audio Service")]
+    [SerializeField] private MonoBehaviour audioServiceBehaviour;
 
-    [SerializeField] private AudioClip successClip;
-    [SerializeField] private AudioClip errorClip;
-    [SerializeField] private AudioClip warningClip;
-    [SerializeField] private AudioClip infoClip;
-
-    private void Awake()
-    {
-        if (audioSource == null)
-            audioSource = GetComponent<AudioSource>();
-    }
+    private IAudioService audioService;
 
     private void OnEnable()
     {
+        ResolveAudioService();
         NotificationEvents.OnNotification += HandleNotification;
     }
 
@@ -37,24 +28,29 @@ public class NotificationAudioController : MonoBehaviour
 
     private void HandleNotification(NotificationData data)
     {
-        if (audioSource == null) return;
-
-        AudioClip clip = GetClip(data.type);
-
-        if (clip == null) return;
-
-        audioSource.PlayOneShot(clip);
+        audioService?.Play(GetCueKey(data.type));
     }
 
-    private AudioClip GetClip(NotificationType type)
+    private AudioCueKey GetCueKey(NotificationType type)
     {
         switch (type)
         {
-            case NotificationType.Success: return successClip;
-            case NotificationType.Error: return errorClip;
-            case NotificationType.Warning: return warningClip;
-            case NotificationType.Info: return infoClip;
-            default: return null;
+            case NotificationType.Success: return AudioCueKey.NotificationSuccess;
+            case NotificationType.Error: return AudioCueKey.NotificationError;
+            case NotificationType.Warning: return AudioCueKey.NotificationWarning;
+            case NotificationType.Info: return AudioCueKey.NotificationInfo;
+            default: return AudioCueKey.NotificationInfo;
         }
+    }
+
+    private void ResolveAudioService()
+    {
+        if (audioServiceBehaviour == null)
+            audioServiceBehaviour = GetComponentInParent<AudioService>();
+
+        audioService = audioServiceBehaviour as IAudioService;
+
+        if (audioService == null && audioServiceBehaviour != null)
+            Debug.LogWarning("[NotificationAudioController] El Audio Service asignado no implementa IAudioService.", this);
     }
 }

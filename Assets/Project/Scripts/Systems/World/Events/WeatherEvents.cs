@@ -9,4 +9,17 @@ using System;
 public static class WeatherEvents
 {
     public static Action<bool> OnRainStateChanged;
+
+    private static WeatherStateEventChannel_SO channel;
+
+    public static void ConfigureChannel(WeatherStateEventChannel_SO eventChannel)
+    {
+        channel = eventChannel;
+    }
+
+    public static void PublishRainState(bool isRaining)
+    {
+        OnRainStateChanged?.Invoke(isRaining);
+        channel?.Raise(isRaining);
+    }
 }

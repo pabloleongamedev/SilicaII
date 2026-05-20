@@ -1,134 +1,44 @@
 /*
  * Arquitectura: Audio/Runtime
  * Script: UIAudioManager
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
- * Modulo: Gestiona reproduccion de audio general, UI y sonidos del jugador.
- * Relaciones: Puede leer IGameSettingsReader por Inspector para aplicar volumen inicial sin depender de GameSettings.Instance.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Rol: Adaptador de audio UI por escena (sin singleton global).
+ * Modulo: Reproduce sonidos UI mediante IAudioService.
+ * Relaciones: Consume IAudioService; las referencias AudioCue_SO viven en AudioCueLibrary_SO.
+ * Uso como referencia: UI audio queda en la escena activa y evita dependencia a Instance/DontDestroyOnLoad.
  */
 using UnityEngine;
-using UnityEngine.Audio;
 
 public class UIAudioManager : MonoBehaviour
 {
-    public static UIAudioManager Instance { get; private set; }
+    [Header("Audio Service")]
+    [SerializeField] private MonoBehaviour audioServiceBehaviour;
 
-    [Header("Referencia al AudioSource (SFX/UI)")]
-    [SerializeField] private AudioSource uiAudioSource;
+    private IAudioService audioService;
 
-    [Header("Clips de UI")]
-    [SerializeField] private AudioClip hoverClip;
-    [SerializeField] private AudioClip clickClip;
-    [SerializeField] private AudioClip applyClip;
-    [SerializeField] private AudioClip resetClip;
-    [SerializeField] private AudioClip sliderTickClip;
-    [SerializeField] private AudioClip sliderLimitClip;
-    [SerializeField] private AudioClip errorClip;
-
-    [SerializeField] private AudioMixerGroup sfxMixerGroup; // asignar en el Inspector
-    [SerializeField] private bool applyVolumeFromSettings = true; // si quieres que el AudioSource también ajuste su .volume
-    [SerializeField] private MonoBehaviour settingsReaderBehaviour;
-
-    private IGameSettingsReader settingsReader;
-    
-    private void Start()
-{
-    ResolveSettingsReader();
-
-    // Si no hay AudioSource, intentar obtenerlo (ya lo haces en Awake)
-    if (uiAudioSource == null)
-        uiAudioSource = GetComponent<AudioSource>();
-
-    // Asignar el AudioMixerGroup si se proporcionó
-    if (sfxMixerGroup != null && uiAudioSource != null)
-        uiAudioSource.outputAudioMixerGroup = sfxMixerGroup;
-
-    // Aplicar volumen inicial opcionalmente (efecto combinado Master * Effects)
-    if (applyVolumeFromSettings && uiAudioSource != null && settingsReader != null)
-    {
-        float master = settingsReader.MasterVolume; // 0.1 - 1
-        float sfx   = settingsReader.EffectsVolume; // 0 - 1
-        uiAudioSource.volume = Mathf.Clamp01(master * sfx);
-    }
-
-    Debug.Log("[UIAudioManager] Initialized. OutputGroup assigned: " + (sfxMixerGroup != null));
-}
-    
     private void Awake()
     {
-        // Singleton básico para que solo exista un UIAudioManager
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        // Si no se asignó desde el Inspector, intenta encontrar el AudioSource en el mismo GameObject
-        if (uiAudioSource == null)
-            uiAudioSource = GetComponent<AudioSource>();
+        ResolveAudioService();
     }
 
-    // ===== Métodos públicos para enlazar desde botones y sliders =====
+    public void PlayHover() => PlayUI(AudioCueKey.UIHover);
+    public void PlayClick() => PlayUI(AudioCueKey.UIClick);
+    public void PlayApply() => PlayUI(AudioCueKey.UIApply);
+    public void PlayReset() => PlayUI(AudioCueKey.UIReset);
+    public void PlaySliderTick() => PlayUI(AudioCueKey.UISliderTick);
+    public void PlaySliderLimit() => PlayUI(AudioCueKey.UISliderLimit);
+    public void PlayError() => PlayUI(AudioCueKey.UIError);
 
-    public void PlayHover()
+    private void PlayUI(AudioCueKey key) => audioService?.Play(key);
+
+    private void ResolveAudioService()
     {
-        PlayOneShot(hoverClip);
+        if (audioServiceBehaviour == null)
+            audioServiceBehaviour = GetComponentInParent<AudioService>();
+
+        audioService = audioServiceBehaviour as IAudioService;
+
+        if (audioService == null && audioServiceBehaviour != null)
+            Debug.LogWarning("[UIAudioManager] El Audio Service asignado no implementa IAudioService.", this);
     }
 
-    public void PlayClick()
-    {
-        PlayOneShot(clickClip);
-    }
-
-    public void PlayApply()
-    {
-        PlayOneShot(applyClip != null ? applyClip : clickClip);
-    }
-
-    public void PlayReset()
-    {
-        PlayOneShot(resetClip != null ? resetClip : clickClip);
-    }
-
-    public void PlaySliderTick()
-    {
-        PlayOneShot(sliderTickClip);
-    }
-
-    public void PlaySliderLimit()
-    {
-        PlayOneShot(sliderLimitClip != null ? sliderLimitClip : sliderTickClip);
-    }
-
-    public void PlayError()
-    {
-        PlayOneShot(errorClip);
-    }
-
-    // ===== Implementación interna =====
-
-    private void PlayOneShot(AudioClip clip)
-    {
-        if (uiAudioSource == null || clip == null)
-            return;
-
-        uiAudioSource.PlayOneShot(clip);
-    }
-
-    private void ResolveSettingsReader()
-    {
-        if (settingsReaderBehaviour == null)
-            settingsReaderBehaviour = GetComponentInParent<GameSettingsService>();
-
-        if (settingsReaderBehaviour == null)
-            settingsReaderBehaviour = gameObject.AddComponent<GameSettingsService>();
-
-        settingsReader = settingsReaderBehaviour as IGameSettingsReader;
-
-        if (applyVolumeFromSettings && settingsReader == null)
-            Debug.LogWarning("[UIAudioManager] Asigna GameSettingsService para aplicar volumen inicial de UI.", this);
-    }
 }

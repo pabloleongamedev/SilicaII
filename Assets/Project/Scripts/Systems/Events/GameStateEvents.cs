@@ -10,4 +10,17 @@ using System;
 public static class GameStateEvents
 {
     public static Action<GameState> OnGameStateChanged;
+
+    private static GameStateEventChannel_SO channel;
+
+    public static void ConfigureChannel(GameStateEventChannel_SO eventChannel)
+    {
+        channel = eventChannel;
+    }
+
+    public static void Publish(GameState state)
+    {
+        OnGameStateChanged?.Invoke(state);
+        channel?.Raise(state);
+    }
 }

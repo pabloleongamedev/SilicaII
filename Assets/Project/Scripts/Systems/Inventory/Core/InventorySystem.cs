@@ -97,14 +97,14 @@ public class InventorySystem : IInventoryWriteModel
         if (canAdd <= 0)
         {
             if (mode == InventoryNotificationMode.Normal)
-                Notify($"Inventario lleno para {item.itemID}", InventoryFeedbackType.Warning);
+                Notify($"Inventario lleno para {GetItemDisplayWithId(item)}", InventoryFeedbackType.Warning);
             return 0;
         }
 
         if (canAdd < amount)
         {
             if (mode == InventoryNotificationMode.Normal)
-                Notify($"No hay espacio suficiente para {item.itemID}", InventoryFeedbackType.Warning);
+                Notify($"No hay espacio suficiente para {GetItemDisplayWithId(item)}", InventoryFeedbackType.Warning);
             return 0;
         }
 
@@ -112,12 +112,23 @@ public class InventorySystem : IInventoryWriteModel
 
         if (added > 0 && mode == InventoryNotificationMode.Normal)
         {
-            Notify($"Has obtenido {item.itemID} x{added}", InventoryFeedbackType.Success);
+            Notify($"Has obtenido {GetItemDisplayWithId(item)} x{added}", InventoryFeedbackType.Success);
             OnItemAdded?.Invoke(item, added);
         }
 
         //  NOTIFICACIÓN A QUEST SYSTEM (CORRECTO)
         return added;
+    }
+
+    private string GetItemDisplayWithId(ItemData_SO item)
+    {
+        if (item == null)
+            return "objeto";
+
+        string displayName = !string.IsNullOrEmpty(item.displayName) ? item.displayName : item.name;
+        string itemId = string.IsNullOrEmpty(item.itemID) ? item.name : item.itemID;
+
+        return $"{displayName}: {itemId}";
     }
 
     // =========================================================

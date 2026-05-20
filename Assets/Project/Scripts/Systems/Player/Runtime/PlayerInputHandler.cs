@@ -12,15 +12,17 @@ using UnityEngine.InputSystem;
 public class PlayerInputHandler : MonoBehaviour
 {
     [Header("References")]
+    [SerializeField] private PlayerStateController stateControllerBehaviour;
     private PlayerStateController stateController;
     private MovementController movementController;
-    private MouseLook mouseLook;
+    private PlayerCameraRig cameraRig;
     private InventoryController inventoryController;
     private InteractionDetector interactionDetector;
 
     private InputSystem_Actions inputActions;
     private InteractionContext interactionContext;
     private GameStateController gameStateController;
+    private bool inputCallbacksBound;
 
 
     private void Awake()
@@ -28,13 +30,27 @@ public class PlayerInputHandler : MonoBehaviour
         // Runtime bridge del jugador: localiza los controladores que reciben input.
         // Este script no contiene reglas de Inventory/Crafting/Quest; solo traduce
         // acciones del Input System a llamadas sobre facades y controladores.
-        inventoryController = GetComponent<InventoryController>();
-        stateController = GetComponent<PlayerStateController>();
-        movementController = GetComponent<MovementController>();
-        interactionDetector = GetComponent<InteractionDetector>();
-        mouseLook = GetComponentInChildren<MouseLook>();
-        gameStateController = GetComponent<GameStateController>();  
+        ResolveReferences();
+        CreateInputActionsIfNeeded();
+    }
+
+    private void ResolveReferences()
+    {
+        inventoryController = GetComponentInParent<InventoryController>();
+        stateController = stateControllerBehaviour != null ? stateControllerBehaviour : GetComponentInParent<PlayerStateController>();
+        movementController = GetComponentInParent<MovementController>();
+        interactionDetector = GetComponentInParent<InteractionDetector>();
+        cameraRig = GetComponentInParent<PlayerCameraRig>();
+        gameStateController = GetComponentInParent<GameStateController>();
+    }
+
+    private void CreateInputActionsIfNeeded()
+    {
+        if (inputActions != null)
+            return;
+
         inputActions = new InputSystem_Actions();
+        BindInputCallbacks();
     }
 
     private void Start()
@@ -52,46 +68,19 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void OnEnable()
     {
+        CreateInputActionsIfNeeded();
+
         inputActions.Enable();
-
-        inputActions.Player.Move.performed += OnMove;
-        inputActions.Player.Move.canceled += OnMove;
-
-        inputActions.Player.Look.performed += OnLook;
-        inputActions.Player.Look.canceled += OnLook;
-
-        inputActions.Player.Sprint.performed += OnSprint;
-        inputActions.Player.Sprint.canceled += OnSprint;
-
-        inputActions.Player.Jump.started += ctx =>
-        {
-            movementController.OnJumpStarted();
-            NotifyAnyInput();
-        };
-
-        inputActions.Player.Jetpack.performed += ctx =>
-        {
-            movementController.SetJetpack(true);
-            NotifyAnyInput();
-        };
-
-        inputActions.Player.Jetpack.canceled += ctx =>
-        {
-            movementController.SetJetpack(false);
-        };
-
-        inputActions.Player.Inventory.performed += ctx =>
-        {
-            ToggleInventory();
-            NotifyAnyInput();
-        };
-
-        inputActions.Player.Interact.performed += OnInteract;
     }
 
     private void OnDisable()
     {
         inputActions.Disable();
+    }
+
+    private void OnDestroy()
+    {
+        UnbindInputCallbacks();
     }
 
     // =========================================================
@@ -112,6 +101,12 @@ public class PlayerInputHandler : MonoBehaviour
         // PlayerStateController es la fuente de verdad para pantallas abiertas.
         // Los paneles escuchan UIStateEvents.OnUIStateChanged para mostrarse.
         if (IsBlocked()) return;
+
+        if (stateController == null)
+        {
+            Debug.LogWarning("[PlayerInputHandler] No hay PlayerStateController asignado para ToggleInventory.", this);
+            return;
+        }
 
         var current = stateController.GetState();
 
@@ -137,12 +132,24 @@ public class PlayerInputHandler : MonoBehaviour
 
         NotifyAnyInput();
 
+        if (interactionDetector == null)
+        {
+            Debug.LogWarning("[PlayerInputHandler] InteractionDetector no esta asignado o no existe en el arbol del Player.", this);
+            return;
+        }
+
         var interactable = interactionDetector.CurrentInteractable;
 
         if (interactable == null) return;
 
-        if (!stateController.CanInteract(interactable))
+        if (stateController != null && !stateController.CanInteract(interactable))
             return;
+
+        if (interactionContext == null)
+        {
+            Debug.LogWarning("[PlayerInputHandler] InteractionContext no esta inicializado; revisa InventoryController en el Player.", this);
+            return;
+        }
 
         interactable.Interact(interactionContext);
     }
@@ -152,6 +159,12 @@ public class PlayerInputHandler : MonoBehaviour
         if (IsBlocked()) return;
 
         var value = ctx.ReadValue<Vector2>();
+
+        if (movementController == null)
+        {
+            Debug.LogWarning("[PlayerInputHandler] MovementController no esta asignado o no existe en el arbol del Player.", this);
+            return;
+        }
 
         movementController.SetMoveInput(value);
 
@@ -168,6 +181,12 @@ public class PlayerInputHandler : MonoBehaviour
 
         bool pressed = ctx.ReadValueAsButton();
 
+        if (movementController == null)
+        {
+            Debug.LogWarning("[PlayerInputHandler] MovementController no esta asignado para Sprint.", this);
+            return;
+        }
+
         movementController.SetSprint(pressed);
 
         if (pressed)
@@ -179,9 +198,91 @@ public class PlayerInputHandler : MonoBehaviour
         if (IsBlocked()) return;
         var value = ctx.ReadValue<Vector2>();
 
-        mouseLook.SetLookInput(value);
+        if (cameraRig == null)
+        {
+            Debug.LogWarning("[PlayerInputHandler] PlayerCameraRig no esta asignado para Look.", this);
+            return;
+        }
+
+        cameraRig.SetLookInput(value);
 
         if (value != Vector2.zero)
             NotifyAnyInput();
+    }
+
+    private void OnJumpStarted(InputAction.CallbackContext ctx)
+    {
+        if (movementController == null)
+        {
+            Debug.LogWarning("[PlayerInputHandler] MovementController no esta asignado para Jump.", this);
+            return;
+        }
+
+        movementController.OnJumpStarted();
+        NotifyAnyInput();
+    }
+
+    private void OnJetpackPerformed(InputAction.CallbackContext ctx)
+    {
+        if (movementController == null)
+        {
+            Debug.LogWarning("[PlayerInputHandler] MovementController no esta asignado para Jetpack.", this);
+            return;
+        }
+
+        movementController.SetJetpack(true);
+        NotifyAnyInput();
+    }
+
+    private void OnJetpackCanceled(InputAction.CallbackContext ctx)
+    {
+        if (movementController == null)
+            return;
+
+        movementController.SetJetpack(false);
+    }
+
+    private void OnInventoryPerformed(InputAction.CallbackContext ctx)
+    {
+        ToggleInventory();
+        NotifyAnyInput();
+    }
+
+    private void BindInputCallbacks()
+    {
+        if (inputCallbacksBound || inputActions == null)
+            return;
+
+        inputActions.Player.Move.performed += OnMove;
+        inputActions.Player.Move.canceled += OnMove;
+        inputActions.Player.Look.performed += OnLook;
+        inputActions.Player.Look.canceled += OnLook;
+        inputActions.Player.Sprint.performed += OnSprint;
+        inputActions.Player.Sprint.canceled += OnSprint;
+        inputActions.Player.Jump.started += OnJumpStarted;
+        inputActions.Player.Jetpack.performed += OnJetpackPerformed;
+        inputActions.Player.Jetpack.canceled += OnJetpackCanceled;
+        inputActions.Player.Inventory.performed += OnInventoryPerformed;
+        inputActions.Player.Interact.performed += OnInteract;
+        inputCallbacksBound = true;
+    }
+
+    private void UnbindInputCallbacks()
+    {
+        if (!inputCallbacksBound)
+            return;
+
+        inputActions.Player.Move.performed -= OnMove;
+        inputActions.Player.Move.canceled -= OnMove;
+        inputActions.Player.Look.performed -= OnLook;
+        inputActions.Player.Look.canceled -= OnLook;
+        inputActions.Player.Sprint.performed -= OnSprint;
+        inputActions.Player.Sprint.canceled -= OnSprint;
+        inputActions.Player.Jump.started -= OnJumpStarted;
+        inputActions.Player.Jetpack.performed -= OnJetpackPerformed;
+        inputActions.Player.Jetpack.canceled -= OnJetpackCanceled;
+        inputActions.Player.Inventory.performed -= OnInventoryPerformed;
+        inputActions.Player.Interact.performed -= OnInteract;
+        inputCallbacksBound = false;
     }
 }

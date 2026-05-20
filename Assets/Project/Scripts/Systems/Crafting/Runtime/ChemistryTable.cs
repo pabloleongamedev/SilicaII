@@ -9,7 +9,7 @@
  */
 using UnityEngine;
 
-public class ChemistryTable : MonoBehaviour, IInteractable
+public class ChemistryTable : MonoBehaviour, IInteractable, IUIStateInteractable
 {
     [SerializeField] private PlayerStateController playerState;
 
@@ -39,5 +39,10 @@ public class ChemistryTable : MonoBehaviour, IInteractable
         return playerState.GetState() == UIState.Chemistry
             ? null
             : "Presiona E para usar reactor de ruptura";
+    }
+
+    public bool CanInteractInState(UIState currentState)
+    {
+        return currentState == UIState.None || currentState == UIState.Chemistry;
     }
 }

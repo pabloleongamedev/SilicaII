@@ -11,4 +11,27 @@ public static class NotificationEvents
 {
     public static Action<NotificationData> OnNotification;
     public static Action<bool> OnNotificationStateChanged;
+
+    private static NotificationEventChannel_SO notificationChannel;
+    private static NotificationStateEventChannel_SO notificationStateChannel;
+
+    public static void ConfigureChannels(
+        NotificationEventChannel_SO notificationEventChannel,
+        NotificationStateEventChannel_SO notificationVisibilityChannel)
+    {
+        notificationChannel = notificationEventChannel;
+        notificationStateChannel = notificationVisibilityChannel;
+    }
+
+    public static void PublishNotification(NotificationData notification)
+    {
+        OnNotification?.Invoke(notification);
+        notificationChannel?.Raise(notification);
+    }
+
+    public static void PublishNotificationState(bool isVisible)
+    {
+        OnNotificationStateChanged?.Invoke(isVisible);
+        notificationStateChannel?.Raise(isVisible);
+    }
 }

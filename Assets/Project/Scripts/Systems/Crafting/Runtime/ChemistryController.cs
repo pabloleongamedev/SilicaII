@@ -310,6 +310,6 @@ public class ChemistryController : MonoBehaviour
             type = type
         };
 
-        CraftingEvents.OnNotificationRequested?.Invoke(notification);
+        CraftingEvents.PublishNotificationRequested(notification);
     }
 }

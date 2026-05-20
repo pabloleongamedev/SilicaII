@@ -2,7 +2,7 @@
  * Arquitectura: Audio/Data
  * Script: AudioCue_SO
  * Rol: Asset de authoring para identificar un sonido sin depender de strings sueltos en gameplay.
- * Relaciones: AudioService registra AudioCue_SO y los consumidores pueden reproducir por referencia o por id temporal.
+ * Relaciones: AudioCueLibrary_SO centraliza AudioCue_SO; AudioService los reproduce por AudioCueKey.
  * Riesgo arquitectonico mitigado: evita typos runtime como "Playerjetpacksound" repartidos entre sistemas.
  */
 using UnityEngine;

@@ -17,6 +17,8 @@ public class SaveLoadSceneBinding : MonoBehaviour,
 {
     [Header("Use Case Provider")]
     [SerializeField] private MonoBehaviour saveLoadProviderBehaviour;
+    [SerializeField] private SaveParticipantRegistry participantRegistry;
+    [SerializeField] private ItemDatabase_SO itemDatabase;
 
     private ISaveCheckpointUseCase saveCheckpointUseCase;
     private IRestoreCheckpointUseCase restoreCheckpointUseCase;
@@ -31,6 +33,13 @@ public class SaveLoadSceneBinding : MonoBehaviour,
     private void Awake()
     {
         ResolveProvider();
+        ApplySceneSaveDependencies();
+    }
+
+    private void OnEnable()
+    {
+        ResolveProvider();
+        ApplySceneSaveDependencies();
     }
 
     public bool TrySaveCheckpoint(bool createIfMissing)
@@ -95,13 +104,16 @@ public class SaveLoadSceneBinding : MonoBehaviour,
 
     private void ResolveProvider()
     {
-        if (saveLoadProviderBehaviour == null)
-            saveLoadProviderBehaviour = GetComponent<GameManager>();
-
         saveCheckpointUseCase = saveLoadProviderBehaviour as ISaveCheckpointUseCase;
         restoreCheckpointUseCase = saveLoadProviderBehaviour as IRestoreCheckpointUseCase;
         saveSlotReader = saveLoadProviderBehaviour as ISaveSlotReader;
         gameSessionLoader = saveLoadProviderBehaviour as IGameSessionLoader;
         gameDataProvider = saveLoadProviderBehaviour as IGameDataProvider;
+    }
+
+    private void ApplySceneSaveDependencies()
+    {
+        if (saveLoadProviderBehaviour is GameManager gameManager)
+            gameManager.ConfigureSceneSaveDependencies(participantRegistry, itemDatabase);
     }
 }

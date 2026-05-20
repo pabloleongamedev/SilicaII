@@ -105,7 +105,7 @@ public class InventoryView : MonoBehaviour
         if (inventoryPanel != null)
             inventoryPanel.SetActive(false);
 
-        UIStateEvents.OnUIStateChanged?.Invoke(UIState.Quest);
+        UIStateEvents.Publish(UIState.Quest);
     }
 
     public void ShowInventoryPanel()

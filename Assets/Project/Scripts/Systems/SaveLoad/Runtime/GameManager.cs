@@ -60,7 +60,6 @@ public class GameManager : MonoBehaviour,
         DontDestroyOnLoad(transform.root.gameObject);
         sceneLoader = ResolveSceneLoader();
         BuildServices();
-        SaveParticipantRegistry.OnRegistryAvailable += HandleRegistryAvailable;
     }
 
     private void Start()
@@ -83,7 +82,6 @@ public class GameManager : MonoBehaviour,
         if (activeInstance == this)
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
-            SaveParticipantRegistry.OnRegistryAvailable -= HandleRegistryAvailable;
             activeInstance = null;
         }
     }
@@ -324,19 +322,14 @@ public class GameManager : MonoBehaviour,
 
     private void SyncSceneCoordinator()
     {
-        // Ruta oficial: SaveParticipantRegistry se asigna por Inspector o se anuncia al cargar la escena.
+        // Ruta oficial: SaveParticipantRegistry/ItemDatabase se inyectan por Inspector via SaveLoadSceneBinding.
         sceneRestoreCoordinator.SetSceneDependencies(participantRegistry, itemDatabase);
     }
 
-    private void HandleRegistryAvailable(SaveParticipantRegistry registry)
+    public void ConfigureSceneSaveDependencies(SaveParticipantRegistry registry, ItemDatabase_SO database)
     {
-        if (registry == null)
-            return;
-
         participantRegistry = registry;
-
-        if (registry.ItemDatabase != null)
-            itemDatabase = registry.ItemDatabase;
+        itemDatabase = database != null ? database : registry != null ? registry.ItemDatabase : itemDatabase;
 
         sceneRestoreCoordinator.SetSceneDependencies(participantRegistry, itemDatabase);
     }

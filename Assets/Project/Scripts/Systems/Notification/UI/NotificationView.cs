@@ -43,7 +43,7 @@ public class NotificationView : MonoBehaviour
         panelNotification.SetActive(true);
 
         // 🔥 bloquear interaction UI
-        NotificationEvents.OnNotificationStateChanged?.Invoke(true);
+        NotificationEvents.PublishNotificationState(true);
 
         text.text = data.message;
 
@@ -56,6 +56,6 @@ public class NotificationView : MonoBehaviour
         panelNotification.SetActive(false);
 
         // 🔥 liberar interaction UI
-        NotificationEvents.OnNotificationStateChanged?.Invoke(false);
+        NotificationEvents.PublishNotificationState(false);
     }
 }

@@ -5,37 +5,17 @@
  * Relaciones: Recibe MonoBehaviours asignados por Inspector y tambien descubre participantes en el mismo GameObject/hijos.
  * Riesgo arquitectonico mitigado: reemplaza busquedas globales; se anuncia al GameManager cuando la escena lo activa.
  */
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class SaveParticipantRegistry : MonoBehaviour
 {
-    public static event Action<SaveParticipantRegistry> OnRegistryAvailable;
-
     [SerializeField] private ItemDatabase_SO itemDatabase;
     [SerializeField] private MonoBehaviour[] participantBehaviours;
     [SerializeField] private bool includeParticipantsOnThisObject = true;
     [SerializeField] private bool includeParticipantsInChildren = false;
 
     public ItemDatabase_SO ItemDatabase => itemDatabase;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStaticState()
-    {
-        OnRegistryAvailable = null;
-    }
-
-    private void OnEnable()
-    {
-        OnRegistryAvailable?.Invoke(this);
-    }
-
-    private void Start()
-    {
-        // Reanuncia en Start por si el GameManager se suscribio despues del OnEnable de la escena.
-        OnRegistryAvailable?.Invoke(this);
-    }
 
     public void Capture(GameData gameData)
     {

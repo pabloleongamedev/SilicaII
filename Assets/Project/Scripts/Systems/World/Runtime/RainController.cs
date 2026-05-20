@@ -65,7 +65,7 @@ public class RainController : MonoBehaviour
 
         isRaining = shouldRain;
         rainObject.SetActive(isRaining);
-        WeatherEvents.OnRainStateChanged?.Invoke(isRaining);
+        WeatherEvents.PublishRainState(isRaining);
     }
 
     private void ResolveTimeSource()

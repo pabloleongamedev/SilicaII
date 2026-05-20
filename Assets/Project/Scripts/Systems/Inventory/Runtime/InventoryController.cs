@@ -117,7 +117,7 @@ public class InventoryController : MonoBehaviour
             type = ToNotificationType(feedback.type)
         };
 
-        InventoryEvents.OnNotificationRequested?.Invoke(notification);
+        InventoryEvents.PublishNotificationRequested(notification);
     }
 
     private void HandleItemAdded(ItemData_SO item, int amount)

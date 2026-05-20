@@ -21,12 +21,12 @@ public class PlayerStateController : MonoBehaviour
     private UIState currentState = UIState.None;
 
     private MovementController movementController;
-    private MouseLook mouseLook;
+    private PlayerCameraRig cameraRig;
 
     private void Awake()
     {
         movementController = GetComponent<MovementController>();
-        mouseLook = GetComponentInChildren<MouseLook>();
+        cameraRig = GetComponentInParent<PlayerCameraRig>();
     }
 
     public void SetState(UIState newState)
@@ -45,31 +45,29 @@ public class PlayerStateController : MonoBehaviour
         if (movementController != null)
             movementController.SetInputEnabled(!isUI);
 
-        if (mouseLook != null)
-            mouseLook.enabled = !isUI;
+        if (cameraRig != null)
+            cameraRig.enabled = !isUI;
 
         // 🔥 ESTA LÍNEA ES LA QUE TE FALTABA
-        UIStateEvents.OnUIStateChanged?.Invoke(currentState);
+        UIStateEvents.Publish(currentState);
     }
 
     public UIState GetState() => currentState;
 
     public bool CanInteract(IInteractable interactable)
     {
+        if (interactable == null)
+            return false;
+
+        if (interactable is IUIStateInteractable stateAware)
+            return stateAware.CanInteractInState(currentState);
+
         switch (currentState)
         {
             case UIState.None:
                 return true;
-
             case UIState.Inventory:
                 return false;
-
-            case UIState.Crafting:
-                return interactable is CraftingTable;
-
-            case UIState.Chemistry:
-                return interactable is ChemistryTable;
-
             default:
                 return false;
         }

@@ -88,8 +88,5 @@ public class CheckpointRestorePoint : MonoBehaviour, IInteractable
     {
         if (restoreCheckpointUseCase == null)
             restoreCheckpointUseCase = restoreCheckpointUseCaseBehaviour as IRestoreCheckpointUseCase;
-
-        if (restoreCheckpointUseCase == null)
-            restoreCheckpointUseCase = GetComponentInParent<IRestoreCheckpointUseCase>();
     }
 }

@@ -84,7 +84,7 @@ public class ToolChemistryView : MonoBehaviour, IDropHandler
     {
         Debug.Log("[Chemistry][Drop] " + msg);
 
-        NotificationEvents.OnNotification?.Invoke(new NotificationData
+        NotificationEvents.PublishNotification(new NotificationData
         {
             message = msg,
             type = type

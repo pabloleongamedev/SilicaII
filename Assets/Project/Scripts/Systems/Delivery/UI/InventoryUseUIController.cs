@@ -47,7 +47,7 @@ public class InventoryUseUIController : MonoBehaviour
     {
         Debug.Log("[InventoryUseUI] " + msg);
 
-        NotificationEvents.OnNotification?.Invoke(new NotificationData
+        NotificationEvents.PublishNotification(new NotificationData
         {
             message = msg,
             type = type

@@ -203,7 +203,7 @@ public class CraftingController : MonoBehaviour
             type = type
         };
 
-        CraftingEvents.OnNotificationRequested?.Invoke(notification);
+        CraftingEvents.PublishNotificationRequested(notification);
     }
 
     private NotificationType ToNotificationType(CraftingResultType type)

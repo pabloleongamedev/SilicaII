@@ -54,23 +54,23 @@ public static class GameplayEventRouter
     private static void ForwardItemCollectedToQuest(string itemID, int amount)
     {
         if (!string.IsNullOrEmpty(itemID))
-            QuestEvents.OnItemCollected?.Invoke(itemID, amount);
+            QuestEvents.PublishItemCollected(itemID, amount);
     }
 
     private static void ForwardItemCraftedToQuest(string itemID, int amount)
     {
         if (!string.IsNullOrEmpty(itemID))
-            QuestEvents.OnItemCrafted?.Invoke(itemID, amount);
+            QuestEvents.PublishItemCrafted(itemID, amount);
     }
 
     private static void ForwardItemRefinedToQuest(string itemID, int amount)
     {
         if (!string.IsNullOrEmpty(itemID))
-            QuestEvents.OnItemRefined?.Invoke(itemID, amount);
+            QuestEvents.PublishItemRefined(itemID, amount);
     }
 
     private static void ForwardNotification(NotificationData notification)
     {
-        NotificationEvents.OnNotification?.Invoke(notification);
+        NotificationEvents.PublishNotification(notification);
     }
 }

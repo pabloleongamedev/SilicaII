@@ -10,4 +10,17 @@ using System;
 public static class UIStateEvents
 {
     public static Action<UIState> OnUIStateChanged;
+
+    private static UIStateEventChannel_SO channel;
+
+    public static void ConfigureChannel(UIStateEventChannel_SO eventChannel)
+    {
+        channel = eventChannel;
+    }
+
+    public static void Publish(UIState state)
+    {
+        OnUIStateChanged?.Invoke(state);
+        channel?.Raise(state);
+    }
 }

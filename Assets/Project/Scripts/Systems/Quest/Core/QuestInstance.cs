@@ -42,7 +42,7 @@ public class QuestInstance
 
             bool completed = current >= required;
 
-            QuestEvents.OnTaskUpdated?.Invoke(i, current, required, completed);
+            QuestEvents.PublishTaskUpdated(i, current, required, completed);
         }
     }
     

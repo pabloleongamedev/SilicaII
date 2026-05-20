@@ -20,4 +20,46 @@ public static class QuestEvents
     public static Action<string, int> OnItemCollected;
     public static Action<string, int> OnItemRefined;
     public static Action<string, int> OnItemCrafted;
+    private static QuestEventChannel_SO channel;
+
+    public static void ConfigureChannel(QuestEventChannel_SO eventChannel)
+    {
+        channel = eventChannel;
+    }
+
+    public static void PublishQuestLoaded(QuestData_SO questData)
+    {
+        OnQuestLoaded?.Invoke(questData);
+        channel?.RaiseQuestLoaded(questData);
+    }
+
+    public static void PublishTaskUpdated(int taskIndex, int current, int required, bool completed)
+    {
+        OnTaskUpdated?.Invoke(taskIndex, current, required, completed);
+        channel?.RaiseTaskUpdated(taskIndex, current, required, completed);
+    }
+
+    public static void PublishQuestCompleted(int questIndex)
+    {
+        OnQuestCompleted?.Invoke(questIndex);
+        channel?.RaiseQuestCompleted(questIndex);
+    }
+
+    public static void PublishItemCollected(string itemID, int amount)
+    {
+        OnItemCollected?.Invoke(itemID, amount);
+        channel?.RaiseItemCollected(itemID, amount);
+    }
+
+    public static void PublishItemRefined(string itemID, int amount)
+    {
+        OnItemRefined?.Invoke(itemID, amount);
+        channel?.RaiseItemRefined(itemID, amount);
+    }
+
+    public static void PublishItemCrafted(string itemID, int amount)
+    {
+        OnItemCrafted?.Invoke(itemID, amount);
+        channel?.RaiseItemCrafted(itemID, amount);
+    }
 }

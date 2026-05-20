@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf97924a85281b147b9aed58d479b3e0, type: 3}
+  m_Name: Audio Cue Library_SO
+  m_EditorClassIdentifier: SilicaII.Systems::AudioCueLibrary_SO
+  playerWalk: {fileID: 11400000, guid: 565ac828221687e4f8282f5cd5403064, type: 2}
+  playerMetalWalk: {fileID: 11400000, guid: 743ecb2fb1e801641a92b84e824b144a, type: 2}
+  playerJump: {fileID: 11400000, guid: d88d3eb21273c7e419052dcf4f233984, type: 2}
+  playerMetalJump: {fileID: 11400000, guid: 2a1eef8d5d0f7814d986e6047870e667, type: 2}
+  playerJetpack: {fileID: 11400000, guid: be764d77a3cf6ef42afff69dda307646, type: 2}
+  scannerScan: {fileID: 11400000, guid: 09e4cca24e3490d4c93268b15ada85ce, type: 2}
+  notificationInfo: {fileID: 0}
+  notificationSuccess: {fileID: 0}
+  notificationWarning: {fileID: 0}
+  notificationError: {fileID: 0}
+  uiHover: {fileID: 0}
+  uiClick: {fileID: 0}
+  uiApply: {fileID: 0}
+  uiReset: {fileID: 0}
+  uiSliderTick: {fileID: 0}
+  uiSliderLimit: {fileID: 0}
+  uiError: {fileID: 0}
+  feedbackHit: {fileID: 0}
+  feedbackExplosion: {fileID: 0}
+  feedbackPickup: {fileID: 0}
+  customCues: []

@@ -80,8 +80,5 @@ public class CheckpointSavePoint : MonoBehaviour, IInteractable
     {
         if (saveCheckpointUseCase == null)
             saveCheckpointUseCase = saveCheckpointUseCaseBehaviour as ISaveCheckpointUseCase;
-
-        if (saveCheckpointUseCase == null)
-            saveCheckpointUseCase = GetComponentInParent<ISaveCheckpointUseCase>();
     }
 }

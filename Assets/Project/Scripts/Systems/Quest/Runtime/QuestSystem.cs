@@ -13,7 +13,6 @@ using System.Collections.Generic;
 public class QuestSystem : MonoBehaviour
 {
     [SerializeField] private List<QuestData_SO> quests;
-    public static event System.Action<int> OnQuestCompleted;
 
     private int currentQuestIndex = 0;
     private QuestData_SO currentQuest;
@@ -65,7 +64,7 @@ public class QuestSystem : MonoBehaviour
         isInitialized = true;
 
         // 🔥 UI
-        QuestEvents.OnQuestLoaded?.Invoke(currentQuest);
+        QuestEvents.PublishQuestLoaded(currentQuest);
     }
 
     // =========================================
@@ -113,7 +112,7 @@ public class QuestSystem : MonoBehaviour
 
             bool completed = current >= required;
 
-            QuestEvents.OnTaskUpdated?.Invoke(i, current, required, completed);
+            QuestEvents.PublishTaskUpdated(i, current, required, completed);
         }
 
         CheckQuestComplete();
@@ -131,8 +130,7 @@ public class QuestSystem : MonoBehaviour
         Debug.Log("MISIÓN COMPLETADA");
 
         // 🔥 ESTE ES EL PUNTO CLAVE
-        QuestEvents.OnQuestCompleted?.Invoke(currentQuestIndex);
-        OnQuestCompleted?.Invoke(currentQuestIndex);
+        QuestEvents.PublishQuestCompleted(currentQuestIndex);
 
         LoadQuest(currentQuestIndex + 1);
     }

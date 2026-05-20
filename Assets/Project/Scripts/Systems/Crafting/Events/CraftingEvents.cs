@@ -15,20 +15,40 @@ public static class CraftingEvents
     public static Action<string, int> OnItemCraftedByID;
     public static Action<string, int> OnItemRefinedByID;
     public static Action<NotificationData> OnNotificationRequested;
+    private static CraftingEventChannel_SO channel;
+
+    public static void ConfigureChannel(CraftingEventChannel_SO eventChannel)
+    {
+        channel = eventChannel;
+    }
 
     public static void PublishItemCrafted(ItemData_SO item, int amount)
     {
         OnItemCrafted?.Invoke(item, amount);
+        channel?.RaiseItemCrafted(item, amount);
 
         if (item != null)
+        {
             OnItemCraftedByID?.Invoke(item.itemID, amount);
+            channel?.RaiseItemCraftedByID(item.itemID, amount);
+        }
     }
 
     public static void PublishItemRefined(ItemData_SO item, int amount)
     {
         OnItemRefined?.Invoke(item, amount);
+        channel?.RaiseItemRefined(item, amount);
 
         if (item != null)
+        {
             OnItemRefinedByID?.Invoke(item.itemID, amount);
+            channel?.RaiseItemRefinedByID(item.itemID, amount);
+        }
+    }
+
+    public static void PublishNotificationRequested(NotificationData notification)
+    {
+        OnNotificationRequested?.Invoke(notification);
+        channel?.RaiseNotification(notification);
     }
 }

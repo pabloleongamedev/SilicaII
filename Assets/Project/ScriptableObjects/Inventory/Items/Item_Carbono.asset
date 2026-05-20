@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Carbono
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: C
+  displayName: Carbon
+  icon: {fileID: 21300000, guid: 0cbc84233a960b348ac0eba3f824cba3, type: 3}
+  maxStack: 99
+  description: "Carbono: Elemento qu\xEDmico fundamental que sirve como columna vertebral
+    de la vida y de la qu\xEDmica org\xE1nica debido a su capacidad \xFAnica para
+    formar enlaces estables y estructuras complejas. Basicamente sustenta la vida
+    en este planeta."

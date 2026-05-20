@@ -3,25 +3,19 @@
  * Script: ScannerTrigger
  * Rol: Feedback visual/audio del scanner del Player.
  * Modulo: Escucha ScannerEvents y ejecuta animacion/audio cuando un IInteractable escaneable confirma que puede escanearse.
- * Relaciones: ScannableObject no conoce este componente; solo publica ScannerEvents.RequestScanFeedback.
+ * Relaciones: ItemPickup en modo Scannable no conoce este componente; solo publica ScannerEvents.RequestScanFeedback.
  * Uso como referencia: ScannerTrigger ya no lee input ni decide que objeto se escanea; Interaction es la entrada oficial.
  */
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class ScannerTrigger : MonoBehaviour
 {
     [Header("Audio Service")]
-    [FormerlySerializedAs("audioManager")]
     [SerializeField] private MonoBehaviour audioServiceBehaviour;
-    [SerializeField] private AudioCue_SO scannerCue;
 
     [Header("Scanner Visual")]
-    [FormerlySerializedAs("PivotScan")]
     [SerializeField] private GameObject pivotScan;
-    [FormerlySerializedAs("audioScanner")]
-    [SerializeField] private AudioSource scannerAudioSource;
     [SerializeField] private string startScanTrigger = "StartScan";
     [SerializeField] private float visualDuration = 0.6f;
 
@@ -74,12 +68,9 @@ public class ScannerTrigger : MonoBehaviour
             return;
 
         pivotScan.SetActive(true);
-        if (scannerCue != null)
-            AudioService?.Play(scannerCue);
-        else
-            AudioService?.Play("Scannersound");
+        AudioService?.Play(AudioCueKey.ScannerScan);
 
-        if (animator != null && !string.IsNullOrEmpty(startScanTrigger))
+        if (CanUseAnimatorTrigger())
             animator.SetTrigger(startScanTrigger);
 
         if (stopRoutine != null)
@@ -100,16 +91,10 @@ public class ScannerTrigger : MonoBehaviour
         if (pivotScan != null)
             pivotScan.SetActive(false);
 
-        if (scannerCue != null)
-            AudioService?.Stop(scannerCue);
-        else
-            AudioService?.Stop("Scannersound");
+        AudioService?.Stop(AudioCueKey.ScannerScan);
 
-        if (animator != null && !string.IsNullOrEmpty(startScanTrigger))
+        if (CanUseAnimatorTrigger())
             animator.ResetTrigger(startScanTrigger);
-
-        if (scannerAudioSource != null)
-            scannerAudioSource.Stop();
     }
 
     private IEnumerator StopAfterDelay()
@@ -129,6 +114,13 @@ public class ScannerTrigger : MonoBehaviour
 
         if (meshRenderer == null)
             meshRenderer = pivotScan.GetComponentInChildren<Renderer>(true);
+    }
+
+    private bool CanUseAnimatorTrigger()
+    {
+        return animator != null
+            && animator.runtimeAnimatorController != null
+            && !string.IsNullOrEmpty(startScanTrigger);
     }
 
     private IAudioService AudioService

@@ -43,12 +43,12 @@ public class PlayerDeathHandler : MonoBehaviour
         if (gameStateController != null)
             gameStateController.SetState(GameState.GameOver);
         else
-            GameStateEvents.OnGameStateChanged?.Invoke(GameState.GameOver);
+            GameStateEvents.Publish(GameState.GameOver);
 
         if (!notifyOnDeath)
             return;
 
-        NotificationEvents.OnNotification?.Invoke(new NotificationData
+        NotificationEvents.PublishNotification(new NotificationData
         {
             message = deathMessage,
             type = NotificationType.Error

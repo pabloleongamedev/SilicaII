@@ -9,7 +9,7 @@
  */
 using UnityEngine;
 
-public class CraftingTable : MonoBehaviour, IInteractable
+public class CraftingTable : MonoBehaviour, IInteractable, IUIStateInteractable
 {
     [SerializeField] private PlayerStateController playerState;
 
@@ -38,5 +38,10 @@ public class CraftingTable : MonoBehaviour, IInteractable
         return playerState.GetState() == UIState.Crafting
             ? null
             : "Presiona E para usar sintetizador";
+    }
+
+    public bool CanInteractInState(UIState currentState)
+    {
+        return currentState == UIState.None || currentState == UIState.Crafting;
     }
 }

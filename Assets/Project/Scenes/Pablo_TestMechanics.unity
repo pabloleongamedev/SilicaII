@@ -151,7 +151,6 @@ Transform:
   - {fileID: 980468513}
   - {fileID: 564437901}
   - {fileID: 826171191564231628}
-  - {fileID: 4587842584965035251}
   m_Father: {fileID: 5710005319379908233}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &410087039
@@ -1617,6 +1616,143 @@ MonoBehaviour:
   fallbackSlotID: 1
   reloadScene: 0
   interactionText: Presiona E para restaurar checkpoint
+--- !u!1 &1666914048
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1666914049}
+  - component: {fileID: 1666914053}
+  - component: {fileID: 1666914052}
+  - component: {fileID: 1666914051}
+  - component: {fileID: 1666914050}
+  m_Layer: 0
+  m_Name: Metano (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1666914049
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666914048}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -11.09, y: 0.65, z: 45.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5566752256238278299}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1666914050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666914048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
+  interactionMode: 1
+  items:
+  - item: {fileID: 11400000, guid: 88eb3893adcb3e241ad47a4d6b690b6a, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: 2450ec614ba58a947a73dc3b31c35fe2, type: 2}
+    amount: 1
+  destroyAfterPickup: 1
+  allowRepeatScan: 1
+  notificationTitle: Analisis detectado
+  notificationDelay: 2.1
+  successType: 1
+  warningType: 2
+--- !u!135 &1666914051
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666914048}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 2
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1666914052
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666914048}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 97065d2a42ecaac4780526da5439ec5b, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1666914053
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666914048}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1674691586
 GameObject:
   m_ObjectHideFlags: 0
@@ -4137,8 +4273,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  item: {fileID: 11400000, guid: b8a5a6f6c0b6ba546bd707ecdeffb2e5, type: 2}
-  amount: 1
+  interactionMode: 0
+  items:
+  - item: {fileID: 11400000, guid: b8a5a6f6c0b6ba546bd707ecdeffb2e5, type: 2}
+    amount: 1
+  destroyAfterPickup: 1
+  allowRepeatScan: 1
+  notificationTitle: Analisis detectado
+  notificationDelay: 0.5
+  successType: 0
+  warningType: 2
 --- !u!114 &710258500109329100
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5257,7 +5401,7 @@ Transform:
   m_GameObject: {fileID: 2824582497511295678}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -43.5, y: 0.65, z: 45.6}
+  m_LocalPosition: {x: -42.74, y: 0.65, z: 45.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5990,8 +6134,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  item: {fileID: 11400000, guid: 2450ec614ba58a947a73dc3b31c35fe2, type: 2}
-  amount: 1
+  interactionMode: 0
+  items:
+  - item: {fileID: 11400000, guid: 2450ec614ba58a947a73dc3b31c35fe2, type: 2}
+    amount: 1
+  destroyAfterPickup: 1
+  allowRepeatScan: 1
+  notificationTitle: Analisis detectado
+  notificationDelay: 0.5
+  successType: 0
+  warningType: 2
 --- !u!1 &1602570200350351865
 GameObject:
   m_ObjectHideFlags: 0
@@ -6072,8 +6224,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  item: {fileID: 11400000, guid: 88eb3893adcb3e241ad47a4d6b690b6a, type: 2}
-  amount: 1
+  interactionMode: 0
+  items:
+  - item: {fileID: 11400000, guid: 88eb3893adcb3e241ad47a4d6b690b6a, type: 2}
+    amount: 1
+  destroyAfterPickup: 1
+  allowRepeatScan: 1
+  notificationTitle: Analisis detectado
+  notificationDelay: 0.5
+  successType: 0
+  warningType: 2
 --- !u!222 &1654097542663386823
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6730,19 +6890,7 @@ MonoBehaviour:
   optionsPanel: {fileID: 0}
   participantRegistry: {fileID: 2679060577072785885}
   itemDatabase: {fileID: 11400000, guid: 6092e80cbdf00b947b3bcddbdf047829, type: 2}
---- !u!114 &6001123171761844001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5780435400246955831}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a444c10e4f8a4c94a8c7f2d7e15a0004, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SilicaII.Systems::SaveLoadSceneBinding
-  saveLoadProviderBehaviour: {fileID: 1921123171761844479}
+  sceneLoaderBehaviour: {fileID: 0}
 --- !u!222 &1927087070845540670
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9037,11 +9185,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43c7ebeeb1b71c74dbd94f466662ee0d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerAudio
+  m_EditorClassIdentifier: SilicaII.Systems::PlayerAudioFeedback
+  movementController: {fileID: 8270189695560625001}
   audioServiceBehaviour: {fileID: 6619128525771919497}
-  walkAction: {fileID: -1680190386980627800, guid: d978929666caf6f43982baf97a023ff8, type: 3}
-  runAction: {fileID: -7471211009204490832, guid: d978929666caf6f43982baf97a023ff8, type: 3}
-  jetPackAction: {fileID: 1120369429361536294, guid: d978929666caf6f43982baf97a023ff8, type: 3}
+  walkPitch: 1
+  sprintPitch: 1.5
 --- !u!1 &2719397095850523006
 GameObject:
   m_ObjectHideFlags: 0
@@ -10395,6 +10543,9 @@ GameObject:
   - component: {fileID: 4411547220594217273}
   - component: {fileID: 2682811921948513039}
   - component: {fileID: 8270189695560625002}
+  - component: {fileID: 8270189695560625004}
+  - component: {fileID: 8270189695560625003}
+  - component: {fileID: 1986325643}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -10402,6 +10553,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1986325643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3275789411505853263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eae0e287f8d8bbe4a8c953513991c59e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SilicaII.Systems::PlayerCameraRig
+  pitchPivot: {fileID: 4587842584965035251}
+  sensitivity: 0.3
+  minPitch: -85
+  maxPitch: 85
 --- !u!114 &3282515766339289332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11056,9 +11223,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4587842584965035251}
-  - component: {fileID: 6573354300642905258}
   m_Layer: 0
-  m_Name: Camera
+  m_Name: CameraPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13114,27 +13280,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5711a2948596b643b6c48c0cc92f942, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScannerTrigger
-  audioServiceBehaviour: {fileID: 0}
+  audioServiceBehaviour: {fileID: 6619128525771919497}
   pivotScan: {fileID: 3594630744036881946}
-  scannerAudioSource: {fileID: 8578943209442788729}
   startScanTrigger: StartScan
-  visualDuration: 0.6
+  visualDuration: 2
   textureScrollSpeed: 2
---- !u!114 &4500600134571752369
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3275789411505853263}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da08ff357bd31a1458e545cced81fbea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SilicaII.Systems::InventoryController
-  config: {fileID: 11400000, guid: 53d14ad7068ba3f4c974cf53c546b232, type: 2}
-  inventoryView: {fileID: 142851993286727077}
-  listView: {fileID: 1024174498404474587}
 --- !u!224 &4435908697032997183
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13224,6 +13374,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &4500600134571752369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3275789411505853263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da08ff357bd31a1458e545cced81fbea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SilicaII.Systems::InventoryController
+  config: {fileID: 11400000, guid: 53d14ad7068ba3f4c974cf53c546b232, type: 2}
+  inventoryView: {fileID: 142851993286727077}
+  listView: {fileID: 1024174498404474587}
 --- !u!114 &4521693446147947864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13483,12 +13648,12 @@ Transform:
   m_GameObject: {fileID: 3573515816302881861}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.51000005, z: 0}
+  m_LocalPosition: {x: 0, y: 0.51000005, z: 0.32999992}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8348781421742902993}
-  m_Father: {fileID: 235113128}
+  m_Father: {fileID: 5710005319379908233}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4598047340078640121
 MonoBehaviour:
@@ -13903,6 +14068,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ccbd69672f1b724392bf15194aba8a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputHandler
+  stateControllerBehaviour: {fileID: 8270189695560625003}
 --- !u!1 &4732694347121010294
 GameObject:
   m_ObjectHideFlags: 0
@@ -14056,7 +14222,7 @@ GameObject:
   - component: {fileID: 826171191564231628}
   - component: {fileID: 6619128525771919497}
   m_Layer: 0
-  m_Name: AudioManager
+  m_Name: AudioService
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15964,6 +16130,7 @@ Transform:
   - {fileID: 6264541378965618937}
   - {fileID: 1360953794359941608}
   - {fileID: 1258899662113929543}
+  - {fileID: 1666914049}
   - {fileID: 5235148585081393507}
   - {fileID: 7064292338195585929}
   m_Father: {fileID: 963607302}
@@ -16239,6 +16406,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4587842584965035251}
   - {fileID: 2395235400866790993}
   - {fileID: 4624386761888984836}
   - {fileID: 235113128}
@@ -17020,6 +17188,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6001123171761844001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5780435400246955831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a444c10e4f8a4c94a8c7f2d7e15a0004, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SilicaII.Systems::SaveLoadSceneBinding
+  saveLoadProviderBehaviour: {fileID: 1921123171761844479}
+  participantRegistry: {fileID: 0}
+  itemDatabase: {fileID: 0}
 --- !u!1 &6006380033760041218
 GameObject:
   m_ObjectHideFlags: 0
@@ -18162,23 +18345,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &6573354300642905258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3573515816302881861}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62884557d8299b34b8c05e5d669aea6b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MouseLook
-  playerBody: {fileID: 5710005319379908233}
-  sensitivity: 0.3
-  smoothTime: 0.05
-  minPitch: -85
-  maxPitch: 85
 --- !u!114 &6587725274366040798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18191,8 +18357,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  item: {fileID: 11400000, guid: 95c7214d34bbc2f4f96ac00cb4070148, type: 2}
-  amount: 1
+  interactionMode: 0
+  items:
+  - item: {fileID: 11400000, guid: 95c7214d34bbc2f4f96ac00cb4070148, type: 2}
+    amount: 1
+  destroyAfterPickup: 1
+  allowRepeatScan: 1
+  notificationTitle: Analisis detectado
+  notificationDelay: 0.5
+  successType: 0
+  warningType: 2
 --- !u!222 &6592311806640023500
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -18210,46 +18384,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4805638665181302483}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 597a4a157ff03634d96e0f6c214c6b7c, type: 3}
+  m_Script: {fileID: 11500000, guid: a222c10e4f8a4c94a8c7f2d7e15a0002, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
-  sounds:
-  - name: Scannersound
-    clip: {fileID: 8300000, guid: aa50ad97cd6838c47a901f6aca889777, type: 3}
-    volume: 1
-    pitch: 1
-    loop: 1
-    source: {fileID: 0}
-  - name: Playerwalksound
-    clip: {fileID: 8300000, guid: a9e685e1af34121498a651c484426703, type: 3}
-    volume: 1
-    pitch: 1.5
-    loop: 1
-    source: {fileID: 0}
-  - name: Playerjumpsound
-    clip: {fileID: 8300000, guid: 65d9836027675574b8d070c5718f99c7, type: 3}
-    volume: 1
-    pitch: 1.5
-    loop: 0
-    source: {fileID: 0}
-  - name: Playerjetpacksound
-    clip: {fileID: 8300000, guid: 445785eae1e083341b5827af437769de, type: 3}
-    volume: 1
-    pitch: 1.5
-    loop: 1
-    source: {fileID: 0}
-  - name: PlayerJumpMetalsound
-    clip: {fileID: 8300000, guid: 0462feb393ce2b64b9f78c8bc9303014, type: 3}
-    volume: 1
-    pitch: 1.5
-    loop: 0
-    source: {fileID: 0}
-  - name: PlayerwalkMetalsound
-    clip: {fileID: 8300000, guid: 8a2c7093236272043805ca942d893d01, type: 3}
-    volume: 1
-    pitch: 1.5
-    loop: 1
-    source: {fileID: 0}
+  m_EditorClassIdentifier: SilicaII.Systems::AudioService
+  audioLibrary: {fileID: 11400000, guid: 1a104b73256a87c4c9e9c435f4920780, type: 2}
 --- !u!224 &6637639838344182038
 RectTransform:
   m_ObjectHideFlags: 0
@@ -19342,8 +19480,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  item: {fileID: 11400000, guid: c702357e020b7224e877216dd429ed47, type: 2}
-  amount: 1
+  interactionMode: 0
+  items:
+  - item: {fileID: 11400000, guid: c702357e020b7224e877216dd429ed47, type: 2}
+    amount: 1
+  destroyAfterPickup: 1
+  allowRepeatScan: 1
+  notificationTitle: Analisis detectado
+  notificationDelay: 0.5
+  successType: 0
+  warningType: 2
 --- !u!114 &7048034938767893525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21991,6 +22137,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MovementController
   config: {fileID: 11400000, guid: 0df0f4a73d062dd47ab7373360d5c2a0, type: 2}
   groundCheck: {fileID: 2395235400866790993}
+  groundCheckRadius: 0.25
+  useRigidbodyInterpolation: 1
+  minLandingHeightDelta: 0.2
 --- !u!114 &8270189695560625002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22004,6 +22153,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::HealthBehaviour
   maxHealth: 100
+--- !u!114 &8270189695560625003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3275789411505853263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89209ed33f162604980794cbe6f1556c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SilicaII.Systems::PlayerStateController
+--- !u!114 &8270189695560625004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3275789411505853263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b9fbd5d0cb94a66b77eea205b6ec0d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SilicaII.Systems::PlayerDeathHandler
+  health: {fileID: 8270189695560625002}
+  gameStateController: {fileID: 881996642}
+  notifyOnDeath: 1
+  deathMessage: Integridad agotada. Game Over.
 --- !u!222 &8292294474370210257
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -22479,11 +22656,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2108cfec38e0c342bba4ce6dbb8f75e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NotificationAudioController
-  audioSource: {fileID: 8578943209442788729}
-  successClip: {fileID: 8300000, guid: cf2fa8cb838740445a9d44897bf20701, type: 3}
-  errorClip: {fileID: 8300000, guid: a33e7e7a39924644db5c72f7f1b4523a, type: 3}
-  warningClip: {fileID: 0}
-  infoClip: {fileID: 0}
+  audioServiceBehaviour: {fileID: 6619128525771919497}
 --- !u!1 &8389064400438909594
 GameObject:
   m_ObjectHideFlags: 0

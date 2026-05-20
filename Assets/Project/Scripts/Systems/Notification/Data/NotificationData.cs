@@ -7,8 +7,6 @@
  * Fase 2: DTO de notificacion queda asociado al canal NotificationEvents.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
-using UnityEngine;
-
 public enum NotificationType
 {
     Info,
@@ -22,5 +20,4 @@ public struct NotificationData
 {
     public string message;
     public NotificationType type;
-    public AudioClip sound;
 }
