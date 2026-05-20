@@ -19,6 +19,7 @@ public enum UIState
 public class PlayerStateController : MonoBehaviour
 {
     private UIState currentState = UIState.None;
+    [SerializeField] private UIStateEventChannel_SO uiStateChannel;
 
     private MovementController movementController;
     private PlayerCameraRig cameraRig;
@@ -48,8 +49,7 @@ public class PlayerStateController : MonoBehaviour
         if (cameraRig != null)
             cameraRig.enabled = !isUI;
 
-        // 🔥 ESTA LÍNEA ES LA QUE TE FALTABA
-        UIStateEvents.Publish(currentState);
+        uiStateChannel?.Raise(currentState);
     }
 
     public UIState GetState() => currentState;

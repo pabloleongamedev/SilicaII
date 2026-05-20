@@ -3,7 +3,7 @@
  * Script: OptionsMenuManager
  * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
  * Modulo: Gestiona pantallas, configuraciones y flujo del menu.
- * Relaciones: Usa IGameSettingsReader/IGameSettingsWriter para no depender de GameSettings.Instance.
+ * Relaciones: Usa IGameSettingsReader/IGameSettingsWriter para no depender de una configuracion global.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using UnityEngine;
@@ -108,9 +108,6 @@ public class OptionsMenuManager : MonoBehaviour
     {
         if (settingsServiceBehaviour == null)
             settingsServiceBehaviour = GetComponentInParent<GameSettingsService>();
-
-        if (settingsServiceBehaviour == null)
-            settingsServiceBehaviour = gameObject.AddComponent<GameSettingsService>();
 
         settingsReader = settingsServiceBehaviour as IGameSettingsReader;
         settingsWriter = settingsServiceBehaviour as IGameSettingsWriter;

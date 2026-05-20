@@ -2,7 +2,7 @@
  * Arquitectura: SaveLoad/Core
  * Script: IGameSessionLoader
  * Rol: Contrato de flujo de partida usado por menu y botones.
- * Relaciones: MainMenuManager/SaveSlot lo consumen; GameManager lo implementa como fachada mientras se extrae la composicion de aplicacion.
+ * Relaciones: MainMenuManager/SaveSlot lo consumen; SaveLoadSceneBinding lo implementa como fachada de escena.
  */
 public interface IGameSessionLoader
 {

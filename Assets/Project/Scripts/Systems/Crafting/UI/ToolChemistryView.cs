@@ -14,6 +14,7 @@ public class ToolChemistryView : MonoBehaviour, IDropHandler
 {
     [SerializeField] private ChemistrySlotView slot;
     [SerializeField] private SeparationDatabase_SO database;
+    [SerializeField] private NotificationEventChannel_SO notificationChannel;
 
     private ItemData_SO currentItem;
 
@@ -84,7 +85,7 @@ public class ToolChemistryView : MonoBehaviour, IDropHandler
     {
         Debug.Log("[Chemistry][Drop] " + msg);
 
-        NotificationEvents.PublishNotification(new NotificationData
+        notificationChannel?.Raise(new NotificationData
         {
             message = msg,
             type = type

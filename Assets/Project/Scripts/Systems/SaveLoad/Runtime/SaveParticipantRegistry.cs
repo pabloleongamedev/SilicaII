@@ -3,7 +3,7 @@
  * Script: SaveParticipantRegistry
  * Rol: Composition root local de participantes de guardado de una escena.
  * Relaciones: Recibe MonoBehaviours asignados por Inspector y tambien descubre participantes en el mismo GameObject/hijos.
- * Riesgo arquitectonico mitigado: reemplaza busquedas globales; se anuncia al GameManager cuando la escena lo activa.
+ * Riesgo arquitectonico mitigado: reemplaza busquedas globales; SaveLoadSceneBinding lo usa como ruta oficial de participantes.
  */
 using System.Collections.Generic;
 using UnityEngine;

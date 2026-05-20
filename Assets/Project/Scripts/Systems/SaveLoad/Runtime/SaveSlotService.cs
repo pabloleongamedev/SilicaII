@@ -2,7 +2,7 @@
  * Arquitectura: SaveLoad/Runtime
  * Script: SaveSlotService
  * Rol: Servicio de lectura de slots. Encapsula SaveController para que Menu/UI no conozca disco ni JSON.
- * Relaciones: GameManager delega consultas de slots aqui; SaveSlot y MainMenuManager consumen ISaveSlotReader.
+ * Relaciones: SaveLoadSceneBinding delega consultas de slots aqui; SaveSlot y MainMenuManager consumen ISaveSlotReader.
  */
 public class SaveSlotService : ISaveSlotReader
 {

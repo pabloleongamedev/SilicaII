@@ -1,8 +1,8 @@
 /*
  * Arquitectura: Quest/Core
  * Script: IQuestEventPublisher
- * Rol: Contrato para publicar progreso de quest sin depender del bus estatico QuestEvents.
- * Relaciones: QuestEvents puede actuar como implementacion legacy; routers futuros pueden inyectar este contrato.
+ * Rol: Contrato para publicar progreso de quest sin depender de canales globales.
+ * Relaciones: QuestEventChannel_SO es la salida oficial de escena; routers o tests pueden adaptar este contrato.
  */
 public interface IQuestEventPublisher
 {

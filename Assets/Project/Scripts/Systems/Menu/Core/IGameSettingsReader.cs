@@ -1,7 +1,7 @@
 /*
  * Arquitectura: Menu/Core
  * Script: IGameSettingsReader
- * Rol: Contrato de lectura de configuracion para UI/audio sin depender de GameSettings.Instance.
+ * Rol: Contrato de lectura de configuracion para UI/audio sin depender de una configuracion global.
  */
 public interface IGameSettingsReader
 {

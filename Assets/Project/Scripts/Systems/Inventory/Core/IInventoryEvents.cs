@@ -2,7 +2,7 @@
  * Arquitectura: Inventory/Core
  * Script: IInventoryEvents
  * Rol: Contrato de publicacion de eventos de inventario por itemID.
- * Relaciones: InventoryEvents es la implementacion estatica legacy; adapters futuros pueden implementar este contrato para tests o escenas paralelas.
+ * Relaciones: InventoryEventChannel_SO es la salida oficial en escena; este contrato queda disponible para adapters de tests o servicios puros.
  */
 public interface IInventoryEvents
 {

@@ -88,14 +88,11 @@ public class SoundSettings : MonoBehaviour
         if (settingsServiceBehaviour == null)
             settingsServiceBehaviour = GetComponentInParent<GameSettingsService>();
 
-        if (settingsServiceBehaviour == null)
-            settingsServiceBehaviour = gameObject.AddComponent<GameSettingsService>();
-
         settingsReader = settingsServiceBehaviour as IGameSettingsReader;
         settingsWriter = settingsServiceBehaviour as IGameSettingsWriter;
 
         if (settingsReader == null)
-            Debug.LogWarning("[SoundSettings] Asigna un GameSettingsService para aplicar volumenes sin usar GameSettings.Instance.", this);
+            Debug.LogWarning("[SoundSettings] Asigna un GameSettingsService para aplicar volumenes desde el asset GameSettings.", this);
     }
     
 

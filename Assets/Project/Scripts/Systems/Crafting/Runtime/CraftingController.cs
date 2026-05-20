@@ -3,8 +3,8 @@
  * Script: CraftingController
  * Rol: Facade runtime de Crafting. Coordina UI, CraftingSystem e Inventory mediante contratos.
  * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
- * Relaciones: Usa InventoryController solo para obtener IInventoryReadModel/IInventoryWriteModel y publica CraftingEvents propios.
- * Riesgo arquitectonico mitigado: ya no llama QuestEvents directamente; GameplayEventRouter traduce CraftingEvents hacia Quest/Notification.
+ * Relaciones: Usa InventoryController solo para obtener IInventoryReadModel/IInventoryWriteModel y publica CraftingEventChannel_SO.
+ * Riesgo arquitectonico mitigado: el router de escena decide si Quest/Notification reaccionan al crafting.
  * Uso como referencia: muestra como un Runtime puede orquestar Core + UI sin conocer consumidores externos.
  */
 using UnityEngine;
@@ -21,6 +21,9 @@ public class CraftingController : MonoBehaviour
     [SerializeField] private CraftingRecipeListView listView;
     [SerializeField] private CraftingRecipeDetailView detailView;
     [SerializeField] private Button craftButton;
+
+    [Header("Events")]
+    [SerializeField] private CraftingEventChannel_SO craftingChannel;
 
     private CraftingSystem system;
 
@@ -180,8 +183,8 @@ public class CraftingController : MonoBehaviour
             UpdateCraftButton();
             return;
         }
-        // Evento propio de Crafting: publica ItemData_SO legacy y itemID runtime para sistemas desacoplados.
-        CraftingEvents.PublishItemCrafted(recipe.result, recipe.resultAmount);
+        craftingChannel?.RaiseItemCrafted(recipe.result, recipe.resultAmount);
+        craftingChannel?.RaiseItemCraftedByID(recipe.result != null ? recipe.result.itemID : string.Empty, recipe.resultAmount);
         //  limpiar slots internos
         system.ClearAllNoReturn();
 
@@ -203,7 +206,7 @@ public class CraftingController : MonoBehaviour
             type = type
         };
 
-        CraftingEvents.PublishNotificationRequested(notification);
+        craftingChannel?.RaiseNotification(notification);
     }
 
     private NotificationType ToNotificationType(CraftingResultType type)

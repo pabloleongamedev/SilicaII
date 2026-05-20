@@ -3,7 +3,7 @@
  * Script: QuestUIController
  * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
  * Modulo: Gestiona misiones y progreso a partir de eventos de gameplay como recolectar, refinar o craftear.
- * Relaciones: Escucha QuestEvents para renderizar snapshots y consulta QuestSystem asignado por Inspector para reconstruir progreso al activarse.
+ * Relaciones: Escucha QuestEventChannel_SO para renderizar snapshots y consulta QuestSystem asignado por Inspector para reconstruir progreso al activarse.
  * Riesgo arquitectonico mitigado: elimina busqueda global de QuestSystem; la dependencia de lectura queda visible en escena.
  */
 using UnityEngine;
@@ -31,18 +31,25 @@ public class QuestUIController : MonoBehaviour
     private List<QuestUIBlock> questBlocks = new();
 
     [SerializeField] private QuestSystem questSystemRef;
+    [SerializeField] private QuestEventChannel_SO questChannel;
 
     // =========================================================
     private void Awake()
     {
-        QuestEvents.OnQuestLoaded += BuildUI;
-        QuestEvents.OnTaskUpdated += UpdateTask;
+        if (questChannel != null)
+        {
+            questChannel.QuestLoaded += BuildUI;
+            questChannel.TaskUpdated += UpdateTask;
+        }
     }
 
     private void OnDestroy()
     {
-        QuestEvents.OnQuestLoaded -= BuildUI;
-        QuestEvents.OnTaskUpdated -= UpdateTask;
+        if (questChannel != null)
+        {
+            questChannel.QuestLoaded -= BuildUI;
+            questChannel.TaskUpdated -= UpdateTask;
+        }
     }
 
     private void OnEnable()

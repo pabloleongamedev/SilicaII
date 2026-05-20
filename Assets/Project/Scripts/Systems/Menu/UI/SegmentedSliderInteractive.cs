@@ -3,7 +3,7 @@
  * Script: SegmentedSliderInteractive
  * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
  * Modulo: Gestiona pantallas, configuraciones y flujo del menu.
- * Relaciones: Se conecta con SaveLoad/GameManager para iniciar, cargar y configurar partida.
+ * Relaciones: Se conecta con Menu/Settings para iniciar, cargar y configurar partida.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
 using UnityEngine;

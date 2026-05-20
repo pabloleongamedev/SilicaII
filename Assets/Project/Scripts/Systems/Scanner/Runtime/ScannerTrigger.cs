@@ -2,8 +2,8 @@
  * Arquitectura: Scanner/Runtime
  * Script: ScannerTrigger
  * Rol: Feedback visual/audio del scanner del Player.
- * Modulo: Escucha ScannerEvents y ejecuta animacion/audio cuando un IInteractable escaneable confirma que puede escanearse.
- * Relaciones: ItemPickup en modo Scannable no conoce este componente; solo publica ScannerEvents.RequestScanFeedback.
+ * Modulo: Escucha ScannerFeedbackEventChannel_SO y ejecuta animacion/audio cuando un IInteractable escaneable confirma que puede escanearse.
+ * Relaciones: ItemPickup en modo Scannable no conoce este componente; solo publica por EventChannel.
  * Uso como referencia: ScannerTrigger ya no lee input ni decide que objeto se escanea; Interaction es la entrada oficial.
  */
 using System.Collections;
@@ -13,6 +13,9 @@ public class ScannerTrigger : MonoBehaviour
 {
     [Header("Audio Service")]
     [SerializeField] private MonoBehaviour audioServiceBehaviour;
+
+    [Header("Events")]
+    [SerializeField] private ScannerFeedbackEventChannel_SO scannerFeedbackChannel;
 
     [Header("Scanner Visual")]
     [SerializeField] private GameObject pivotScan;
@@ -37,12 +40,14 @@ public class ScannerTrigger : MonoBehaviour
     private void OnEnable()
     {
         ResolveAudioService();
-        ScannerEvents.OnScanFeedbackRequested += HandleScanFeedbackRequested;
+        if (scannerFeedbackChannel != null)
+            scannerFeedbackChannel.Raised += HandleScanFeedbackRequested;
     }
 
     private void OnDisable()
     {
-        ScannerEvents.OnScanFeedbackRequested -= HandleScanFeedbackRequested;
+        if (scannerFeedbackChannel != null)
+            scannerFeedbackChannel.Raised -= HandleScanFeedbackRequested;
         StopScanning();
     }
 

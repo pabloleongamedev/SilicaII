@@ -11,15 +11,18 @@ using UnityEngine;
 public class ChemistryUIController : MonoBehaviour
 {
     [SerializeField] private GameObject chemistryPanel;
+    [SerializeField] private UIStateEventChannel_SO uiStateChannel;
 
     private void OnEnable()
     {
-        UIStateEvents.OnUIStateChanged += HandleState;
+        if (uiStateChannel != null)
+            uiStateChannel.Raised += HandleState;
     }
 
     private void OnDisable()
     {
-        UIStateEvents.OnUIStateChanged -= HandleState;
+        if (uiStateChannel != null)
+            uiStateChannel.Raised -= HandleState;
     }
 
     private void HandleState(UIState state)

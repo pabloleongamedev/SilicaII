@@ -1,36 +1,71 @@
 /*
  * Arquitectura: Events/EventChannels
  * Script: GameplayEventChannelsBinding
- * Rol: Composition root de canales de eventos por escena.
- * Relaciones: Configura los buses estaticos para que publiquen tambien en EventChannels ScriptableObject.
- * Uso como referencia: mantener este binding en escena evita singletons y hace visibles las dependencias de eventos.
+ * Rol: Router de escena entre EventChannels ScriptableObject.
+ * Relaciones: Conecta Inventory/Crafting con Quest/Notification sin buses estaticos ni dependencias directas entre sistemas.
+ * Uso como referencia: mantener este binding en escena hace visibles las reglas de integracion entre canales.
  */
 using UnityEngine;
 
 public class GameplayEventChannelsBinding : MonoBehaviour
 {
-    [Header("Core Channels")]
+    [Header("Notification")]
     [SerializeField] private NotificationEventChannel_SO notificationChannel;
-    [SerializeField] private NotificationStateEventChannel_SO notificationStateChannel;
-    [SerializeField] private GameStateEventChannel_SO gameStateChannel;
-    [SerializeField] private UIStateEventChannel_SO uiStateChannel;
 
-    [Header("System Channels")]
+    [Header("Gameplay")]
     [SerializeField] private InventoryEventChannel_SO inventoryChannel;
     [SerializeField] private CraftingEventChannel_SO craftingChannel;
     [SerializeField] private QuestEventChannel_SO questChannel;
-    [SerializeField] private ScannerFeedbackEventChannel_SO scannerFeedbackChannel;
-    [SerializeField] private WeatherStateEventChannel_SO weatherStateChannel;
 
-    private void Awake()
+    private void OnEnable()
     {
-        NotificationEvents.ConfigureChannels(notificationChannel, notificationStateChannel);
-        GameStateEvents.ConfigureChannel(gameStateChannel);
-        UIStateEvents.ConfigureChannel(uiStateChannel);
-        InventoryEvents.ConfigureChannel(inventoryChannel);
-        CraftingEvents.ConfigureChannel(craftingChannel);
-        QuestEvents.ConfigureChannel(questChannel);
-        ScannerEvents.ConfigureChannel(scannerFeedbackChannel);
-        WeatherEvents.ConfigureChannel(weatherStateChannel);
+        if (inventoryChannel != null)
+        {
+            inventoryChannel.ItemAddedByID += ForwardItemCollectedToQuest;
+            inventoryChannel.NotificationRequested += ForwardNotification;
+        }
+
+        if (craftingChannel != null)
+        {
+            craftingChannel.ItemCraftedByID += ForwardItemCraftedToQuest;
+            craftingChannel.ItemRefinedByID += ForwardItemRefinedToQuest;
+            craftingChannel.NotificationRequested += ForwardNotification;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (inventoryChannel != null)
+        {
+            inventoryChannel.ItemAddedByID -= ForwardItemCollectedToQuest;
+            inventoryChannel.NotificationRequested -= ForwardNotification;
+        }
+
+        if (craftingChannel != null)
+        {
+            craftingChannel.ItemCraftedByID -= ForwardItemCraftedToQuest;
+            craftingChannel.ItemRefinedByID -= ForwardItemRefinedToQuest;
+            craftingChannel.NotificationRequested -= ForwardNotification;
+        }
+    }
+
+    private void ForwardItemCollectedToQuest(string itemID, int amount)
+    {
+        questChannel?.RaiseItemCollected(itemID, amount);
+    }
+
+    private void ForwardItemCraftedToQuest(string itemID, int amount)
+    {
+        questChannel?.RaiseItemCrafted(itemID, amount);
+    }
+
+    private void ForwardItemRefinedToQuest(string itemID, int amount)
+    {
+        questChannel?.RaiseItemRefined(itemID, amount);
+    }
+
+    private void ForwardNotification(NotificationData notification)
+    {
+        notificationChannel?.Raise(notification);
     }
 }

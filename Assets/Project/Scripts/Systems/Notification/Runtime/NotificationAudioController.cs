@@ -3,7 +3,7 @@
  * Script: NotificationAudioController
  * Rol: Adaptador de audio de notificaciones.
  * Modulo: Gestiona mensajes visuales y sonoros de feedback para el jugador.
- * Relaciones: Escucha NotificationEvents.OnNotification y solicita AudioCueKey al IAudioService central.
+ * Relaciones: Escucha NotificationEventChannel_SO y solicita AudioCueKey al IAudioService central.
  * Uso como referencia: no guarda clips propios; AudioCueLibrary_SO centraliza las referencias.
  */
 using UnityEngine;
@@ -13,17 +13,22 @@ public class NotificationAudioController : MonoBehaviour
     [Header("Audio Service")]
     [SerializeField] private MonoBehaviour audioServiceBehaviour;
 
+    [Header("Events")]
+    [SerializeField] private NotificationEventChannel_SO notificationChannel;
+
     private IAudioService audioService;
 
     private void OnEnable()
     {
         ResolveAudioService();
-        NotificationEvents.OnNotification += HandleNotification;
+        if (notificationChannel != null)
+            notificationChannel.Raised += HandleNotification;
     }
 
     private void OnDisable()
     {
-        NotificationEvents.OnNotification -= HandleNotification;
+        if (notificationChannel != null)
+            notificationChannel.Raised -= HandleNotification;
     }
 
     private void HandleNotification(NotificationData data)

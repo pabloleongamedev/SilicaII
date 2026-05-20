@@ -14,6 +14,7 @@ public class InteractionUIController : MonoBehaviour
     [SerializeField] private InteractionDetector detector;
     [SerializeField] private GameObject panel;
     [SerializeField] private TMP_Text text;
+    [SerializeField] private NotificationStateEventChannel_SO notificationStateChannel;
 
     private bool notificationActive;
 
@@ -22,7 +23,8 @@ public class InteractionUIController : MonoBehaviour
         if (detector != null)
             detector.OnInteractableChanged += HandleChanged;
 
-        NotificationEvents.OnNotificationStateChanged += HandleNotification;
+        if (notificationStateChannel != null)
+            notificationStateChannel.Raised += HandleNotification;
     }
 
     private void OnDisable()
@@ -30,7 +32,8 @@ public class InteractionUIController : MonoBehaviour
         if (detector != null)
             detector.OnInteractableChanged -= HandleChanged;
 
-        NotificationEvents.OnNotificationStateChanged -= HandleNotification;
+        if (notificationStateChannel != null)
+            notificationStateChannel.Raised -= HandleNotification;
     }
 
     private void HandleNotification(bool isActive)

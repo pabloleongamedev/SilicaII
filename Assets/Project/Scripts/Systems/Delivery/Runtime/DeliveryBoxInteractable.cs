@@ -16,6 +16,7 @@ public class DeliveryBoxInteractable : MonoBehaviour, IInteractable
     [Header("Refs")]
     [SerializeField] private InventoryController inventoryController;
     [SerializeField] private PlayerStateController playerState;
+    [SerializeField] private NotificationEventChannel_SO notificationChannel;
 
     private IInventoryReadModel read;
     private IInventoryWriteModel write;
@@ -115,7 +116,7 @@ public class DeliveryBoxInteractable : MonoBehaviour, IInteractable
     {
         Debug.Log("[DeliveryBox] " + msg);
 
-        NotificationEvents.PublishNotification(new NotificationData
+        notificationChannel?.Raise(new NotificationData
         {
             message = msg,
             type = type

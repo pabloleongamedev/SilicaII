@@ -1170,7 +1170,7 @@ GameObject:
   - component: {fileID: 3153643010255134346}
   - component: {fileID: 6698746976159326217}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: SaveLoadSceneBinding
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1663,14 +1663,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4106645591600503090}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 412bb620bdb4c6b45ad9d300267ad306, type: 3}
+  m_Script: {fileID: 11500000, guid: a444c10e4f8a4c94a8c7f2d7e15a0004, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: SilicaII.Systems::GameManager
+  m_EditorClassIdentifier: SilicaII.Systems::SaveLoadSceneBinding
   autoSaveInterval: 3600
-  enableAutoSave: 1
-  mainMenuPanel: {fileID: 1459206413}
-  optionsPanel: {fileID: 2498574361926638359}
+  enableAutoSave: 0
   participantRegistry: {fileID: 3366727754306379031}
+  itemDatabase: {fileID: 0}
+  sceneLoaderBehaviour: {fileID: 0}
 --- !u!222 &8361686901121428948
 CanvasRenderer:
   m_ObjectHideFlags: 0

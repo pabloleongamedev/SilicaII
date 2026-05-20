@@ -103,9 +103,6 @@ public class GraphicsSettings : MonoBehaviour
         if (settingsServiceBehaviour == null)
             settingsServiceBehaviour = GetComponentInParent<GameSettingsService>();
 
-        if (settingsServiceBehaviour == null)
-            settingsServiceBehaviour = gameObject.AddComponent<GameSettingsService>();
-
         settingsReader = settingsServiceBehaviour as IGameSettingsReader;
         settingsWriter = settingsServiceBehaviour as IGameSettingsWriter;
 

@@ -3,8 +3,8 @@
  * Script: ChemistryController
  * Rol: Facade runtime de Chemistry. Coordina UI, ChemistrySystem, metodos de separacion e Inventory.
  * Modulo: Gestiona recetas, crafting y separacion quimica; consume/produce items mediante los contratos de Inventory.
- * Relaciones: Usa IInventoryReadModel/IInventoryWriteModel para transacciones; escucha UIStateEvents.OnUIStateChanged y publica CraftingEvents propios.
- * Riesgo arquitectonico mitigado: ya no llama QuestEvents directamente; GameplayEventRouter traduce CraftingEvents hacia Quest/Notification.
+ * Relaciones: Usa IInventoryReadModel/IInventoryWriteModel para transacciones; escucha UIStateEventChannel_SO y publica CraftingEventChannel_SO.
+ * Riesgo arquitectonico mitigado: el router de escena decide si Quest/Notification reaccionan a Chemistry.
  * Uso como referencia: documenta un controlador runtime funcional que aun puede adelgazar separando flujo UI y transacciones.
  */
 using UnityEngine;
@@ -27,6 +27,10 @@ public class ChemistryController : MonoBehaviour
 
     [Header("Refs")]
     [SerializeField] private InventoryController inventoryController;
+
+    [Header("Events")]
+    [SerializeField] private UIStateEventChannel_SO uiStateChannel;
+    [SerializeField] private CraftingEventChannel_SO craftingChannel;
 
     private SeparationMethod_SO currentMethod;
     private CompoundDefinition_SO currentCompound;
@@ -67,12 +71,14 @@ public class ChemistryController : MonoBehaviour
 
     private void OnEnable()
     {
-        UIStateEvents.OnUIStateChanged += HandleStateChanged;
+        if (uiStateChannel != null)
+            uiStateChannel.Raised += HandleStateChanged;
     }
 
     private void OnDisable()
     {
-        UIStateEvents.OnUIStateChanged -= HandleStateChanged;
+        if (uiStateChannel != null)
+            uiStateChannel.Raised -= HandleStateChanged;
     }
 
     private void OnDestroy()
@@ -286,8 +292,8 @@ public class ChemistryController : MonoBehaviour
             return;
         }
 
-        // Evento propio de Crafting: publica ItemData_SO legacy y itemID runtime para sistemas desacoplados.
-        CraftingEvents.PublishItemRefined(currentCompound.inputItem, 1);
+        craftingChannel?.RaiseItemRefined(currentCompound.inputItem, 1);
+        craftingChannel?.RaiseItemRefinedByID(currentCompound.inputItem != null ? currentCompound.inputItem.itemID : string.Empty, 1);
 
         // 🔥 limpiar sin rollback
         isCleaning = true;
@@ -310,6 +316,6 @@ public class ChemistryController : MonoBehaviour
             type = type
         };
 
-        CraftingEvents.PublishNotificationRequested(notification);
+        craftingChannel?.RaiseNotification(notification);
     }
 }

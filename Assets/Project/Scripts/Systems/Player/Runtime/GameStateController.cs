@@ -10,6 +10,8 @@ using UnityEngine;
 
 public class GameStateController : MonoBehaviour
 {
+    [SerializeField] private GameStateEventChannel_SO gameStateChannel;
+
     private GameState currentState = GameState.Gameplay;
 
     private void Awake()
@@ -31,7 +33,7 @@ public class GameStateController : MonoBehaviour
 
         Debug.Log("GAME STATE CAMBIADO A: " + currentState);
 
-        GameStateEvents.Publish(currentState);
+        gameStateChannel?.Raise(currentState);
     }
 
     public bool IsBlocked()

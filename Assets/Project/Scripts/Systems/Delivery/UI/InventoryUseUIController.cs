@@ -12,6 +12,7 @@ public class InventoryUseUIController : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] private InventoryListView inventoryListView;
+    [SerializeField] private NotificationEventChannel_SO notificationChannel;
 /*
     public void OnUseButtonPressed()
     {
@@ -47,7 +48,7 @@ public class InventoryUseUIController : MonoBehaviour
     {
         Debug.Log("[InventoryUseUI] " + msg);
 
-        NotificationEvents.PublishNotification(new NotificationData
+        notificationChannel?.Raise(new NotificationData
         {
             message = msg,
             type = type

@@ -2,7 +2,7 @@
  * Arquitectura: World/Runtime
  * Script: RainController
  * Rol: Presenter/controlador de lluvia basado en una fuente de tiempo desacoplada.
- * Relaciones: Consume IWorldTimeSource y publica WeatherEvents.OnRainStateChanged cuando cambia el clima.
+ * Relaciones: Consume IWorldTimeSource y publica WeatherStateEventChannel_SO cuando cambia el clima.
  * Uso como referencia: no lee campos publicos de DayNightCycle; la fuente de tiempo se asigna por Inspector.
  */
 using UnityEngine;
@@ -22,6 +22,9 @@ public class RainController : MonoBehaviour
     [SerializeField, Range(0f, 23f)] private float rainStartHour = 14f;
     [FormerlySerializedAs("duracionLluviaEnMinutos")]
     [SerializeField] private float rainDurationMinutes = 1f;
+
+    [Header("Events")]
+    [SerializeField] private WeatherStateEventChannel_SO weatherStateChannel;
 
     private IWorldTimeSource timeSource;
     private bool isRaining;
@@ -65,7 +68,7 @@ public class RainController : MonoBehaviour
 
         isRaining = shouldRain;
         rainObject.SetActive(isRaining);
-        WeatherEvents.PublishRainState(isRaining);
+        weatherStateChannel?.Raise(isRaining);
     }
 
     private void ResolveTimeSource()

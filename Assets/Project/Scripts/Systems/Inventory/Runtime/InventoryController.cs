@@ -4,7 +4,7 @@
  * Rol: Facade runtime de Inventory. Construye el Core desde configuracion y expone contratos de lectura/escritura.
  * Modulo: Gestiona items, cantidades, slots, vistas de inventario y contratos de lectura/escritura para otros sistemas.
  * Relaciones: Interaction y Crafting consumen IInventoryReadModel/IInventoryWriteModel; UI escucha ReadModel; SaveLoad exporta/importa InventorySaveData.
- * Riesgo arquitectonico mitigado: ya no publica QuestEvents directamente; GameplayEventRouter traduce InventoryEvents hacia Quest/Notification.
+ * Riesgo arquitectonico mitigado: publica en InventoryEventChannel_SO; el router de escena decide si Quest/Notification reaccionan.
  * Uso como referencia: buen ejemplo de Core desacoplado con facade runtime y eventos propios del sistema.
  */
 using UnityEngine;
@@ -19,6 +19,9 @@ public class InventoryController : MonoBehaviour
     [Header("View")]
     [SerializeField] private InventoryView inventoryView;
     [SerializeField] private InventoryListView listView;
+
+    [Header("Events")]
+    [SerializeField] private InventoryEventChannel_SO inventoryChannel;
 
     public IInventoryReadModel ReadModel => inventorySystem.ReadModel;
     public IInventoryWriteModel WriteModel => inventorySystem;
@@ -117,18 +120,19 @@ public class InventoryController : MonoBehaviour
             type = ToNotificationType(feedback.type)
         };
 
-        InventoryEvents.PublishNotificationRequested(notification);
+        inventoryChannel?.RaiseNotification(notification);
     }
 
     private void HandleItemAdded(ItemData_SO item, int amount)
     {
-        // Evento propio de Inventory: publica ItemData_SO legacy y itemID runtime para sistemas desacoplados.
-        InventoryEvents.PublishItemAdded(item, amount);
+        inventoryChannel?.RaiseItemAdded(item, amount);
+        inventoryChannel?.RaiseItemAddedByID(item != null ? item.itemID : string.Empty, amount);
     }
 
     private void HandleItemRemoved(ItemData_SO item, int amount)
     {
-        InventoryEvents.PublishItemRemoved(item, amount);
+        inventoryChannel?.RaiseItemRemoved(item, amount);
+        inventoryChannel?.RaiseItemRemovedByID(item != null ? item.itemID : string.Empty, amount);
     }
 
     private NotificationType ToNotificationType(InventoryFeedbackType type)

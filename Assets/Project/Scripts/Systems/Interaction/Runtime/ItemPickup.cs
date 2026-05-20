@@ -3,7 +3,7 @@
  * Script: ItemPickup
  * Rol: Interactable unico para objetos del mundo que contienen uno o mas items.
  * Modulo: Expone contenidos mediante IPickable y, segun InteractionMode, ejecuta recoleccion o escaneo.
- * Relaciones: InteractionDetector solo ve IInteractable; Inventory recibe items por InteractionContext; ScannerTrigger recibe feedback por ScannerEvents.
+ * Relaciones: InteractionDetector solo ve IInteractable; Inventory recibe items por InteractionContext; ScannerTrigger recibe feedback por ScannerFeedbackEventChannel_SO.
  * Riesgo arquitectonico mitigado: el modo explicito evita componentes redundantes cuando el diseno exige que un objeto sea pickable o scannable, nunca ambos.
  * Uso como referencia: un componente puede implementar varios contratos si el Inspector deja clara la decision de comportamiento.
  */
@@ -43,6 +43,10 @@ public class ItemPickup : MonoBehaviour, IInteractable, IPickable, IScannable
     [SerializeField] private float notificationDelay = 2.1f;
     [SerializeField] private NotificationType successType = NotificationType.Info;
     [SerializeField] private NotificationType warningType = NotificationType.Warning;
+
+    [Header("Events")]
+    [SerializeField] private ScannerFeedbackEventChannel_SO scannerFeedbackChannel;
+    [SerializeField] private NotificationEventChannel_SO notificationChannel;
 
     private bool isScanning;
     private bool wasScanned;
@@ -174,7 +178,7 @@ public class ItemPickup : MonoBehaviour, IInteractable, IPickable, IScannable
     private IEnumerator ScanRoutine()
     {
         isScanning = true;
-        ScannerEvents.RequestScanFeedback(this);
+        scannerFeedbackChannel?.Raise(this);
 
         if (notificationDelay > 0f)
             yield return new WaitForSeconds(notificationDelay);
@@ -244,7 +248,7 @@ public class ItemPickup : MonoBehaviour, IInteractable, IPickable, IScannable
 
     private void PublishNotification(string message, NotificationType type)
     {
-        NotificationEvents.PublishNotification(new NotificationData
+        notificationChannel?.Raise(new NotificationData
         {
             message = message,
             type = type

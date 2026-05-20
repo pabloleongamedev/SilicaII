@@ -399,6 +399,7 @@ MonoBehaviour:
   brightnessSlider: {fileID: 1017261948318282191}
   fullscreenToggle: {fileID: 6655077513035193812}
   brightnessOverlay: {fileID: 0}
+  settingsServiceBehaviour: {fileID: 8871323635106730891}
 --- !u!1 &776516451543179732
 GameObject:
   m_ObjectHideFlags: 0
@@ -2884,6 +2885,7 @@ MonoBehaviour:
   masterVolumeSlider: {fileID: 7082288668354843625}
   musicSlider: {fileID: 8741875865838903184}
   sfxSlider: {fileID: 550842233579899826}
+  settingsServiceBehaviour: {fileID: 8871323635106730891}
 --- !u!1 &7381323635106730891
 GameObject:
   m_ObjectHideFlags: 0
@@ -2898,6 +2900,7 @@ GameObject:
   - component: {fileID: 5073603907986682896}
   - component: {fileID: 7911207896989075190}
   - component: {fileID: 3662958490877999081}
+  - component: {fileID: 8871323635106730891}
   m_Layer: 5
   m_Name: OptionsPanel
   m_TagString: Untagged
@@ -3026,6 +3029,21 @@ MonoBehaviour:
   musicSlider: {fileID: 8741875865838903184}
   effectsSlider: {fileID: 550842233579899826}
   masterVolumeSlider: {fileID: 7082288668354843625}
+  settingsServiceBehaviour: {fileID: 8871323635106730891}
+--- !u!114 &8871323635106730891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7381323635106730891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf8ede61cb9144c59e9a12650aeed583, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameSettingsService
+  settings: {fileID: 11400000, guid: 0b9ec329cb0d4575a9af0d4196f75e85, type: 2}
+  loadOnAwake: 1
 --- !u!1 &7800231234078361826
 GameObject:
   m_ObjectHideFlags: 0

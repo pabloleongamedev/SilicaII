@@ -2,15 +2,16 @@
  * Arquitectura: Menu/Runtime
  * Script: GameSettingsService
  * Rol: Adapter de escena para configuracion persistente.
- * Relaciones: Implementa IGameSettingsReader/IGameSettingsWriter y envuelve GameSettings, que conserva PlayerPrefs como detalle interno.
- * Riesgo arquitectonico mitigado: UI y Audio dependen de contratos asignables por Inspector, no de GameSettings.Instance.
+ * Relaciones: Implementa IGameSettingsReader/IGameSettingsWriter y usa GameSettings como asset/config asignado por Inspector.
+ * Riesgo arquitectonico mitigado: UI y Audio dependen de contratos asignables; no existe singleton global de configuracion.
  * Uso como referencia: si luego cambias PlayerPrefs por archivo, nube o perfil de usuario, los consumidores no cambian.
  */
 using UnityEngine;
 
 public class GameSettingsService : MonoBehaviour, IGameSettingsReader, IGameSettingsWriter
 {
-    private GameSettings Settings => GameSettings.Instance;
+    [SerializeField] private GameSettings settings;
+    [SerializeField] private bool loadOnAwake = true;
 
     public float Brightness
     {
@@ -42,6 +43,27 @@ public class GameSettingsService : MonoBehaviour, IGameSettingsReader, IGameSett
         set => Settings.Fullscreen = value;
     }
 
+    private GameSettings Settings
+    {
+        get
+        {
+            if (settings == null)
+            {
+                settings = ScriptableObject.CreateInstance<GameSettings>();
+                settings.ResetRuntimeToDefaults();
+                Debug.LogWarning("[GameSettingsService] No hay GameSettings asset asignado. Se creo una configuracion runtime temporal.", this);
+            }
+
+            return settings;
+        }
+    }
+
+    private void Awake()
+    {
+        if (loadOnAwake)
+            Load();
+    }
+
     public int GetMasterVolumeSegments()
     {
         return Settings.GetMasterVolumeSegments();
@@ -54,16 +76,30 @@ public class GameSettingsService : MonoBehaviour, IGameSettingsReader, IGameSett
 
     public void Save()
     {
-        Settings.Save();
+        var current = Settings;
+
+        PlayerPrefs.SetFloat(current.BrightnessKey, current.Brightness);
+        PlayerPrefs.SetFloat(current.MusicVolumeKey, current.MusicVolume);
+        PlayerPrefs.SetFloat(current.EffectsVolumeKey, current.EffectsVolume);
+        PlayerPrefs.SetFloat(current.MasterVolumeKey, current.MasterVolume);
+        PlayerPrefs.SetInt(current.FullscreenKey, current.Fullscreen ? 1 : 0);
+        PlayerPrefs.Save();
     }
 
     public void Load()
     {
-        Settings.Load();
+        var current = Settings;
+
+        current.Brightness = PlayerPrefs.GetFloat(current.BrightnessKey, current.DefaultBrightness);
+        current.MusicVolume = PlayerPrefs.GetFloat(current.MusicVolumeKey, current.DefaultMusicVolume);
+        current.EffectsVolume = PlayerPrefs.GetFloat(current.EffectsVolumeKey, current.DefaultEffectsVolume);
+        current.MasterVolume = PlayerPrefs.GetFloat(current.MasterVolumeKey, current.DefaultMasterVolume);
+        current.Fullscreen = PlayerPrefs.GetInt(current.FullscreenKey, current.DefaultFullscreen ? 1 : 0) == 1;
     }
 
     public void ResetToDefaults()
     {
-        Settings.ResetToDefaults();
+        Settings.ResetRuntimeToDefaults();
+        Save();
     }
 }

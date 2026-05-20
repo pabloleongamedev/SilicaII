@@ -2,7 +2,7 @@
  * Arquitectura: Menu/Runtime
  * Script: UnitySceneLoader
  * Rol: Fallback no-MonoBehaviour para codigo runtime que aun no tiene SceneLoadService asignado por Inspector.
- * Relaciones: Mantiene GameManager/Menu funcionales mientras migras escenas; la ruta recomendada sigue siendo SceneLoadService.
+ * Relaciones: Mantiene Menu/SaveLoad funcionales cuando no hay SceneLoadService asignado; la ruta recomendada sigue siendo SceneLoadService.
  */
 using UnityEngine;
 using UnityEngine.SceneManagement;

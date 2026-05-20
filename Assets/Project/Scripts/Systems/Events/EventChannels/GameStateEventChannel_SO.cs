@@ -2,7 +2,7 @@
  * Arquitectura: Events/EventChannels
  * Script: GameStateEventChannel_SO
  * Rol: Canal de evento serializable para cambios de estado global de juego.
- * Relaciones: Alternativa modular a GameStateEvents; GameStateController o presenters pueden asignarlo por Inspector.
+ * Relaciones: Salida oficial para GameStateController o presenters asignados por Inspector.
  * Riesgo arquitectonico mitigado: hace visible en escena que sistemas reaccionan a GameState sin depender de estado estatico compartido.
  */
 using System;

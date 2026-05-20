@@ -3,7 +3,7 @@
  * Script: QuestSystem
  * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
  * Modulo: Gestiona misiones y progreso a partir de eventos de gameplay como recolectar, refinar o craftear.
- * Relaciones: Escucha QuestEvents con itemID y publica estado de mision hacia UI u otros sistemas.
+ * Relaciones: Escucha QuestEventChannel_SO con itemID y publica snapshots para UI/teleport.
  * Fase 5: Quest compara por itemID para no depender de la misma instancia ItemData_SO que Inventory/Crafting.
  * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
  */
@@ -13,6 +13,9 @@ using System.Collections.Generic;
 public class QuestSystem : MonoBehaviour
 {
     [SerializeField] private List<QuestData_SO> quests;
+
+    [Header("Events")]
+    [SerializeField] private QuestEventChannel_SO questChannel;
 
     private int currentQuestIndex = 0;
     private QuestData_SO currentQuest;
@@ -30,23 +33,29 @@ public class QuestSystem : MonoBehaviour
     {
         // Quest progresa reaccionando a eventos publicados por otros modulos.
         // Inventory/Crafting no necesitan conocer el estado interno de misiones.
-        QuestEvents.OnItemCollected += HandleCollect;
-        QuestEvents.OnItemRefined += HandleRefined;
-        QuestEvents.OnItemCrafted += HandleCraft;
+        if (questChannel == null)
+            return;
+
+        questChannel.ItemCollected += HandleCollect;
+        questChannel.ItemRefined += HandleRefined;
+        questChannel.ItemCrafted += HandleCraft;
     }
 
     private void OnDisable()
     {
-        QuestEvents.OnItemCollected -= HandleCollect;
-        QuestEvents.OnItemRefined -= HandleRefined;
-        QuestEvents.OnItemCrafted -= HandleCraft;
+        if (questChannel == null)
+            return;
+
+        questChannel.ItemCollected -= HandleCollect;
+        questChannel.ItemRefined -= HandleRefined;
+        questChannel.ItemCrafted -= HandleCraft;
     }
 
     // =========================================
     private void LoadQuest(int index)
     {
         // QuestData_SO es el dato editable; el progreso runtime se inicializa aqui.
-        // La UI se entera mediante QuestEvents.OnQuestLoaded.
+        // La UI se entera mediante QuestEventChannel_SO.QuestLoaded.
         if (index >= quests.Count)
         {
             Debug.Log("TODAS LAS MISIONES COMPLETADAS");
@@ -64,7 +73,7 @@ public class QuestSystem : MonoBehaviour
         isInitialized = true;
 
         // 🔥 UI
-        QuestEvents.PublishQuestLoaded(currentQuest);
+        questChannel?.RaiseQuestLoaded(currentQuest);
     }
 
     // =========================================
@@ -112,7 +121,7 @@ public class QuestSystem : MonoBehaviour
 
             bool completed = current >= required;
 
-            QuestEvents.PublishTaskUpdated(i, current, required, completed);
+            questChannel?.RaiseTaskUpdated(i, current, required, completed);
         }
 
         CheckQuestComplete();
@@ -120,7 +129,7 @@ public class QuestSystem : MonoBehaviour
     private void CheckQuestComplete()
     {
         // Al completar se avisa por evento modular y luego se carga la siguiente.
-        // El evento estatico antiguo sigue existiendo solo como compatibilidad.
+        // QuestSystem no decide quien reacciona: solo emite el snapshot por canal.
         for (int i = 0; i < currentQuest.tasks.Count; i++)
         {
             if (progress[i] < currentQuest.tasks[i].requiredAmount)
@@ -130,7 +139,7 @@ public class QuestSystem : MonoBehaviour
         Debug.Log("MISIÓN COMPLETADA");
 
         // 🔥 ESTE ES EL PUNTO CLAVE
-        QuestEvents.PublishQuestCompleted(currentQuestIndex);
+        questChannel?.RaiseQuestCompleted(currentQuestIndex);
 
         LoadQuest(currentQuestIndex + 1);
     }

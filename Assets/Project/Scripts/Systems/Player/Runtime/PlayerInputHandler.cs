@@ -89,7 +89,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void NotifyAnyInput()
     {
-        InputActivityEvents.OnAnyInput?.Invoke();
+        // Punto de extension reservado para un InputActivityEventChannel_SO si se requiere telemetria de input.
     }
 
     // =========================================================
@@ -99,7 +99,7 @@ public class PlayerInputHandler : MonoBehaviour
     private void ToggleInventory()
     {
         // PlayerStateController es la fuente de verdad para pantallas abiertas.
-        // Los paneles escuchan UIStateEvents.OnUIStateChanged para mostrarse.
+        // Los paneles escuchan UIStateEventChannel_SO para mostrarse.
         if (IsBlocked()) return;
 
         if (stateController == null)

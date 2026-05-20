@@ -2,7 +2,7 @@
  * Arquitectura: SaveLoad/Runtime
  * Script: AutosaveController
  * Rol: Controla temporizacion de autosave sin conocer disco, escena ni participantes.
- * Relaciones: GameManager lo alimenta con deltaTime y ejecuta SaveService cuando ShouldSave retorna true.
+ * Relaciones: SaveLoadSceneBinding lo alimenta con deltaTime y ejecuta SaveService cuando ShouldSave retorna true.
  */
 public class AutosaveController
 {

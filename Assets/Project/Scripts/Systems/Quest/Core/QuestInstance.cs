@@ -42,7 +42,7 @@ public class QuestInstance
 
             bool completed = current >= required;
 
-            QuestEvents.PublishTaskUpdated(i, current, required, completed);
+            // Core puro: QuestSystem decide si este progreso se publica hacia UI.
         }
     }
     

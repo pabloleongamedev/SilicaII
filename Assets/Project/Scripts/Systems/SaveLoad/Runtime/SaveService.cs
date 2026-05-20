@@ -2,7 +2,7 @@
  * Arquitectura: SaveLoad/Runtime
  * Script: SaveService
  * Rol: Servicio de escritura de partidas. Recibe GameData ya capturado y lo persiste mediante SaveController.
- * Relaciones: GameManager delega aqui SaveGame/Checkpoint/Autosave; SceneRestoreCoordinator captura estado antes de llamar este servicio.
+ * Relaciones: SaveLoadSceneBinding delega aqui SaveGame/Checkpoint/Autosave; SceneRestoreCoordinator captura estado antes de llamar este servicio.
  */
 public class SaveService
 {

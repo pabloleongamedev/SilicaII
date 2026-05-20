@@ -2,7 +2,7 @@
  * Arquitectura: Player/Runtime
  * Script: PlayerDeathHandler
  * Rol: Adapter entre HealthBehaviour.OnDied y las consecuencias especificas del jugador.
- * Relaciones: Escucha HealthBehaviour, cambia GameStateController a GameOver y publica NotificationEvents.
+ * Relaciones: Escucha HealthBehaviour, cambia GameStateController a GameOver y publica NotificationEventChannel_SO si corresponde.
  * Requisito de escena: debe vivir en el prefab Player junto a HealthBehaviour para que la muerte dispare GameOver.
  * Fase 3: separa la regla "si el jugador muere, hay GameOver" del sistema Health, que debe poder reutilizarse en enemigos/objetos.
  */
@@ -14,6 +14,8 @@ public class PlayerDeathHandler : MonoBehaviour
 {
     [SerializeField] private HealthBehaviour health;
     [SerializeField] private GameStateController gameStateController;
+    [SerializeField] private GameStateEventChannel_SO gameStateChannel;
+    [SerializeField] private NotificationEventChannel_SO notificationChannel;
     [SerializeField] private bool notifyOnDeath = true;
     [SerializeField] private string deathMessage = "Integridad agotada. Game Over.";
 
@@ -43,12 +45,12 @@ public class PlayerDeathHandler : MonoBehaviour
         if (gameStateController != null)
             gameStateController.SetState(GameState.GameOver);
         else
-            GameStateEvents.Publish(GameState.GameOver);
+            gameStateChannel?.Raise(GameState.GameOver);
 
         if (!notifyOnDeath)
             return;
 
-        NotificationEvents.PublishNotification(new NotificationData
+        notificationChannel?.Raise(new NotificationData
         {
             message = deathMessage,
             type = NotificationType.Error

@@ -4,7 +4,7 @@
  * Rol: Vista/controlador de un slot de guardado simplificado.
  * Modulo: Gestiona el estado visual de Continuar/Nueva Partida.
  * Relaciones: Lee ISaveSlotReader y dispara IGameSessionLoader sobre el slot unico "1".
- * Riesgo arquitectonico mitigado: no conoce GameManager; requiere asignar servicios por Inspector.
+ * Riesgo arquitectonico mitigado: no conoce la implementacion concreta de SaveLoad; requiere asignar servicios por Inspector.
  * Uso como referencia: la vista conoce intenciones de aplicacion, no detalles de JSON, disco ni singleton.
  */
 using TMPro;

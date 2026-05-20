@@ -19,6 +19,7 @@ public class InventoryView : MonoBehaviour
     [SerializeField] private InventoryDragHandler dragHandler;
     [SerializeField] private GameObject QuestPanel;
     [SerializeField] private GameObject inventoryPanel; 
+    [SerializeField] private UIStateEventChannel_SO uiStateChannel;
 
     private IInventoryReadModel inventory;
     private List<InventorySlotView> slotViews = new List<InventorySlotView>();
@@ -105,7 +106,7 @@ public class InventoryView : MonoBehaviour
         if (inventoryPanel != null)
             inventoryPanel.SetActive(false);
 
-        UIStateEvents.Publish(UIState.Quest);
+        uiStateChannel?.Raise(UIState.Quest);
     }
 
     public void ShowInventoryPanel()

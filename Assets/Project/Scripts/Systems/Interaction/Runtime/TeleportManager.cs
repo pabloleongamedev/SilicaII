@@ -17,6 +17,8 @@ public class TeleportManager : MonoBehaviour, IInteractable
 
     [Header("Refs")]
     [SerializeField] private QuestSystem questSystem;
+    [SerializeField] private QuestEventChannel_SO questChannel;
+    [SerializeField] private NotificationEventChannel_SO notificationChannel;
     private bool canExit = false;
 
     // =========================================================
@@ -78,12 +80,14 @@ public class TeleportManager : MonoBehaviour, IInteractable
 
     private void OnEnable()
     {
-        QuestEvents.OnQuestCompleted += HandleQuestCompleted;
+        if (questChannel != null)
+            questChannel.QuestCompleted += HandleQuestCompleted;
     }
 
     private void OnDisable()
     {
-        QuestEvents.OnQuestCompleted -= HandleQuestCompleted;
+        if (questChannel != null)
+            questChannel.QuestCompleted -= HandleQuestCompleted;
     }
 
     private void HandleQuestCompleted(int questIndex)
@@ -138,7 +142,7 @@ public class TeleportManager : MonoBehaviour, IInteractable
     {
         Debug.Log("[Teleport] " + msg);
 
-        NotificationEvents.PublishNotification(new NotificationData
+        notificationChannel?.Raise(new NotificationData
         {
             message = msg,
             type = type
