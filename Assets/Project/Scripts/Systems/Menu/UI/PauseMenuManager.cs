@@ -17,16 +17,19 @@ public class PauseMenuManager : MonoBehaviour
     public bool IsPaused => isPaused;
 
     [SerializeField] private PlayerStateController playerStateController;
+    [SerializeField] private MonoBehaviour pauseServiceBehaviour;
     [SerializeField] private MonoBehaviour sceneLoaderBehaviour;
     [SerializeField] private string menuSceneName = "Menu";
 
     private InputSystem_Actions inputActions;
     private ISceneLoader sceneLoader;
+    private IGamePauseService pauseService;
 
     void Awake()
     {
         inputActions = new InputSystem_Actions();
         sceneLoader = ResolveSceneLoader();
+        pauseService = ResolvePauseService();
         
     }
 
@@ -54,7 +57,7 @@ public class PauseMenuManager : MonoBehaviour
     {
         pauseMenuUI.SetActive(true);
         optionsPanelUI.SetActive(false);
-        Time.timeScale = 0f;
+        ResolvePauseService()?.SetPaused(true);
         if (playerStateController != null)
             playerStateController.SetState(UIState.Blocked);
         isPaused = true;
@@ -64,7 +67,7 @@ public class PauseMenuManager : MonoBehaviour
     {
         pauseMenuUI.SetActive(false);
         optionsPanelUI.SetActive(false); // cerrar el panel de opciones
-        Time.timeScale = 1f;
+        ResolvePauseService()?.SetPaused(false);
         if (playerStateController != null)
             playerStateController.SetState(UIState.None);
         isPaused = false;
@@ -72,7 +75,7 @@ public class PauseMenuManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        Time.timeScale = 1f;
+        ResolvePauseService()?.SetPaused(false);
         if (playerStateController != null)
             playerStateController.SetState(UIState.None);
         ResolveSceneLoader().LoadScene(menuSceneName);
@@ -110,5 +113,19 @@ public class PauseMenuManager : MonoBehaviour
             sceneLoader = new UnitySceneLoader();
 
         return sceneLoader;
+    }
+
+    private IGamePauseService ResolvePauseService()
+    {
+        if (pauseService == null)
+            pauseService = pauseServiceBehaviour as IGamePauseService;
+
+        if (pauseService == null && pauseServiceBehaviour != null)
+            Debug.LogWarning("[PauseMenuManager] El Pause Service asignado no implementa IGamePauseService.", this);
+
+        if (pauseService == null)
+            pauseService = new UnityGamePauseService();
+
+        return pauseService;
     }
 }

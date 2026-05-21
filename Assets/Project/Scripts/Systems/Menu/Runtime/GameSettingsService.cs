@@ -10,51 +10,81 @@ using UnityEngine;
 
 public class GameSettingsService : MonoBehaviour, IGameSettingsReader, IGameSettingsWriter
 {
+    private const float FallbackBrightness = 0.75f;
+    private const float FallbackMusicVolume = 0.5f;
+    private const float FallbackEffectsVolume = 0.5f;
+    private const float FallbackMasterVolume = 1f;
+    private const bool FallbackFullscreen = true;
+
     [SerializeField] private GameSettings settings;
     [SerializeField] private bool loadOnAwake = true;
 
+    private bool warnedMissingSettings;
+
     public float Brightness
     {
-        get => Settings.Brightness;
-        set => Settings.Brightness = value;
+        get => HasSettings ? settings.Brightness : FallbackBrightness;
+        set
+        {
+            if (HasSettings)
+                settings.Brightness = value;
+        }
     }
 
     public float MusicVolume
     {
-        get => Settings.MusicVolume;
-        set => Settings.MusicVolume = value;
+        get => HasSettings ? settings.MusicVolume : FallbackMusicVolume;
+        set
+        {
+            if (HasSettings)
+                settings.MusicVolume = value;
+        }
     }
 
     public float EffectsVolume
     {
-        get => Settings.EffectsVolume;
-        set => Settings.EffectsVolume = value;
+        get => HasSettings ? settings.EffectsVolume : FallbackEffectsVolume;
+        set
+        {
+            if (HasSettings)
+                settings.EffectsVolume = value;
+        }
     }
 
     public float MasterVolume
     {
-        get => Settings.MasterVolume;
-        set => Settings.MasterVolume = value;
+        get => HasSettings ? settings.MasterVolume : FallbackMasterVolume;
+        set
+        {
+            if (HasSettings)
+                settings.MasterVolume = value;
+        }
     }
 
     public bool Fullscreen
     {
-        get => Settings.Fullscreen;
-        set => Settings.Fullscreen = value;
+        get => HasSettings ? settings.Fullscreen : FallbackFullscreen;
+        set
+        {
+            if (HasSettings)
+                settings.Fullscreen = value;
+        }
     }
 
-    private GameSettings Settings
+    private bool HasSettings
     {
         get
         {
-            if (settings == null)
+            if (settings != null)
+                return true;
+
+            if (!warnedMissingSettings)
             {
-                settings = ScriptableObject.CreateInstance<GameSettings>();
-                settings.ResetRuntimeToDefaults();
-                Debug.LogWarning("[GameSettingsService] No hay GameSettings asset asignado. Se creo una configuracion runtime temporal.", this);
+                warnedMissingSettings = true;
+                Debug.LogWarning("[GameSettingsService] Asigna un GameSettings asset por Inspector. Se usaran defaults runtime y no se persistiran cambios.", this);
             }
 
-            return settings;
+            return false;
         }
     }
 
@@ -66,17 +96,21 @@ public class GameSettingsService : MonoBehaviour, IGameSettingsReader, IGameSett
 
     public int GetMasterVolumeSegments()
     {
-        return Settings.GetMasterVolumeSegments();
+        return HasSettings ? settings.GetMasterVolumeSegments() : Mathf.Clamp(Mathf.RoundToInt(FallbackMasterVolume * 10f), 1, 10);
     }
 
     public void SetMasterVolumeFromSegments(float segments)
     {
-        Settings.SetMasterVolumeFromSegments(segments);
+        if (HasSettings)
+            settings.SetMasterVolumeFromSegments(segments);
     }
 
     public void Save()
     {
-        var current = Settings;
+        if (!HasSettings)
+            return;
+
+        var current = settings;
 
         PlayerPrefs.SetFloat(current.BrightnessKey, current.Brightness);
         PlayerPrefs.SetFloat(current.MusicVolumeKey, current.MusicVolume);
@@ -88,7 +122,10 @@ public class GameSettingsService : MonoBehaviour, IGameSettingsReader, IGameSett
 
     public void Load()
     {
-        var current = Settings;
+        if (!HasSettings)
+            return;
+
+        var current = settings;
 
         current.Brightness = PlayerPrefs.GetFloat(current.BrightnessKey, current.DefaultBrightness);
         current.MusicVolume = PlayerPrefs.GetFloat(current.MusicVolumeKey, current.DefaultMusicVolume);
@@ -99,7 +136,10 @@ public class GameSettingsService : MonoBehaviour, IGameSettingsReader, IGameSett
 
     public void ResetToDefaults()
     {
-        Settings.ResetRuntimeToDefaults();
+        if (!HasSettings)
+            return;
+
+        settings.ResetRuntimeToDefaults();
         Save();
     }
 }

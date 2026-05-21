@@ -93,9 +93,9 @@ public class DayNightCycle : MonoBehaviour, IWorldTimeSource
 
     private void ResolveTimeSource()
     {
-        if (timeSourceBehaviour == null)
-            timeSourceBehaviour = GetComponent<WorldTimeService>();
-
         timeSource = timeSourceBehaviour as IWorldTimeSource;
+
+        if (timeSourceBehaviour != null && timeSource == null)
+            Debug.LogWarning("[DayNightCycle] El Time Source asignado no implementa IWorldTimeSource.", this);
     }
 }

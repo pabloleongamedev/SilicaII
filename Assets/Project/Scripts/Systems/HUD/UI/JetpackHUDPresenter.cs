@@ -24,7 +24,7 @@ public class JetpackHUDPresenter : MonoBehaviour
         fuelReader = ResolveFuelReader(fuelReaderBehaviour);
 
         if (jetpackBar == null)
-            jetpackBar = GetComponentInChildren<JetpackBarSegments>(true);
+            Debug.LogWarning("[JetpackHUDPresenter] Asigna JetpackBarSegments por Inspector.", this);
     }
 
     private void OnEnable()
@@ -103,12 +103,6 @@ public class JetpackHUDPresenter : MonoBehaviour
             return;
 
         fuelReader = ResolveFuelReader(fuelReaderBehaviour);
-        if (fuelReader != null)
-            return;
-
-        var localMovement = GetComponentInParent<MovementController>();
-        if (localMovement != null)
-            fuelReader = localMovement;
 
         if (fuelReader == null)
             Debug.LogWarning("[JetpackHUDPresenter] Asigna un MonoBehaviour que implemente IJetpackFuelReader por Inspector.", this);

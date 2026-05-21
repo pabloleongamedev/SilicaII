@@ -32,13 +32,13 @@ public class UIAudioManager : MonoBehaviour
 
     private void ResolveAudioService()
     {
-        if (audioServiceBehaviour == null)
-            audioServiceBehaviour = GetComponentInParent<AudioService>();
-
         audioService = audioServiceBehaviour as IAudioService;
 
         if (audioService == null && audioServiceBehaviour != null)
             Debug.LogWarning("[UIAudioManager] El Audio Service asignado no implementa IAudioService.", this);
+
+        if (audioService == null)
+            Debug.LogWarning("[UIAudioManager] Asigna un AudioService u otro IAudioService por Inspector.", this);
     }
 
 }

@@ -184,16 +184,13 @@ public class PlayerAudioFeedback : MonoBehaviour
     private void ResolveReferences()
     {
         if (movementController == null)
-            movementController = GetComponentInParent<MovementController>();
+            Debug.LogWarning("[PlayerAudioFeedback] Asigna MovementController por Inspector.", this);
 
         ResolveAudioService();
     }
 
     private void ResolveAudioService()
     {
-        if (audioServiceBehaviour == null)
-            audioServiceBehaviour = FindLocalAudioServiceBehaviour();
-
         audioService = audioServiceBehaviour as IAudioService;
 
         if (audioService == null && audioServiceBehaviour != null)
@@ -204,26 +201,5 @@ public class PlayerAudioFeedback : MonoBehaviour
             hasLoggedMissingAudioService = true;
             Debug.LogWarning("[PlayerAudioFeedback] Asigna un AudioService u otro IAudioService por Inspector.", this);
         }
-    }
-
-    private MonoBehaviour FindLocalAudioServiceBehaviour()
-    {
-        var localBehaviours = GetComponentsInChildren<MonoBehaviour>(true);
-
-        foreach (var behaviour in localBehaviours)
-        {
-            if (behaviour != null && behaviour is IAudioService)
-                return behaviour;
-        }
-
-        var parentBehaviours = GetComponentsInParent<MonoBehaviour>(true);
-
-        foreach (var behaviour in parentBehaviours)
-        {
-            if (behaviour != null && behaviour is IAudioService)
-                return behaviour;
-        }
-
-        return null;
     }
 }

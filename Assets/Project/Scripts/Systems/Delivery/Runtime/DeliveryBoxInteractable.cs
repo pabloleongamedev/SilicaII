@@ -1,14 +1,12 @@
 /*
  * Arquitectura: Delivery/Runtime
  * Script: DeliveryBoxInteractable
- * Rol: Conecta Unity con el Core. Lee componentes, recibe input/eventos y actua como facade o binding de escena.
- * Modulo: Gestiona la entrega/uso de items desde la UI de inventario hacia objetos interactuables.
- * Relaciones: Usa Inventory y PlayerState para seleccionar y consumir items entregados.
- * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ * Rol: Interactable de entrega. Activa la UI de inventario y recibe el item elegido mediante contrato.
+ * Relaciones: Usa Inventory, PlayerState e InventoryUseUIController asignados por Inspector; no mantiene rutas globales ni static state.
  */
 using UnityEngine;
 
-public class DeliveryBoxInteractable : MonoBehaviour, IInteractable
+public class DeliveryBoxInteractable : MonoBehaviour, IInteractable, IDeliveryItemUseHandler
 {
     [Header("Config")]
     [SerializeField] private int amountToConsume = 1;
@@ -16,38 +14,43 @@ public class DeliveryBoxInteractable : MonoBehaviour, IInteractable
     [Header("Refs")]
     [SerializeField] private InventoryController inventoryController;
     [SerializeField] private PlayerStateController playerState;
+    [SerializeField] private MonoBehaviour inventoryUseHandlerBinderBehaviour;
     [SerializeField] private NotificationEventChannel_SO notificationChannel;
 
     private IInventoryReadModel read;
     private IInventoryWriteModel write;
+    private IInventoryUseHandlerBinder inventoryUseHandlerBinder;
+    private bool isWaitingForItem;
 
-    // 🔥 referencia ACTIVA (sin singleton global sucio)
-    private static DeliveryBoxInteractable activeBox;
-
-    private bool isWaitingForItem = false;
-
-    // =========================================================
-    private void Start()
+    private void Awake()
     {
-        read = inventoryController.ReadModel;
-        write = inventoryController.WriteModel;
+        ResolveReferences();
     }
 
-    // =========================================================
+    private void Start()
+    {
+        ResolveReferences();
+    }
+
     public void Interact(InteractionContext context)
     {
+        ResolveReferences();
+
+        if (read == null || write == null || playerState == null || inventoryUseHandlerBinder == null)
+        {
+            Notify("Faltan referencias para entregar items", NotificationType.Warning);
+            return;
+        }
+
         if (IsInventoryEmpty())
         {
             Notify("Ve a buscar muchos elementos", NotificationType.Warning);
             return;
         }
 
-        // 🔥 ACTIVAR ESTA CAJA
-        activeBox = this;
         isWaitingForItem = true;
-
+        inventoryUseHandlerBinder.SetUseHandler(this);
         playerState.SetState(UIState.Inventory);
-
         Notify("Selecciona un objeto para entregar", NotificationType.Info);
     }
 
@@ -56,24 +59,12 @@ public class DeliveryBoxInteractable : MonoBehaviour, IInteractable
         return "Presiona E para usar la caja";
     }
 
-    // =========================================================
-    // 🔥 BOTÓN "USAR" LLAMA A ESTO
-    // =========================================================
-    public static void OnUseButtonPressed(ItemData_SO item, int amount)
-    {
-        if (activeBox == null)
-            return;
-
-        activeBox.HandleUse(item, amount);
-    }
-
-    // =========================================================
-    private void HandleUse(ItemData_SO item, int amount)
+    public void UseItem(ItemData_SO item, int amount)
     {
         if (!isWaitingForItem)
             return;
 
-        if (item == null)
+        if (item == null || read == null || write == null)
             return;
 
         int available = read.GetAmount(item);
@@ -85,21 +76,20 @@ public class DeliveryBoxInteractable : MonoBehaviour, IInteractable
         }
 
         int toRemove = Mathf.Min(amountToConsume, available);
-
         write.RemoveItem(item, toRemove);
-
         Notify($"Has entregado {item.name} x{toRemove}", NotificationType.Success);
 
-        // 🔥 LIMPIAR ESTADO
-        isWaitingForItem = false;
-        activeBox = null;
+        ClearWaitingState();
 
-        playerState.SetState(UIState.None);
+        if (playerState != null)
+            playerState.SetState(UIState.None);
     }
 
-    // =========================================================
     private bool IsInventoryEmpty()
     {
+        if (read == null)
+            return true;
+
         for (int i = 0; i < read.Capacity; i++)
         {
             var slot = read.GetItem(i);
@@ -111,10 +101,36 @@ public class DeliveryBoxInteractable : MonoBehaviour, IInteractable
         return true;
     }
 
-    // =========================================================
+    private void ResolveReferences()
+    {
+        if (inventoryController == null)
+        {
+            Debug.LogWarning("[DeliveryBoxInteractable] Asigna InventoryController por Inspector.", this);
+        }
+        else
+        {
+            read = inventoryController.ReadModel;
+            write = inventoryController.WriteModel;
+        }
+
+        if (playerState == null)
+            Debug.LogWarning("[DeliveryBoxInteractable] Asigna PlayerStateController por Inspector.", this);
+
+        inventoryUseHandlerBinder = inventoryUseHandlerBinderBehaviour as IInventoryUseHandlerBinder;
+
+        if (inventoryUseHandlerBinder == null)
+            Debug.LogWarning("[DeliveryBoxInteractable] Asigna InventoryUseUIController por Inspector.", this);
+    }
+
+    private void ClearWaitingState()
+    {
+        isWaitingForItem = false;
+        inventoryUseHandlerBinder?.ClearUseHandler(this);
+    }
+
     private void Notify(string msg, NotificationType type)
     {
-        Debug.Log("[DeliveryBox] " + msg);
+        Debug.Log("[DeliveryBox] " + msg, this);
 
         notificationChannel?.Raise(new NotificationData
         {

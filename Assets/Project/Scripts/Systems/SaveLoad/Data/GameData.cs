@@ -32,6 +32,7 @@ public class GameData
     public string currentScene = "MainMenu";
     public float missionTimeRemaining = -1f;
     public float missionDuration = -1f;
+    public QuestSaveData questData = new QuestSaveData();
     public List<string> scannedElements = new List<string>();
 
     [Header("Estado del Mundo")]
@@ -52,6 +53,7 @@ public class GameData
             currentScene = "Pablo_TestMechanics",
             missionTimeRemaining = -1f,
             missionDuration = -1f,
+            questData = QuestSaveData.CreateDefault(),
             inventoryItems = new List<InventorySaveData>(),
             scannedElements = new List<string>(),
             collectedItems = new List<string>(),
@@ -76,6 +78,22 @@ public class GameData
         int hours = playTimeSeconds / 3600;
         int minutes = (playTimeSeconds % 3600) / 60;
         return $"{hours}h {minutes}m";
+    }
+}
+
+[System.Serializable]
+public class QuestSaveData
+{
+    public int currentQuestIndex;
+    public List<int> taskProgress = new List<int>();
+
+    public static QuestSaveData CreateDefault()
+    {
+        return new QuestSaveData
+        {
+            currentQuestIndex = 0,
+            taskProgress = new List<int>()
+        };
     }
 }
 

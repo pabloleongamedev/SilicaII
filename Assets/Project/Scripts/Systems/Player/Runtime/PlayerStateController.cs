@@ -20,14 +20,17 @@ public class PlayerStateController : MonoBehaviour
 {
     private UIState currentState = UIState.None;
     [SerializeField] private UIStateEventChannel_SO uiStateChannel;
+    [SerializeField] private MonoBehaviour pauseServiceBehaviour;
 
     private MovementController movementController;
     private PlayerCameraRig cameraRig;
+    private IGamePauseService pauseService = new UnityGamePauseService();
 
     private void Awake()
     {
         movementController = GetComponent<MovementController>();
         cameraRig = GetComponentInParent<PlayerCameraRig>();
+        ResolvePauseService();
     }
 
     public void SetState(UIState newState)
@@ -41,7 +44,8 @@ public class PlayerStateController : MonoBehaviour
         Cursor.lockState = isUI ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isUI;
 
-        Time.timeScale = isUI ? 0f : 1f;
+        if (pauseService != null)
+            pauseService.SetPaused(isUI);
 
         if (movementController != null)
             movementController.SetInputEnabled(!isUI);
@@ -71,5 +75,16 @@ public class PlayerStateController : MonoBehaviour
             default:
                 return false;
         }
+    }
+
+    private void ResolvePauseService()
+    {
+        pauseService = pauseServiceBehaviour as IGamePauseService;
+
+        if (pauseServiceBehaviour != null && pauseService == null)
+            Debug.LogWarning("[PlayerStateController] El Pause Service asignado no implementa IGamePauseService.", this);
+
+        if (pauseService == null)
+            pauseService = new UnityGamePauseService();
     }
 }

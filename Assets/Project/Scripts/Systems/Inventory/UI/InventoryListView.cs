@@ -19,6 +19,7 @@ public class InventoryListView : MonoBehaviour
 
     private IInventoryReadModel inventory;
     private List<InventoryListItemView> items = new List<InventoryListItemView>();
+    private InventoryItemInstance selectedItem;
 
     public Action<int, int> OnItemDropped;
     public Action<InventoryItemInstance> OnItemClicked;
@@ -88,6 +89,12 @@ public class InventoryListView : MonoBehaviour
 
     private void HandleClick(InventoryItemInstance item)
     {
+        selectedItem = item;
         OnItemClicked?.Invoke(item);
+    }
+
+    public InventoryItemInstance GetSelectedItem()
+    {
+        return selectedItem;
     }
 }

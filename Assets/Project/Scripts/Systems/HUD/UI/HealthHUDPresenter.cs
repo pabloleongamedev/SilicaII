@@ -21,10 +21,10 @@ public class HealthHUDPresenter : MonoBehaviour
     private void Awake()
     {
         if (health == null)
-            health = GetComponentInParent<HealthBehaviour>();
+            Debug.LogWarning("[HealthHUDPresenter] Asigna HealthBehaviour por Inspector.", this);
 
         if (healthBar == null)
-            healthBar = GetComponentInChildren<HealthBarSegments>(true);
+            Debug.LogWarning("[HealthHUDPresenter] Asigna HealthBarSegments por Inspector.", this);
     }
 
     private void OnEnable()

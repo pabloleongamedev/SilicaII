@@ -76,9 +76,12 @@ public class RainController : MonoBehaviour
         if (timeSourceBehaviour == null && legacyTimeSource != null)
             timeSourceBehaviour = legacyTimeSource;
 
-        if (timeSourceBehaviour == null)
-            timeSourceBehaviour = GetComponentInParent<WorldTimeService>();
-
         timeSource = timeSourceBehaviour as IWorldTimeSource;
+
+        if (timeSourceBehaviour != null && timeSource == null)
+            Debug.LogWarning("[RainController] El Time Source asignado no implementa IWorldTimeSource.", this);
+
+        if (timeSource == null)
+            Debug.LogWarning("[RainController] Asigna IWorldTimeSource por Inspector.", this);
     }
 }

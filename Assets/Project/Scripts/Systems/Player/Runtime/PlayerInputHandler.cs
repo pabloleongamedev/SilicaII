@@ -13,15 +13,16 @@ public class PlayerInputHandler : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private PlayerStateController stateControllerBehaviour;
+    [SerializeField] private InventoryController inventoryController;
+    [SerializeField] private MovementController movementController;
+    [SerializeField] private InteractionDetector interactionDetector;
+    [SerializeField] private PlayerCameraRig cameraRig;
+    [SerializeField] private GameStateController gameStateController;
+
     private PlayerStateController stateController;
-    private MovementController movementController;
-    private PlayerCameraRig cameraRig;
-    private InventoryController inventoryController;
-    private InteractionDetector interactionDetector;
 
     private InputSystem_Actions inputActions;
     private InteractionContext interactionContext;
-    private GameStateController gameStateController;
     private bool inputCallbacksBound;
 
 
@@ -36,12 +37,13 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void ResolveReferences()
     {
-        inventoryController = GetComponentInParent<InventoryController>();
-        stateController = stateControllerBehaviour != null ? stateControllerBehaviour : GetComponentInParent<PlayerStateController>();
-        movementController = GetComponentInParent<MovementController>();
-        interactionDetector = GetComponentInParent<InteractionDetector>();
-        cameraRig = GetComponentInParent<PlayerCameraRig>();
-        gameStateController = GetComponentInParent<GameStateController>();
+        stateController = stateControllerBehaviour;
+        WarnMissing(inventoryController, "InventoryController");
+        WarnMissing(stateController, "PlayerStateController");
+        WarnMissing(movementController, "MovementController");
+        WarnMissing(interactionDetector, "InteractionDetector");
+        WarnMissing(cameraRig, "PlayerCameraRig");
+        WarnMissing(gameStateController, "GameStateController");
     }
 
     private void CreateInputActionsIfNeeded()
@@ -59,7 +61,7 @@ public class PlayerInputHandler : MonoBehaviour
         // Asi los interactuables no conocen InventorySystem ni sus detalles internos.
         if (inventoryController == null || inventoryController.ReadModel == null || inventoryController.WriteModel == null)
         {
-            Debug.LogError("InventorySystem NULL en Start");
+            Debug.LogWarning("[PlayerInputHandler] Asigna InventoryController por Inspector para construir InteractionContext.", this);
             return;
         }
 
@@ -284,5 +286,11 @@ public class PlayerInputHandler : MonoBehaviour
         inputActions.Player.Inventory.performed -= OnInventoryPerformed;
         inputActions.Player.Interact.performed -= OnInteract;
         inputCallbacksBound = false;
+    }
+
+    private void WarnMissing(Object reference, string referenceName)
+    {
+        if (reference == null)
+            Debug.LogWarning($"[PlayerInputHandler] Asigna {referenceName} por Inspector.", this);
     }
 }

@@ -10,7 +10,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class QuestSystem : MonoBehaviour
+public class QuestSystem : MonoBehaviour, ISaveParticipant
 {
     [SerializeField] private List<QuestData_SO> quests;
 
@@ -23,10 +23,12 @@ public class QuestSystem : MonoBehaviour
     private Dictionary<int, int> progress = new();
 
     private bool isInitialized = false;
+    private bool restoredFromSave;
 
     private void Start()
     {
-        LoadQuest(0);
+        if (!restoredFromSave)
+            LoadQuest(0);
     }
 
     private void OnEnable()
@@ -156,4 +158,72 @@ public class QuestSystem : MonoBehaviour
         return 0;
     }
 
+    public void Capture(GameData gameData)
+    {
+        if (gameData == null)
+            return;
+
+        if (gameData.questData == null)
+            gameData.questData = QuestSaveData.CreateDefault();
+
+        gameData.questData.currentQuestIndex = currentQuestIndex;
+        gameData.questData.taskProgress.Clear();
+
+        if (currentQuest == null)
+            return;
+
+        for (int i = 0; i < currentQuest.tasks.Count; i++)
+            gameData.questData.taskProgress.Add(GetTaskProgress(i));
+    }
+
+    public void Restore(GameData gameData, IItemResolver itemResolver)
+    {
+        if (gameData == null || gameData.questData == null)
+            return;
+
+        RestoreQuestState(gameData.questData);
+    }
+
+    private void RestoreQuestState(QuestSaveData savedQuest)
+    {
+        if (savedQuest == null || quests == null || quests.Count == 0)
+            return;
+
+        int restoredIndex = Mathf.Clamp(savedQuest.currentQuestIndex, 0, quests.Count);
+
+        if (restoredIndex >= quests.Count)
+        {
+            currentQuestIndex = quests.Count;
+            currentQuest = null;
+            progress.Clear();
+            isInitialized = false;
+            restoredFromSave = true;
+            return;
+        }
+
+        currentQuestIndex = restoredIndex;
+        currentQuest = quests[currentQuestIndex];
+        progress.Clear();
+
+        for (int i = 0; i < currentQuest.tasks.Count; i++)
+        {
+            int restoredProgress = savedQuest.taskProgress != null && i < savedQuest.taskProgress.Count
+                ? savedQuest.taskProgress[i]
+                : 0;
+
+            int required = currentQuest.tasks[i] != null ? currentQuest.tasks[i].requiredAmount : 0;
+            progress[i] = Mathf.Clamp(restoredProgress, 0, Mathf.Max(0, required));
+        }
+
+        isInitialized = true;
+        restoredFromSave = true;
+        questChannel?.RaiseQuestLoaded(currentQuest);
+
+        for (int i = 0; i < currentQuest.tasks.Count; i++)
+        {
+            int required = currentQuest.tasks[i] != null ? currentQuest.tasks[i].requiredAmount : 0;
+            int current = GetTaskProgress(i);
+            questChannel?.RaiseTaskUpdated(i, current, required, current >= required);
+        }
+    }
 }

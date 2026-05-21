@@ -85,9 +85,6 @@ public class SoundSettings : MonoBehaviour
 
     private void ResolveSettingsService()
     {
-        if (settingsServiceBehaviour == null)
-            settingsServiceBehaviour = GetComponentInParent<GameSettingsService>();
-
         settingsReader = settingsServiceBehaviour as IGameSettingsReader;
         settingsWriter = settingsServiceBehaviour as IGameSettingsWriter;
 

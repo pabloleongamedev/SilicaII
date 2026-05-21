@@ -539,7 +539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a0733292d3a4545b3ab1c08409d1ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::ChemistryTable
-  playerState: {fileID: 0}
+  playerState: {fileID: 8270189695560625003}
 --- !u!1 &564437900
 GameObject:
   m_ObjectHideFlags: 0
@@ -1238,6 +1238,56 @@ MonoBehaviour:
   damagePerTick: 1
   tickInterval: 1
   target: {fileID: 3275789411505853263}
+--- !u!1 &1300842277
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1300842279}
+  - component: {fileID: 1300842278}
+  m_Layer: 0
+  m_Name: QuestSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1300842278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300842277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88008ea538f7bdd4ab86fc99635cf3dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SilicaII.Systems::QuestSystem
+  quests:
+  - {fileID: 11400000, guid: a07f9beee1affc941875bc2a34151e79, type: 2}
+  - {fileID: 11400000, guid: eebd04af7641c5242987358eb00fa35c, type: 2}
+  - {fileID: 11400000, guid: 0556de6a18a43df4791ef6855fb470f9, type: 2}
+  - {fileID: 11400000, guid: 75f5520de3fa34b48aa2855ca581c9cd, type: 2}
+  questChannel: {fileID: 11400000, guid: e0e26f20ee4bddc49803102f979ae1ac, type: 2}
+--- !u!4 &1300842279
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300842277}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 8.09, y: 0.73613, z: 21.98507}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1407107178
 GameObject:
   m_ObjectHideFlags: 0
@@ -1664,8 +1714,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
-  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
   interactionMode: 1
   items:
   - item: {fileID: 11400000, guid: 88eb3893adcb3e241ad47a4d6b690b6a, type: 2}
@@ -1678,6 +1726,8 @@ MonoBehaviour:
   notificationDelay: 2.1
   successType: 1
   warningType: 2
+  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
+  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
 --- !u!135 &1666914051
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1903,7 +1953,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c84b69ea7dbfa9c4aa7efc06fcd63796, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::CraftingTable
-  playerState: {fileID: 0}
+  playerState: {fileID: 8270189695560625003}
 --- !u!1 &1679740132
 GameObject:
   m_ObjectHideFlags: 0
@@ -2100,6 +2150,24 @@ Transform:
   - {fileID: 1161355296}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1986325643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3275789411505853263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eae0e287f8d8bbe4a8c953513991c59e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SilicaII.Systems::PlayerCameraRig
+  pitchPivot: {fileID: 4587842584965035251}
+  sensitivity: 0.3
+  minPitch: -85
+  maxPitch: 85
+  smoothLook: 1
+  lookSmoothTime: 0.035
 --- !u!1 &2051029210
 GameObject:
   m_ObjectHideFlags: 0
@@ -2157,8 +2225,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 060a472434d622644a509c95926a48e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::NotificationManager
-  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
   view: {fileID: 8185074315668197860}
+  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
 --- !u!114 &2051029213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2171,9 +2239,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69182eb8ad3c65d4586669ef97b9b898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::InventoryUIController
-  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
   inventoryPanel: {fileID: 8840620288748306921}
   questPanel: {fileID: 690609228155863685}
+  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
 --- !u!114 &2051029214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2186,8 +2254,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af240bf1d18f7c9488e5c0858c9d8925, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::ChemistryUIController
-  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
   chemistryPanel: {fileID: 2095048843825602291}
+  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
 --- !u!114 &2051029215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2200,8 +2268,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18e11889cae176a49933b482d6b21e7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::CraftingUIController
-  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
   craftingPanel: {fileID: 3678218190199371711}
+  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
 --- !u!114 &2051029216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2214,8 +2282,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e947393f1d6414a49a70db5f7e6bcc03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::UIController
-  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
   crosshair: {fileID: 6208174908689721173}
+  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
+--- !u!114 &2065748457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2065748458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3ae1739ef9929841898abcf82e6b029, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
+  inventoryChannel: {fileID: 11400000, guid: ab1e0ab60ae1f974a93d563378a49295, type: 2}
+  craftingChannel: {fileID: 11400000, guid: dfbd3863c6db4834987b2ab7a0f5675a, type: 2}
+  questChannel: {fileID: 11400000, guid: e0e26f20ee4bddc49803102f979ae1ac, type: 2}
 --- !u!1 &2065748458
 GameObject:
   m_ObjectHideFlags: 0
@@ -2296,22 +2380,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1966128522}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2065748457
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2065748458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3ae1739ef9929841898abcf82e6b029, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
-  inventoryChannel: {fileID: 11400000, guid: ab1e0ab60ae1f974a93d563378a49295, type: 2}
-  craftingChannel: {fileID: 11400000, guid: dfbd3863c6db4834987b2ab7a0f5675a, type: 2}
-  questChannel: {fileID: 11400000, guid: e0e26f20ee4bddc49803102f979ae1ac, type: 2}
 --- !u!114 &28947799937651576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2354,10 +2422,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d9ec9f0e043bc4448175320c3324d8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InteractionUIController
-  notificationStateChannel: {fileID: 11400000, guid: b70dc458ac8f3804e83a6255410afa14, type: 2}
   detector: {fileID: 3044617806153453669}
   panel: {fileID: 6448703111043887844}
   text: {fileID: 447306422964130965}
+  notificationStateChannel: {fileID: 11400000, guid: b70dc458ac8f3804e83a6255410afa14, type: 2}
 --- !u!114 &46793575550639540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2740,13 +2808,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92838ae836413b245befe8a5641d6dca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryView
-  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
   slotPrefab: {fileID: 5022299233272472526, guid: 8fcf12a3979a85943bb102f16e695ed8, type: 3}
   InventoryGridContainer: {fileID: 3182186132781133581}
   descriptionPanel: {fileID: 3690361650704530940}
   dragHandler: {fileID: 2324935664048688379}
   QuestPanel: {fileID: 690609228155863685}
   inventoryPanel: {fileID: 8840620288748306921}
+  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
 --- !u!1 &150162392281672067
 GameObject:
   m_ObjectHideFlags: 0
@@ -3951,7 +4019,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.1
+  m_Radius: 0.5
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -4300,8 +4368,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
-  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
   interactionMode: 0
   items:
   - item: {fileID: 11400000, guid: b8a5a6f6c0b6ba546bd707ecdeffb2e5, type: 2}
@@ -4312,6 +4378,8 @@ MonoBehaviour:
   notificationDelay: 0.5
   successType: 0
   warningType: 2
+  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
+  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
 --- !u!114 &710258500109329100
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6163,8 +6231,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
-  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
   interactionMode: 0
   items:
   - item: {fileID: 11400000, guid: 2450ec614ba58a947a73dc3b31c35fe2, type: 2}
@@ -6175,6 +6241,8 @@ MonoBehaviour:
   notificationDelay: 0.5
   successType: 0
   warningType: 2
+  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
+  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
 --- !u!1 &1602570200350351865
 GameObject:
   m_ObjectHideFlags: 0
@@ -6255,8 +6323,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
-  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
   interactionMode: 0
   items:
   - item: {fileID: 11400000, guid: 88eb3893adcb3e241ad47a4d6b690b6a, type: 2}
@@ -6267,6 +6333,8 @@ MonoBehaviour:
   notificationDelay: 0.5
   successType: 0
   warningType: 2
+  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
+  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
 --- !u!222 &1654097542663386823
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7883,8 +7951,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a76c37159b3860342ae782cffc100032, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChemistryController
-  craftingChannel: {fileID: 11400000, guid: dfbd3863c6db4834987b2ab7a0f5675a, type: 2}
-  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
   methods:
   - {fileID: 11400000, guid: 7653d0829e81f834da3dededfc5d78d4, type: 2}
   - {fileID: 11400000, guid: 5400602905bedc546b93a71459a2df50, type: 2}
@@ -7896,6 +7962,8 @@ MonoBehaviour:
   inventoryListView: {fileID: 3991479591569778717}
   refineButton: {fileID: 3622661255584258789}
   inventoryController: {fileID: 4500600134571752369}
+  uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
+  craftingChannel: {fileID: 11400000, guid: dfbd3863c6db4834987b2ab7a0f5675a, type: 2}
 --- !u!114 &2296492001564758940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9187,7 +9255,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SilicaII.Systems::SaveParticipantRegistry
   itemDatabase: {fileID: 11400000, guid: 6092e80cbdf00b947b3bcddbdf047829, type: 2}
   participantBehaviours:
-  - {fileID: 0}
+  - {fileID: 4500600134571752369}
   includeParticipantsOnThisObject: 1
   includeParticipantsInChildren: 0
 --- !u!114 &2682811921948513039
@@ -10569,22 +10637,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1986325643
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3275789411505853263}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eae0e287f8d8bbe4a8c953513991c59e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SilicaII.Systems::PlayerCameraRig
-  pitchPivot: {fileID: 4587842584965035251}
-  sensitivity: 0.3
-  minPitch: -85
-  maxPitch: 85
 --- !u!114 &3282515766339289332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11503,13 +11555,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f51b27caa4514c4a81255c27b9d8399, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CraftingController
-  craftingChannel: {fileID: 11400000, guid: dfbd3863c6db4834987b2ab7a0f5675a, type: 2}
   database: {fileID: 11400000, guid: 7d624ec5dbede7d48b05dd2555b3b957, type: 2}
   inventoryController: {fileID: 4500600134571752369}
   toolView: {fileID: 6235476814452945905}
   listView: {fileID: 5291728023944837297}
   detailView: {fileID: 5232405848263147797}
   craftButton: {fileID: 6926073208359121393}
+  craftingChannel: {fileID: 11400000, guid: dfbd3863c6db4834987b2ab7a0f5675a, type: 2}
 --- !u!114 &3669591240460585181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13050,12 +13102,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc01c586b0498af499fe4052ebd3488f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::QuestUIController
-  questChannel: {fileID: 11400000, guid: e0e26f20ee4bddc49803102f979ae1ac, type: 2}
   missionContent: {fileID: 5904828213926514921}
   missionPrefab: {fileID: 7629501445442311445, guid: b132377d3de43fe49be843da85889a88, type: 3}
   taskContent: {fileID: 2850300375551325348}
   taskPrefab: {fileID: 7629501445442311445, guid: 8b435ab5fb3b37047ab31ef3942ccd20, type: 3}
-  questSystemRef: {fileID: 0}
+  questSystemRef: {fileID: 1300842278}
+  questChannel: {fileID: 11400000, guid: e0e26f20ee4bddc49803102f979ae1ac, type: 2}
 --- !u!224 &4310059763133901795
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13298,8 +13350,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5711a2948596b643b6c48c0cc92f942, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScannerTrigger
-  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
   audioServiceBehaviour: {fileID: 6619128525771919497}
+  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
   pivotScan: {fileID: 3594630744036881946}
   startScanTrigger: StartScan
   visualDuration: 2
@@ -13405,10 +13457,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da08ff357bd31a1458e545cced81fbea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::InventoryController
-  inventoryChannel: {fileID: 11400000, guid: ab1e0ab60ae1f974a93d563378a49295, type: 2}
   config: {fileID: 11400000, guid: 53d14ad7068ba3f4c974cf53c546b232, type: 2}
   inventoryView: {fileID: 142851993286727077}
   listView: {fileID: 1024174498404474587}
+  inventoryChannel: {fileID: 11400000, guid: ab1e0ab60ae1f974a93d563378a49295, type: 2}
 --- !u!114 &4521693446147947864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13668,7 +13720,7 @@ Transform:
   m_GameObject: {fileID: 3573515816302881861}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.51000005, z: 0.32999992}
+  m_LocalPosition: {x: 0, y: 0.55, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -14089,6 +14141,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputHandler
   stateControllerBehaviour: {fileID: 8270189695560625003}
+  inventoryController: {fileID: 4500600134571752369}
+  movementController: {fileID: 8270189695560625001}
+  interactionDetector: {fileID: 3044617806153453669}
+  cameraRig: {fileID: 1986325643}
+  gameStateController: {fileID: 881996642}
 --- !u!1 &4732694347121010294
 GameObject:
   m_ObjectHideFlags: 0
@@ -18190,9 +18247,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4e8f4ea81c1951458e379120a342491, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ToolChemistryView
-  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
   slot: {fileID: 1502867738116350806}
   database: {fileID: 11400000, guid: 5972099df1744df47897299a399eda9c, type: 2}
+  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
 --- !u!114 &6480758452847758391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18379,8 +18436,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
-  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
   interactionMode: 0
   items:
   - item: {fileID: 11400000, guid: 95c7214d34bbc2f4f96ac00cb4070148, type: 2}
@@ -18391,6 +18446,8 @@ MonoBehaviour:
   notificationDelay: 0.5
   successType: 0
   warningType: 2
+  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
+  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
 --- !u!222 &6592311806640023500
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -19504,8 +19561,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
-  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
   interactionMode: 0
   items:
   - item: {fileID: 11400000, guid: c702357e020b7224e877216dd429ed47, type: 2}
@@ -19516,6 +19571,8 @@ MonoBehaviour:
   notificationDelay: 0.5
   successType: 0
   warningType: 2
+  scannerFeedbackChannel: {fileID: 11400000, guid: 677e4f7c5c9f72f44aa63069b9547822, type: 2}
+  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
 --- !u!114 &7048034938767893525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19884,7 +19941,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.55
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -21995,10 +22052,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94b35c5d2c22c944e91e5ef73362e3ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NotificationView
-  notificationStateChannel: {fileID: 11400000, guid: b70dc458ac8f3804e83a6255410afa14, type: 2}
   panelNotification: {fileID: 9200699857936002308}
   text: {fileID: 7044840931353406344}
   duration: 2
+  notificationStateChannel: {fileID: 11400000, guid: b70dc458ac8f3804e83a6255410afa14, type: 2}
 --- !u!1 &8192531634102270972
 GameObject:
   m_ObjectHideFlags: 0
@@ -22193,6 +22250,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::PlayerStateController
   uiStateChannel: {fileID: 11400000, guid: a9b213fff8a174646a1db273e02fb1a5, type: 2}
+  pauseServiceBehaviour: {fileID: 0}
 --- !u!114 &8270189695560625004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22205,10 +22263,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9fbd5d0cb94a66b77eea205b6ec0d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::PlayerDeathHandler
-  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
-  gameStateChannel: {fileID: 11400000, guid: 148d200796916374399822b182102796, type: 2}
   health: {fileID: 8270189695560625002}
   gameStateController: {fileID: 881996642}
+  gameStateChannel: {fileID: 11400000, guid: 148d200796916374399822b182102796, type: 2}
+  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
   notifyOnDeath: 1
   deathMessage: Integridad agotada. Game Over.
 --- !u!222 &8292294474370210257
@@ -22686,8 +22744,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2108cfec38e0c342bba4ce6dbb8f75e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NotificationAudioController
-  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
   audioServiceBehaviour: {fileID: 6619128525771919497}
+  notificationChannel: {fileID: 11400000, guid: fdea5e41e4cbdae42905c26386494f27, type: 2}
 --- !u!1 &8389064400438909594
 GameObject:
   m_ObjectHideFlags: 0
@@ -24354,11 +24412,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68ca7373139fd0c4f957a0f8129330e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SilicaII.Systems::PlayerSaveParticipant
-  player: {fileID: 0}
-  health: {fileID: 0}
-  inventory: {fileID: 0}
-  movement: {fileID: 0}
-  missionTimer: {fileID: 0}
+  player: {fileID: 4731813635617707229}
+  health: {fileID: 8270189695560625002}
+  inventory: {fileID: 4500600134571752369}
+  movement: {fileID: 8270189695560625001}
+  missionTimer: {fileID: 6153769335652966175}
 --- !u!222 &9110263151613250995
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -24733,3 +24791,4 @@ SceneRoots:
   - {fileID: 5710005319379908233}
   - {fileID: 8411801332410470796}
   - {fileID: 1966128522}
+  - {fileID: 1300842279}

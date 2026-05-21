@@ -141,9 +141,6 @@ public class ScannerTrigger : MonoBehaviour
 
     private void ResolveAudioService()
     {
-        if (audioServiceBehaviour == null)
-            audioServiceBehaviour = FindLocalAudioServiceBehaviour();
-
         audioService = audioServiceBehaviour as IAudioService;
 
         if (audioService == null && audioServiceBehaviour != null)
@@ -154,28 +151,5 @@ public class ScannerTrigger : MonoBehaviour
             hasLoggedMissingAudioService = true;
             Debug.LogWarning("[ScannerTrigger] Asigna AudioService u otro IAudioService por Inspector.", this);
         }
-    }
-
-    private MonoBehaviour FindLocalAudioServiceBehaviour()
-    {
-        // ScannerTrigger vive en el Player. Esta busqueda se limita al arbol local del Player,
-        // permitiendo resolver un servicio de audio hijo sin volver a depender de singletons globales.
-        var localBehaviours = GetComponentsInChildren<MonoBehaviour>(true);
-
-        foreach (var behaviour in localBehaviours)
-        {
-            if (behaviour != null && behaviour is IAudioService)
-                return behaviour;
-        }
-
-        var parentBehaviours = GetComponentsInParent<MonoBehaviour>(true);
-
-        foreach (var behaviour in parentBehaviours)
-        {
-            if (behaviour != null && behaviour is IAudioService)
-                return behaviour;
-        }
-
-        return null;
     }
 }

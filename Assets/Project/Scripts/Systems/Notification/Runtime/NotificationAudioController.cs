@@ -50,12 +50,12 @@ public class NotificationAudioController : MonoBehaviour
 
     private void ResolveAudioService()
     {
-        if (audioServiceBehaviour == null)
-            audioServiceBehaviour = GetComponentInParent<AudioService>();
-
         audioService = audioServiceBehaviour as IAudioService;
 
         if (audioService == null && audioServiceBehaviour != null)
             Debug.LogWarning("[NotificationAudioController] El Audio Service asignado no implementa IAudioService.", this);
+
+        if (audioService == null)
+            Debug.LogWarning("[NotificationAudioController] Asigna un AudioService u otro IAudioService por Inspector.", this);
     }
 }
