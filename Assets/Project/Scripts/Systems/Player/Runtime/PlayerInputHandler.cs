@@ -17,6 +17,7 @@ public class PlayerInputHandler : MonoBehaviour
     [SerializeField] private MovementController movementController;
     [SerializeField] private InteractionDetector interactionDetector;
     [SerializeField] private PlayerCameraRig cameraRig;
+    [SerializeField] private PlayerPerspectiveController perspectiveController;
     [SerializeField] private GameStateController gameStateController;
 
     private PlayerStateController stateController;
@@ -250,6 +251,21 @@ public class PlayerInputHandler : MonoBehaviour
         NotifyAnyInput();
     }
 
+    private void OnCameraPerformed(InputAction.CallbackContext ctx)
+    {
+        if (IsBlocked()) return;
+        if (!ctx.performed) return;
+
+        if (perspectiveController == null)
+        {
+            Debug.LogWarning("[PlayerInputHandler] PlayerPerspectiveController no esta asignado para alternar camara.", this);
+            return;
+        }
+
+        perspectiveController.TogglePerspective();
+        NotifyAnyInput();
+    }
+
     private void BindInputCallbacks()
     {
         if (inputCallbacksBound || inputActions == null)
@@ -264,6 +280,7 @@ public class PlayerInputHandler : MonoBehaviour
         inputActions.Player.Jump.started += OnJumpStarted;
         inputActions.Player.Jetpack.performed += OnJetpackPerformed;
         inputActions.Player.Jetpack.canceled += OnJetpackCanceled;
+        inputActions.Player.Camera.performed += OnCameraPerformed;
         inputActions.Player.Inventory.performed += OnInventoryPerformed;
         inputActions.Player.Interact.performed += OnInteract;
         inputCallbacksBound = true;
@@ -283,6 +300,7 @@ public class PlayerInputHandler : MonoBehaviour
         inputActions.Player.Jump.started -= OnJumpStarted;
         inputActions.Player.Jetpack.performed -= OnJetpackPerformed;
         inputActions.Player.Jetpack.canceled -= OnJetpackCanceled;
+        inputActions.Player.Camera.performed -= OnCameraPerformed;
         inputActions.Player.Inventory.performed -= OnInventoryPerformed;
         inputActions.Player.Interact.performed -= OnInteract;
         inputCallbacksBound = false;

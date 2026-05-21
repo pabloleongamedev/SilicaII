@@ -81,6 +81,7 @@ Reglas de capas:
 - Settings: `GameSettings.asset` + `GameSettingsService`, consumido por `IGameSettingsReader` / `IGameSettingsWriter`.
 - Pause: `IGamePauseService` + `GamePauseService`.
 - Player/Input: `PlayerInputHandler` depende de referencias serializadas.
+- Perspective: `PlayerPerspectiveController` alterna primera/tercera persona desde `PlayerInputHandler`; la tercera persona es presentacion visual/camara, no un segundo movimiento/input.
 - Inventory: controller central, vistas separadas y persistencia via participante.
 - Crafting/Chemistry: datos + controllers + canales, sin UI como dominio.
 - Quest: progreso persistente via `QuestSystem` / `QuestSaveData`.
@@ -135,6 +136,7 @@ Validacion manual en Unity:
 - Confirmar que no haya Missing Script.
 - Probar menu: nueva partida y cargar.
 - Probar gameplay: checkpoint save/restore, autosave si aplica, inventory, crafting, quest, scanner, delivery, world.
+- Probar perspectiva: tecla `C` / accion `Player.Camera` alterna primera y tercera persona si `PlayerPerspectiveController` esta configurado por Inspector.
 - Probar opciones: brillo, fullscreen y volumen.
 - Probar pausa: abrir, reanudar y volver a menu.
 
