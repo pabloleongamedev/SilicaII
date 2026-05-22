@@ -15,12 +15,23 @@ public class AudioService : MonoBehaviour, IAudioService
     [SerializeField] private AudioCueLibrary_SO audioLibrary;
     
     private readonly Dictionary<string, AudioSource> sourcesByID = new();
+    private readonly HashSet<AudioCueKey> missingCueWarnings = new();
 
     public void Play(AudioCueKey key)
     {
         var source = ResolveSource(key);
         source?.Play();
     } 
+
+    public void PlayOneShot(AudioCueKey key)
+    {
+        var source = ResolveSource(key);
+
+        if (source == null || source.clip == null)
+            return;
+
+        source.PlayOneShot(source.clip);
+    }
 
     public void Stop(AudioCueKey key)
     {
@@ -40,12 +51,29 @@ public class AudioService : MonoBehaviour, IAudioService
     {
         var cue = audioLibrary != null ? audioLibrary.Get(key) : null;
 
-        if (cue == null)
+        if (cue == null || cue.Clip == null)
+        {
+            WarnMissingCue(key, cue);
             return null;
+        }
 
         Register(cue);
         sourcesByID.TryGetValue(cue.CueID, out var source);
         return source;
+    }
+
+    private void WarnMissingCue(AudioCueKey key, AudioCue_SO cue)
+    {
+        if (missingCueWarnings.Contains(key))
+            return;
+
+        missingCueWarnings.Add(key);
+        string reason = audioLibrary == null
+            ? "AudioCueLibrary_SO no esta asignada"
+            : cue == null
+                ? "AudioCue_SO no esta asignado en la libreria"
+                : "AudioCue_SO no tiene clip";
+        Debug.LogWarning($"[AudioService] No se puede reproducir {key}: {reason}.", this);
     }
 
     private void Register(AudioCue_SO cue)

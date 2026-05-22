@@ -16,6 +16,8 @@ public class AudioCueLibrary_SO : ScriptableObject
     [SerializeField] private AudioCue_SO playerMetalWalk;
     [SerializeField] private AudioCue_SO playerJump;
     [SerializeField] private AudioCue_SO playerMetalJump;
+    [SerializeField] private AudioCue_SO playerJumpBase;
+    [SerializeField] private AudioCue_SO playerWalkBase;
     [SerializeField] private AudioCue_SO playerJetpack;
 
     [Header("Scanner")]
@@ -49,8 +51,10 @@ public class AudioCueLibrary_SO : ScriptableObject
         switch (key)
         {
             case AudioCueKey.PlayerWalk: return playerWalk;
+            case AudioCueKey.PlayerWalkBase: return playerWalkBase;
             case AudioCueKey.PlayerMetalWalk: return playerMetalWalk;
             case AudioCueKey.PlayerJump: return playerJump;
+            case AudioCueKey.PlayerJumpBase: return playerJumpBase;
             case AudioCueKey.PlayerMetalJump: return playerMetalJump;
             case AudioCueKey.PlayerJetpack: return playerJetpack;
             case AudioCueKey.ScannerScan: return scannerScan;

@@ -16,12 +16,14 @@ MonoBehaviour:
   playerMetalWalk: {fileID: 11400000, guid: 743ecb2fb1e801641a92b84e824b144a, type: 2}
   playerJump: {fileID: 11400000, guid: d88d3eb21273c7e419052dcf4f233984, type: 2}
   playerMetalJump: {fileID: 11400000, guid: 2a1eef8d5d0f7814d986e6047870e667, type: 2}
+  playerJumpBase: {fileID: 11400000, guid: 7dca130ca3a6a004ba6724e875ee4328, type: 2}
+  playerWalkBase: {fileID: 11400000, guid: 8ec6f0d620a16744bb5a885b07972b60, type: 2}
   playerJetpack: {fileID: 11400000, guid: be764d77a3cf6ef42afff69dda307646, type: 2}
   scannerScan: {fileID: 11400000, guid: 09e4cca24e3490d4c93268b15ada85ce, type: 2}
   notificationInfo: {fileID: 0}
-  notificationSuccess: {fileID: 0}
+  notificationSuccess: {fileID: 11400000, guid: 6bbf79f66a244c5449cfb70a63d5877e, type: 2}
   notificationWarning: {fileID: 0}
-  notificationError: {fileID: 0}
+  notificationError: {fileID: 11400000, guid: 600a2317e163e3b4e8b3626d6f0a5cc8, type: 2}
   uiHover: {fileID: 0}
   uiClick: {fileID: 0}
   uiApply: {fileID: 0}

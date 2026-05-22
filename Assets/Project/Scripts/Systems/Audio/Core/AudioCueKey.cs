@@ -9,10 +9,12 @@ public enum AudioCueKey
     None = 0,
 
     PlayerWalk = 10,
-    PlayerMetalWalk = 11,
-    PlayerJump = 12,
-    PlayerMetalJump = 13,
-    PlayerJetpack = 14,
+    PlayerWalkBase = 11,
+    PlayerMetalWalk = 12,
+    PlayerJump = 13,
+    PlayerJumpBase = 14,
+    PlayerMetalJump = 15,
+    PlayerJetpack = 16,
 
     ScannerScan = 30,
 

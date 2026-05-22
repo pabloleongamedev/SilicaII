@@ -81,11 +81,11 @@ Reglas de capas:
 - Settings: `GameSettings.asset` + `GameSettingsService`, consumido por `IGameSettingsReader` / `IGameSettingsWriter`.
 - Pause: `IGamePauseService` + `GamePauseService`.
 - Player/Input: `PlayerInputHandler` depende de referencias serializadas.
-- Perspective: `PlayerPerspectiveController` alterna primera/tercera persona desde `PlayerInputHandler`; la tercera persona es presentacion visual/camara, no un segundo movimiento/input.
+- Perspective: `PlayerPerspectiveController` alterna primera/tercera persona desde `PlayerInputHandler`; el cambio solo ajusta la camara compartida, no activa/desactiva el cuerpo. En `Pablo_TestMechanics.unity`, `PlayerRobotVisual` permanece visible y `Main Camera` se referencia en `Shared Camera Transform`; `PlayerAnimatorPresenter` sincroniza el Animator con `MovementController`.
 - Inventory: controller central, vistas separadas y persistencia via participante.
 - Crafting/Chemistry: datos + controllers + canales, sin UI como dominio.
 - Quest: progreso persistente via `QuestSystem` / `QuestSaveData`.
-- Notification/Audio/HUD: presenters y servicios/canales.
+- Notification/Audio/HUD: presenters y servicios/canales. Los pasos y aterrizajes del Player se disparan solo por `AnimationEvent OnFootstep` / `OnLand` en el Animator visual, recibidos por `PlayerFootstepAnimationEvents` y delegados a `PlayerAudioFeedback`. No hay sonido al iniciar salto. Audio de locomocion usa `WalkBase` / `JumpBase` por defecto, y cambia a variantes Grass/Metal si el ground tag contiene `Grass` o `Metal`. El jetpack es la excepcion: su audio lo controla `MovementController.OnJetpackActiveChanged`.
 - Interaction/Scanner/World/Delivery: contexto de escena, referencias explicitas, warning + no-op si falta dependencia.
 
 ## Escenas y assets clave
@@ -94,6 +94,7 @@ Reglas de capas:
 - `Assets/Project/Scenes/Menu.unity`
 - `Assets/Project/Prefabs/UI/OptionsPanel.prefab`
 - `Assets/Project/ScriptableObjects/Menu/GameSettings.asset`
+- `Assets/PlayerTest/Prefabs/PlayerRobot.prefab` debe mantenerse como prefab visual-only: sin input, movimiento, inventario, scanner, camara, audio listener ni servicios propios.
 
 ## Validaciones recomendadas
 

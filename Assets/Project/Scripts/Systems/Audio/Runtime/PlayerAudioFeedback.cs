@@ -2,7 +2,7 @@
  * Arquitectura: Audio/Runtime
  * Script: PlayerAudioFeedback
  * Rol: Feedback audiovisual del Player. Observa MovementController y solicita AudioCueKey al IAudioService central.
- * Relaciones: No lee input ni colisiones propias; PlayerInputHandler alimenta MovementController y este publica estado real.
+ * Relaciones: PlayerFootstepAnimationEvents invoca PlayFootstep/PlayLanding; MovementController publica estado de jetpack y superficie.
  * Uso como referencia: mantiene audio desacoplado de Input System y evita duplicar reglas de movimiento.
  */
 using UnityEngine;
@@ -18,12 +18,10 @@ public class PlayerAudioFeedback : MonoBehaviour
     [SerializeField] private float sprintPitch = 1.5f;
 
     private IAudioService audioService;
-    private bool hasMoveInput;
     private bool isGrounded;
     private bool isSprinting;
     private bool isJetpackActive;
     private string currentGroundTag = "Ground";
-    private AudioCueKey activeWalkCue = AudioCueKey.None;
     private bool hasLoggedMissingAudioService;
 
     private void Awake()
@@ -36,14 +34,12 @@ public class PlayerAudioFeedback : MonoBehaviour
         ResolveReferences();
         Subscribe();
         SyncFromMovement();
-        RefreshWalkAudio();
         RefreshJetpackAudio();
     }
 
     private void OnDisable()
     {
         Unsubscribe();
-        StopWalkAudio();
         StopJetpackAudio();
     }
 
@@ -52,9 +48,7 @@ public class PlayerAudioFeedback : MonoBehaviour
         if (movementController == null)
             return;
 
-        movementController.OnMoveInputChanged += HandleMoveInputChanged;
         movementController.OnSprintChanged += HandleSprintChanged;
-        movementController.OnLanded += HandleLanded;
         movementController.OnJetpackActiveChanged += HandleJetpackActiveChanged;
         movementController.OnGroundStateChanged += HandleGroundStateChanged;
     }
@@ -64,9 +58,7 @@ public class PlayerAudioFeedback : MonoBehaviour
         if (movementController == null)
             return;
 
-        movementController.OnMoveInputChanged -= HandleMoveInputChanged;
         movementController.OnSprintChanged -= HandleSprintChanged;
-        movementController.OnLanded -= HandleLanded;
         movementController.OnJetpackActiveChanged -= HandleJetpackActiveChanged;
         movementController.OnGroundStateChanged -= HandleGroundStateChanged;
     }
@@ -76,28 +68,15 @@ public class PlayerAudioFeedback : MonoBehaviour
         if (movementController == null)
             return;
 
-        hasMoveInput = movementController.GetMoveInput().sqrMagnitude > 0.01f;
         isGrounded = movementController.IsGrounded();
         isSprinting = movementController.IsSprinting();
         isJetpackActive = movementController.IsJetpackActive();
         currentGroundTag = movementController.GetGroundTag();
     }
 
-    private void HandleMoveInputChanged(Vector2 input)
-    {
-        hasMoveInput = input.sqrMagnitude > 0.01f;
-        RefreshWalkAudio();
-    }
-
     private void HandleSprintChanged(bool sprinting)
     {
         isSprinting = sprinting;
-        RefreshWalkAudio();
-    }
-
-    private void HandleLanded(string groundTag)
-    {
-        AudioService?.Play(groundTag == "MetalGround" ? AudioCueKey.PlayerMetalJump : AudioCueKey.PlayerJump);
     }
 
     private void HandleJetpackActiveChanged(bool active)
@@ -108,45 +87,31 @@ public class PlayerAudioFeedback : MonoBehaviour
 
     private void HandleGroundStateChanged(bool grounded, string groundTag)
     {
-        bool changedSurface = currentGroundTag != groundTag;
         isGrounded = grounded;
         currentGroundTag = groundTag;
-
-        if (changedSurface)
-            StopWalkAudio();
-
-        RefreshWalkAudio();
     }
 
-    private void RefreshWalkAudio()
+    public void PlayFootstep()
     {
-        if (!hasMoveInput || !isGrounded)
-        {
-            StopWalkAudio();
+        SyncFromMovement();
+
+        if (isJetpackActive)
             return;
-        }
 
-        AudioCueKey nextCue = IsMetalGround() ? AudioCueKey.PlayerMetalWalk : AudioCueKey.PlayerWalk;
-
-        if (activeWalkCue != AudioCueKey.None && activeWalkCue != nextCue)
-            StopWalkAudio();
-
-        if (activeWalkCue == AudioCueKey.None)
-        {
-            activeWalkCue = nextCue;
-            AudioService?.Play(activeWalkCue);
-        }
-
-        AudioService?.ChangePitch(activeWalkCue, isSprinting ? sprintPitch : walkPitch);
+        AudioCueKey footstepCue = GetWalkCue(currentGroundTag);
+        AudioService?.ChangePitch(footstepCue, isSprinting ? sprintPitch : walkPitch);
+        AudioService?.PlayOneShot(footstepCue);
     }
 
-    private void StopWalkAudio()
+    public void PlayLanding()
     {
-        if (activeWalkCue == AudioCueKey.None)
-            return;
+        SyncFromMovement();
+        PlayLanding(currentGroundTag);
+    }
 
-        AudioService?.Stop(activeWalkCue);
-        activeWalkCue = AudioCueKey.None;
+    private void PlayLanding(string groundTag)
+    {
+        AudioService?.PlayOneShot(GetJumpCue(groundTag));
     }
 
     private void RefreshJetpackAudio()
@@ -165,9 +130,32 @@ public class PlayerAudioFeedback : MonoBehaviour
         AudioService?.Stop(AudioCueKey.PlayerJetpack);
     }
 
-    private bool IsMetalGround()
+    private AudioCueKey GetWalkCue(string groundTag)
     {
-        return currentGroundTag == "MetalGround";
+        if (ContainsSurface(groundTag, "Metal"))
+            return AudioCueKey.PlayerMetalWalk;
+
+        if (ContainsSurface(groundTag, "Grass"))
+            return AudioCueKey.PlayerWalk;
+
+        return AudioCueKey.PlayerWalkBase;
+    }
+
+    private AudioCueKey GetJumpCue(string groundTag)
+    {
+        if (ContainsSurface(groundTag, "Metal"))
+            return AudioCueKey.PlayerMetalJump;
+
+        if (ContainsSurface(groundTag, "Grass"))
+            return AudioCueKey.PlayerJump;
+
+        return AudioCueKey.PlayerJumpBase;
+    }
+
+    private bool ContainsSurface(string groundTag, string surface)
+    {
+        return !string.IsNullOrEmpty(groundTag)
+            && groundTag.IndexOf(surface, System.StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
     private IAudioService AudioService

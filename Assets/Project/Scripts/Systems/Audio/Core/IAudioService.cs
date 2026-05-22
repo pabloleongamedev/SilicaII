@@ -8,6 +8,7 @@
 public interface IAudioService
 {
     void Play(AudioCueKey key);
+    void PlayOneShot(AudioCueKey key);
     void Stop(AudioCueKey key);
     void ChangePitch(AudioCueKey key, float pitch);
 }

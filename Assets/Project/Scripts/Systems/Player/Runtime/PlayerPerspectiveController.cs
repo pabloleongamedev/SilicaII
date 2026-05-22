@@ -2,7 +2,7 @@
  * Arquitectura: Player/Runtime
  * Script: PlayerPerspectiveController
  * Rol: Alterna presentacion primera/tercera persona desde input centralizado.
- * Relaciones: PlayerInputHandler invoca TogglePerspective; las referencias visuales/camaras se asignan por Inspector.
+ * Relaciones: PlayerInputHandler invoca TogglePerspective; la camara compartida se asigna por Inspector.
  */
 using UnityEngine;
 
@@ -11,13 +11,12 @@ public class PlayerPerspectiveController : MonoBehaviour
     [Header("Mode")]
     [SerializeField] private PlayerPerspectiveMode initialMode = PlayerPerspectiveMode.FirstPerson;
 
-    [Header("First Person")]
-    [SerializeField] private GameObject firstPersonCameraRoot;
-    [SerializeField] private GameObject firstPersonVisualRoot;
-
-    [Header("Third Person")]
-    [SerializeField] private GameObject thirdPersonCameraRoot;
-    [SerializeField] private GameObject thirdPersonVisualRoot;
+    [Header("Shared Camera Offset")]
+    [SerializeField] private Transform sharedCameraTransform;
+    [SerializeField] private Vector3 firstPersonLocalPosition;
+    [SerializeField] private Vector3 firstPersonLocalEulerAngles;
+    [SerializeField] private Vector3 thirdPersonLocalPosition = new Vector3(0f, 0.35f, -3f);
+    [SerializeField] private Vector3 thirdPersonLocalEulerAngles;
 
     private PlayerPerspectiveMode currentMode;
 
@@ -48,21 +47,21 @@ public class PlayerPerspectiveController : MonoBehaviour
         currentMode = mode;
 
         bool thirdPerson = currentMode == PlayerPerspectiveMode.ThirdPerson;
-        SetActive(firstPersonCameraRoot, !thirdPerson);
-        SetActive(firstPersonVisualRoot, !thirdPerson);
-        SetActive(thirdPersonCameraRoot, thirdPerson);
-        SetActive(thirdPersonVisualRoot, thirdPerson);
+        ApplySharedCameraOffset(thirdPerson);
     }
 
-    private void SetActive(GameObject target, bool active)
+    private void ApplySharedCameraOffset(bool thirdPerson)
     {
-        if (target == null)
+        if (sharedCameraTransform == null)
         {
-            Debug.LogWarning("[PlayerPerspectiveController] Asigna todos los roots de perspectiva por Inspector.", this);
+            Debug.LogWarning("[PlayerPerspectiveController] Asigna Shared Camera Transform por Inspector.", this);
             return;
         }
 
-        if (target.activeSelf != active)
-            target.SetActive(active);
+        if (firstPersonLocalPosition == thirdPersonLocalPosition && firstPersonLocalEulerAngles == thirdPersonLocalEulerAngles)
+            Debug.LogWarning("[PlayerPerspectiveController] Los offsets de primera y tercera persona son iguales; el cambio de perspectiva no sera visible.", this);
+
+        sharedCameraTransform.localPosition = thirdPerson ? thirdPersonLocalPosition : firstPersonLocalPosition;
+        sharedCameraTransform.localRotation = Quaternion.Euler(thirdPerson ? thirdPersonLocalEulerAngles : firstPersonLocalEulerAngles);
     }
 }
