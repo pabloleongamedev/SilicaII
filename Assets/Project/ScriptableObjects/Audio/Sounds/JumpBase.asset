@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: JumpBase
   m_EditorClassIdentifier: SilicaII.Systems::AudioCue_SO
   cueID: JumpBase
-  clip: {fileID: 8300000, guid: 0462feb393ce2b64b9f78c8bc9303014, type: 3}
+  clip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
   volume: 1
   pitch: 1.5
   loop: 0

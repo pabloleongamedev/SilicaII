@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: WalkBase
   m_EditorClassIdentifier: SilicaII.Systems::AudioCue_SO
   cueID: WalkBase
-  clip: {fileID: 8300000, guid: 8a2c7093236272043805ca942d893d01, type: 3}
+  clip: {fileID: 8300000, guid: 72f526a6a9890f643a88e85a61c86c8a, type: 3}
   volume: 1
   pitch: 1.5
   loop: 0
