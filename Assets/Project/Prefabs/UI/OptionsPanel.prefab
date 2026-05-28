@@ -304,7 +304,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 600, y: -290}
-  m_SizeDelta: {x: 291.50024, y: 0}
+  m_SizeDelta: {x: 292.50024, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &328593105205895850
 CanvasRenderer:
@@ -992,7 +992,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 33.05
+  m_fontSize: 33.15
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1094,7 +1094,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 67.87506, y: -3}
+  m_AnchoredPosition: {x: 68.12506, y: -3}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &3476750120046358971
@@ -1182,7 +1182,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 600, y: -50}
-  m_SizeDelta: {x: 291.50024, y: 90}
+  m_SizeDelta: {x: 292.50024, y: 90}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2052157791498908290
 MonoBehaviour:
@@ -1963,8 +1963,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 745.7501, y: -820}
-  m_SizeDelta: {x: 291.50024, y: 80}
+  m_AnchoredPosition: {x: 746.2501, y: -820}
+  m_SizeDelta: {x: 292.50024, y: 80}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &3858913429224107137
 MonoBehaviour:
@@ -2043,7 +2043,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 223.62518, y: -3}
+  m_AnchoredPosition: {x: 224.37518, y: -3}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &5328587731031118267
@@ -2789,8 +2789,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 745.7501, y: -610}
-  m_SizeDelta: {x: 291.50024, y: 0}
+  m_AnchoredPosition: {x: 746.2501, y: -610}
+  m_SizeDelta: {x: 292.50024, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &371916083771327232
 CanvasRenderer:
@@ -2882,9 +2882,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6068879274c96ab4e9592868219956a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoundSettings
-  masterVolumeSlider: {fileID: 7082288668354843625}
-  musicSlider: {fileID: 8741875865838903184}
-  sfxSlider: {fileID: 550842233579899826}
+  audioMixer: {fileID: 0}
+  masterVolumeParameter: MasterVol
+  musicVolumeParameter: MusicVol
+  sfxVolumeParameter: SFXVol
   settingsServiceBehaviour: {fileID: 8871323635106730891}
 --- !u!1 &7381323635106730891
 GameObject:
@@ -3029,6 +3030,7 @@ MonoBehaviour:
   musicSlider: {fileID: 8741875865838903184}
   effectsSlider: {fileID: 550842233579899826}
   masterVolumeSlider: {fileID: 7082288668354843625}
+  soundSettings: {fileID: 0}
   settingsServiceBehaviour: {fileID: 8871323635106730891}
 --- !u!114 &8871323635106730891
 MonoBehaviour:
@@ -4251,7 +4253,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5127856028435997962, guid: 4b563301280a8d24fa75433a46df70cf, type: 3}
   m_PrefabInstance: {fileID: 8445739404011567084}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6312343643185189247}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -4478,7 +4480,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5127856028435997962, guid: 4b563301280a8d24fa75433a46df70cf, type: 3}
   m_PrefabInstance: {fileID: 8882236959039278743}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6478625223305242628}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
