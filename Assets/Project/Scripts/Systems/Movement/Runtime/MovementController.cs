@@ -71,7 +71,7 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
         jetpackSystem = new JetpackSystem(config.jetpackForce, config.maxJetpackFuel);
 
         abilitySystem = new AbilitySystem();
-        jetpackAbility = new JetpackAbility(this, jetpackSystem);
+        jetpackAbility = new JetpackAbility(this, jetpackSystem, config.jetpackRampUpTime);
         abilitySystem.Register(jetpackAbility);
 
         walkStrategy = new WalkMovement(config.walkSpeed);
@@ -316,6 +316,11 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
     public float GetHorizontalSpeed()
     {
         return new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).magnitude;
+    }
+
+    public float GetVerticalSpeed()
+    {
+        return rb.linearVelocity.y;
     }
 
     public float GetJetpackRatio()

@@ -82,16 +82,25 @@ Reglas de capas:
 - Pause: `IGamePauseService` + `GamePauseService`.
 - Player/Input: `PlayerInputHandler` depende de referencias serializadas.
 - Perspective: `PlayerPerspectiveController` alterna primera/tercera persona desde `PlayerInputHandler`; el cambio solo ajusta la camara compartida, no activa/desactiva el cuerpo. En `Pablo_TestMechanics.unity`, `PlayerRobotVisual` permanece visible y `Main Camera` se referencia en `Shared Camera Transform`; `PlayerAnimatorPresenter` sincroniza el Animator con `MovementController`.
+- Camera motion: `PlayerCameraMotion` vive en `Main Camera`, lee `MovementController` por Inspector y se sincroniza con `PlayerFootstepAnimationEvents.FootstepReceived`. Cada `AnimationEvent OnFootstep` dispara un pulso local suave de camara si hay input de movimiento, grounded y jetpack inactivo. `stepDuration` define la duracion del pulso y `smoothTime` suaviza la transicion. No controla input, yaw/pitch ni offsets de perspectiva; `PlayerPerspectiveController` conserva el offset base de primera/tercera persona.
+- Player visual animation: `PlayerAnimatorPresenter` usa `MovementController.GetVerticalSpeed()` para activar `Jump` por velocidad vertical positiva real y no esperar a que termine `groundedGraceTime`; el umbral es constante interna para no agregar ruido al Inspector. `FreeFall` solo se activa con caida real: no grounded, velocidad vertical negativa suficiente y sin jetpack efectivo. Durante jetpack efectivo, el Animator vuelve a locomocion idle y `Visual Tilt Root` inclina el visual 20 grados hacia el movimiento, con 10 grados extra mientras sprint/boost esta activo.
+- Jetpack: `JetpackAbility` aplica rampa de potencia con `MovementConfig_SO.jetpackRampUpTime`; el empuje vertical y el boost horizontal empiezan suaves y suben hasta la fuerza configurada para evitar impulso inicial brusco.
 - Inventory: controller central, vistas separadas y persistencia via participante.
 - Crafting/Chemistry: datos + controllers + canales, sin UI como dominio.
 - Quest: progreso persistente via `QuestSystem` / `QuestSaveData`.
-- Notification/Audio/HUD: presenters y servicios/canales. Los pasos y aterrizajes del Player se disparan solo por `AnimationEvent OnFootstep` / `OnLand` en el Animator visual, recibidos por `PlayerFootstepAnimationEvents` y delegados a `PlayerAudioFeedback`. No hay sonido al iniciar salto. Audio de locomocion usa `WalkBase` / `JumpBase` por defecto, y cambia a variantes Grass/Metal si el ground tag contiene `Grass` o `Metal`. El jetpack es la excepcion: su audio lo controla `MovementController.OnJetpackActiveChanged`.
+- Notification/Audio/HUD: presenters y servicios/canales. Los pasos y aterrizajes del Player se disparan solo por `AnimationEvent OnFootstep` / `OnLand` en el Animator visual, recibidos por `PlayerFootstepAnimationEvents` y delegados a `PlayerAudioFeedback`. `PlayerFootstepAnimationEvents` filtra duplicados muy cercanos para evitar rafagas por blending/transiciones del Animator. No hay sonido al iniciar salto. Audio de locomocion usa `WalkBase` / `JumpBase` por defecto, y cambia a variantes Grass/Metal si el ground tag contiene `Grass` o `Metal`. El jetpack es la excepcion: su audio lo controla `MovementController.OnJetpackActiveChanged`.
 - Interaction/Scanner/World/Delivery: contexto de escena, referencias explicitas, warning + no-op si falta dependencia.
 
 ## Escenas y assets clave
 
 - `Assets/Project/Scenes/Pablo_TestMechanics.unity`
 - `Assets/Project/Scenes/Menu.unity`
+- Menu scene wiring: este es el estado canonico que se debe preservar. `Canvas` contiene `MainMenuManager`, `SceneLoadService` y `SaveLoadSceneBinding`. `MainMenuManager` usa `SceneLoadService` por Inspector y consume `SaveLoadSceneBinding` como `ISaveSlotReader`/`IGameSessionLoader`.
+  - Estado inicial: `MenuButton` activo, `BannerGame` activo, `Play_Panel` oculto, `OptionsPanel` oculto y `CreditsPanel` oculto.
+  - `Jugar`: no oculta `MenuButton` ni `BannerGame`; solo muestra `Play_Panel` y refresca sus `SaveSlot`.
+  - `Opciones`: mantiene `MenuButton`, oculta `BannerGame`, oculta `Play_Panel`, muestra `OptionsPanel` y al cerrar vuelve a `ShowMainMenu`.
+  - `Creditos`: mantiene `MenuButton`, oculta `BannerGame`, oculta `Play_Panel`, muestra `CreditsPanel` y al cerrar vuelve a `ShowMainMenu`. El `Button` de creditos debe ejecutar `ShowCredits` y tambien tener wiring explicito `BannerGame.SetActive(false)` / `CreditsPanel.SetActive(true)`; el cierre debe ejecutar `ShowMainMenu` y `BannerGame.SetActive(true)` / `CreditsPanel.SetActive(false)`.
+  - `SaveSlot` soporta modo `NewGame` y `LoadGame` para separar crear partida de cargar existente.
 - `Assets/Project/Prefabs/UI/OptionsPanel.prefab`
 - `Assets/Project/ScriptableObjects/Menu/GameSettings.asset`
 - `Assets/PlayerTest/Prefabs/PlayerRobot.prefab` debe mantenerse como prefab visual-only: sin input, movimiento, inventario, scanner, camara, audio listener ni servicios propios.

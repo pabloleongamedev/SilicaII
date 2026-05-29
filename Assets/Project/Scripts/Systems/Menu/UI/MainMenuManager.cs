@@ -16,6 +16,7 @@ public class MainMenuManager : MonoBehaviour
 {
     [Header("Panels")]
     [SerializeField] private GameObject mainPanel;
+    [SerializeField] private GameObject bannerPanel;
     [SerializeField] private GameObject playPanel;
     [SerializeField] private GameObject optionsPanel;
     [SerializeField] private GameObject creditsPanel;
@@ -59,7 +60,12 @@ public class MainMenuManager : MonoBehaviour
 
     public void ShowMainMenu()
     {
-        SwitchPanel(mainPanel, mainFirstButton);
+        SetPanel(mainPanel, true);
+        SetPanel(bannerPanel, true);
+        SetPanel(playPanel, false);
+        SetPanel(optionsPanel, false);
+        SetPanel(creditsPanel, false);
+        SelectButton(mainFirstButton);
     }
 
     public void ShowPlayMenu()
@@ -69,21 +75,42 @@ public class MainMenuManager : MonoBehaviour
         if (playPanel == null)
             return;
 
-        SwitchPanel(playPanel, playFirstButton);
+        SetPanel(mainPanel, true);
+        SetPanel(bannerPanel, true);
+        SetPanel(playPanel, true);
+        SetPanel(optionsPanel, false);
+        SetPanel(creditsPanel, false);
+        SelectButton(playFirstButton);
 
-        var saveSlot = playPanel.GetComponentInChildren<SaveSlot>(true);
-        if (saveSlot != null)
+        foreach (var saveSlot in playPanel.GetComponentsInChildren<SaveSlot>(true))
             saveSlot.RefreshSlot();
     }
 
     public void ShowOptions()
     {
-        SwitchPanel(optionsPanel, optionsFirstButton);
+        SetPanel(mainPanel, true);
+        SetPanel(bannerPanel, false);
+        SetPanel(playPanel, false);
+        SetPanel(optionsPanel, true);
+        SetPanel(creditsPanel, false);
+        SelectButton(optionsFirstButton);
     }
 
     public void ShowCredits()
     {
-        SwitchPanel(creditsPanel, creditsFirstButton);
+        if (creditsPanel == null)
+        {
+            Debug.LogWarning("[MainMenuManager] Asigna Credits Panel por Inspector para mostrar creditos.", this);
+            ShowMainMenu();
+            return;
+        }
+
+        SetPanel(mainPanel, true);
+        SetPanel(bannerPanel, false);
+        SetPanel(playPanel, false);
+        SetPanel(optionsPanel, false);
+        SetPanel(creditsPanel, true);
+        SelectButton(creditsFirstButton);
     }
 
     public void StartGame()
@@ -121,25 +148,19 @@ public class MainMenuManager : MonoBehaviour
         ResolveSceneLoader().LoadScene(fallbackSceneIndex);
     }
 
-    private void SwitchPanel(GameObject targetPanel, Button firstButton)
-    {
-        SetPanel(mainPanel, false);
-        SetPanel(playPanel, false);
-        SetPanel(optionsPanel, false);
-        SetPanel(creditsPanel, false);
-        SetPanel(targetPanel, true);
-
-        if (firstButton != null && EventSystem.current != null)
-        {
-            EventSystem.current.SetSelectedGameObject(null);
-            firstButton.Select();
-        }
-    }
-
     private void SetPanel(GameObject panel, bool active)
     {
         if (panel != null)
             panel.SetActive(active);
+    }
+
+    private void SelectButton(Button button)
+    {
+        if (button == null || EventSystem.current == null)
+            return;
+
+        EventSystem.current.SetSelectedGameObject(null);
+        button.Select();
     }
 
     private void ResolveSerializedServices()

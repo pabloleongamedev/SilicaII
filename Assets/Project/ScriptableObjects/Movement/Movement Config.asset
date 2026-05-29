@@ -18,6 +18,7 @@ MonoBehaviour:
   gravity: -20
   jumpForce: 8
   jetpackForce: 22
+  jetpackRampUpTime: 0.45
   maxJetpackFuel: 10
   jetpackBoostForce: 200
   maxJetpackHeight: 30

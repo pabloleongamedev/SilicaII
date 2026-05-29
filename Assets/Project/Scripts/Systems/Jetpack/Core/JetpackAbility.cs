@@ -10,15 +10,18 @@ public class JetpackAbility : IAbility
 {
     private IJetpackMovementContext movement;
     private JetpackSystem jetpack;
+    private float rampUpTime;
 
     private float startHeight;
+    private float activeTime;
     private bool hasStartedJetpack;
     private bool isActive;
 
-    public JetpackAbility(IJetpackMovementContext movement, JetpackSystem jetpack)
+    public JetpackAbility(IJetpackMovementContext movement, JetpackSystem jetpack, float rampUpTime)
     {
         this.movement = movement;
         this.jetpack = jetpack;
+        this.rampUpTime = rampUpTime;
     }
 
     public void SetActive(bool active)
@@ -28,6 +31,7 @@ public class JetpackAbility : IAbility
         // 🔥 reset limpio al soltar botón
         if (!active)
         {
+            activeTime = 0f;
             hasStartedJetpack = false;
         }
     }
@@ -47,9 +51,11 @@ public class JetpackAbility : IAbility
         if (!hasStartedJetpack)
         {
             startHeight = movement.GetCurrentHeight();
+            activeTime = 0f;
             hasStartedJetpack = true;
         }
 
+        activeTime += deltaTime;
         float currentHeight = movement.GetCurrentHeight();
         float heightDelta = currentHeight - startHeight;
 
@@ -62,14 +68,24 @@ public class JetpackAbility : IAbility
         if (force <= 0f)
             return;
 
-        movement.AddExternalVerticalForce(force);
+        float power = GetRampPower();
+
+        movement.AddExternalVerticalForce(force * power);
 
         // boost horizontal
         if (!isGrounded && movement.IsSprinting())
         {
             movement.AddExternalHorizontalForce(
-                movement.GetForward() * movement.GetJetpackBoost() * deltaTime
+                movement.GetForward() * movement.GetJetpackBoost() * power * deltaTime
             );
         }
+    }
+
+    private float GetRampPower()
+    {
+        if (rampUpTime <= 0f)
+            return 1f;
+
+        return UnityEngine.Mathf.Clamp01(activeTime / rampUpTime);
     }
 }

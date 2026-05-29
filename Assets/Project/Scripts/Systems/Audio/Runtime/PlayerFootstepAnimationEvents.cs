@@ -5,16 +5,29 @@
  * Relaciones: Vive junto al Animator que emite OnFootstep; PlayerAudioFeedback decide superficie, pitch y servicio de audio.
  */
 using UnityEngine;
+using System;
 
 public class PlayerFootstepAnimationEvents : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private PlayerAudioFeedback audioFeedback;
 
+    private const float MinimumFootstepInterval = 0.12f;
+
+    public event Action FootstepReceived;
+    public event Action LandReceived;
+
+    private float lastFootstepTime = -Mathf.Infinity;
     private bool hasLoggedMissingFeedback;
 
     public void OnFootstep()
     {
+        if (Time.time - lastFootstepTime < MinimumFootstepInterval)
+            return;
+
+        lastFootstepTime = Time.time;
+        FootstepReceived?.Invoke();
+
         if (!HasFeedback())
             return;
 
@@ -23,6 +36,8 @@ public class PlayerFootstepAnimationEvents : MonoBehaviour
 
     public void OnLand()
     {
+        LandReceived?.Invoke();
+
         if (!HasFeedback())
             return;
 

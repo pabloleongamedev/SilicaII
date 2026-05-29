@@ -9,10 +9,19 @@
  */
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SaveSlot : MonoBehaviour
 {
+    private enum SlotAction
+    {
+        Auto,
+        NewGame,
+        LoadGame
+    }
+
     [Header("Configuracion")]
+    [SerializeField] private SlotAction slotAction = SlotAction.Auto;
     [SerializeField] private TextMeshProUGUI textLabel;
     [SerializeField] private TextMeshProUGUI infoLabel;
     [SerializeField] private MonoBehaviour saveSlotReaderBehaviour;
@@ -24,9 +33,11 @@ public class SaveSlot : MonoBehaviour
     private SaveInfo saveInfo;
     private ISaveSlotReader saveSlotReader;
     private IGameSessionLoader gameSessionLoader;
+    private Button button;
 
     private void Awake()
     {
+        button = GetComponent<Button>();
         saveSlotReader = saveSlotReaderBehaviour as ISaveSlotReader;
         gameSessionLoader = gameSessionLoaderBehaviour as IGameSessionLoader;
     }
@@ -43,8 +54,8 @@ public class SaveSlot : MonoBehaviour
         if (saveSlotReader == null)
             return;
 
-        hasData = saveSlotReader.HasSaveFile(UniqueSlot);
-        saveInfo = saveSlotReader.GetSaveInfo(UniqueSlot);
+        hasData = saveSlotReader != null && saveSlotReader.HasSaveFile(UniqueSlot);
+        saveInfo = saveSlotReader != null ? saveSlotReader.GetSaveInfo(UniqueSlot) : null;
         UpdateSlotVisual();
     }
 
@@ -55,6 +66,26 @@ public class SaveSlot : MonoBehaviour
         if (gameSessionLoader == null)
         {
             Debug.LogWarning("[SaveSlot] No existe IGameSessionLoader para cargar o crear partida.", this);
+            return;
+        }
+
+        if (slotAction == SlotAction.NewGame)
+        {
+            Debug.Log("[SaveSlot] Creando nueva partida...");
+            gameSessionLoader.CreateNewGame(UniqueSlot);
+            return;
+        }
+
+        if (slotAction == SlotAction.LoadGame)
+        {
+            if (!hasData)
+            {
+                Debug.LogWarning("[SaveSlot] No hay partida guardada para cargar.", this);
+                return;
+            }
+
+            Debug.Log("[SaveSlot] Cargando partida guardada...");
+            gameSessionLoader.LoadGame(UniqueSlot);
             return;
         }
 
@@ -75,6 +106,34 @@ public class SaveSlot : MonoBehaviour
         if (textLabel == null)
         {
             Debug.LogError("[SaveSlot] TextLabel no asignado", this);
+            return;
+        }
+
+        if (slotAction == SlotAction.NewGame)
+        {
+            textLabel.text = "Nueva Partida";
+
+            if (infoLabel != null)
+                infoLabel.text = "Iniciar desde cero";
+
+            if (button != null)
+                button.interactable = true;
+
+            return;
+        }
+
+        if (slotAction == SlotAction.LoadGame)
+        {
+            textLabel.text = "Cargar Partida";
+
+            if (infoLabel != null)
+                infoLabel.text = hasData && saveInfo != null
+                    ? $"{saveInfo.playTime} | {saveInfo.lastSaveTime}"
+                    : "Sin partida guardada";
+
+            if (button != null)
+                button.interactable = hasData;
+
             return;
         }
 

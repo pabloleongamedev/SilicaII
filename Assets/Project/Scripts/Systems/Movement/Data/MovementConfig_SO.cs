@@ -22,6 +22,7 @@ public class MovementConfig_SO : ScriptableObject
 
     [Header("Jetpack")]
     public float jetpackForce = 12f;
+    public float jetpackRampUpTime = 0.35f;
     public float maxJetpackFuel  = 10f;
     public float jetpackBoostForce = 5f;
     public float maxJetpackHeight = 50f;

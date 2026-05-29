@@ -13722,7 +13722,7 @@ Transform:
   m_GameObject: {fileID: 3573515816302881861}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.55, z: 0.1}
+  m_LocalPosition: {x: 0, y: 0.85, z: 0.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -21789,6 +21789,7 @@ GameObject:
   - component: {fileID: 8897055451899104269}
   - component: {fileID: 3856114926012408155}
   - component: {fileID: 6431972515834526665}
+  - component: {fileID: 8110442588656347067}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -21796,6 +21797,26 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &8110442588656347067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8110442588656347066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c6ca6253a1447c4aa775f78c385fc3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementController: {fileID: 8270189695560625001}
+  cameraTransform: {fileID: 8348781421742902993}
+  footstepEvents: {fileID: 9100000000000000201}
+  walkStepAmplitude: {x: 0.08, y: -0.14, z: 0}
+  runStepAmplitude: {x: 0.12, y: -0.22, z: 0}
+  minMoveInput: 0.05
+  stepDuration: 0.22
+  smoothTime: 0.06
 --- !u!1 &8111722734442582039
 GameObject:
   m_ObjectHideFlags: 0
@@ -22404,7 +22425,7 @@ Transform:
   m_GameObject: {fileID: 8110442588656347066}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.379, z: 0.025}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -24291,6 +24312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementController: {fileID: 8270189695560625001}
   animator: {fileID: 9100000000000000103}
+  visualTiltRoot: {fileID: 9100000000000000102}
   speedBlendRate: 10
   airborneFreeFallDelay: 0.15
 --- !u!1001 &9100000000000000100
@@ -24368,6 +24390,17 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 696509871515532926, guid: 07afe2b0a98da0942a1bf3608418d141, type: 3}
   m_PrefabInstance: {fileID: 9100000000000000100}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &9100000000000000201 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9100000000000000201, guid: 07afe2b0a98da0942a1bf3608418d141, type: 3}
+  m_PrefabInstance: {fileID: 9100000000000000100}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9df20a68ddf94650a9a5fa86a59b0a2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!222 &9110263151613250995
 CanvasRenderer:
   m_ObjectHideFlags: 0
