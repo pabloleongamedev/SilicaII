@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a44bc7547b1f2d4aa7ffc70a5adba81, type: 3}
-  m_Name: Quest_03_Intro 1
+  m_Name: Quest_04_Intro
   m_EditorClassIdentifier: Assembly-CSharp::QuestData_SO
   questName: "Introduci\xF3n sintentizar elementos qu\xEDmicos"
   tasks:

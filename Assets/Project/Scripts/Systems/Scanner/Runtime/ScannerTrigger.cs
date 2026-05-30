@@ -124,6 +124,9 @@ public class ScannerTrigger : MonoBehaviour
     private bool CanUseAnimatorTrigger()
     {
         return animator != null
+            && animator.isActiveAndEnabled
+            && animator.gameObject.activeInHierarchy
+            && animator.isInitialized
             && animator.runtimeAnimatorController != null
             && !string.IsNullOrEmpty(startScanTrigger);
     }

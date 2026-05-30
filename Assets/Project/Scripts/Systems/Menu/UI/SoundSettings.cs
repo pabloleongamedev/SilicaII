@@ -41,46 +41,47 @@ public class SoundSettings : MonoBehaviour
         if (settingsReader == null)
             return;
 
-        DebugSetMixerVolume(masterVolumeParameter, settingsReader.MasterVolume);
-        DebugSetMixerVolume(musicVolumeParameter, settingsReader.MusicVolume);
-        DebugSetMixerVolume(sfxVolumeParameter, settingsReader.EffectsVolume);
+        SetMixerVolume(masterVolumeParameter, settingsReader.MasterVolume);
+        SetMixerVolume(musicVolumeParameter, settingsReader.MusicVolume);
+        SetMixerVolume(sfxVolumeParameter, settingsReader.EffectsVolume);
     }
 
     public void PreviewMusicVolume(float value)
     {
-        DebugSetMixerVolume(musicVolumeParameter, value);
+        SetMixerVolume(musicVolumeParameter, value);
     }
 
     public void PreviewSFXVolume(float value)
     {
-        DebugSetMixerVolume(sfxVolumeParameter, value);
+        SetMixerVolume(sfxVolumeParameter, value);
     }
 
     public void PreviewMasterVolume(float segments)
-{
-    segments = Mathf.Clamp(segments, 1f, 10f);
-
-    float normalizedVolume = segments / 10f;
-    if (settingsWriter != null)
-        settingsWriter.MasterVolume = normalizedVolume;
-
-    DebugSetMixerVolume(masterVolumeParameter, normalizedVolume);
-}
-
-
-    private void DebugSetMixerVolume(string parameterName, float normalizedVolume)
     {
-        normalizedVolume = Mathf.Clamp(normalizedVolume, 0.5f, 1f);
-        float volumeInDb = Mathf.Log10(normalizedVolume) * 20f;
+        segments = Mathf.Clamp(segments, 1f, 10f);
+        SetMixerVolume(masterVolumeParameter, segments / 10f);
+    }
 
-        bool setOk = audioMixer.SetFloat(parameterName, volumeInDb);
 
-        float currentValue;
-        bool getOk = audioMixer.GetFloat(parameterName, out currentValue);
+    private void SetMixerVolume(string parameterName, float normalizedVolume)
+    {
+        if (audioMixer == null)
+        {
+            Debug.LogWarning("[SoundSettings] Asigna AudioMixer por Inspector para aplicar volumenes.", this);
+            return;
+        }
 
-        Debug.Log(
-            $"[AUDIO DEBUG] Param: {parameterName} | Normalized: {normalizedVolume} | dB: {volumeInDb} | SetOK: {setOk} | GetOK: {getOk} | Current: {currentValue}"
-        );
+        if (string.IsNullOrWhiteSpace(parameterName))
+        {
+            Debug.LogWarning("[SoundSettings] Asigna el nombre del parametro expuesto del AudioMixer.", this);
+            return;
+        }
+
+        normalizedVolume = Mathf.Clamp01(normalizedVolume);
+        float volumeInDb = normalizedVolume <= 0.0001f ? -80f : Mathf.Log10(normalizedVolume) * 20f;
+
+        if (!audioMixer.SetFloat(parameterName, volumeInDb))
+            Debug.LogWarning($"[SoundSettings] El AudioMixer no tiene expuesto el parametro '{parameterName}'.", this);
     }
 
     private void ResolveSettingsService()

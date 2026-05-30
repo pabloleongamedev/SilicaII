@@ -24,13 +24,13 @@ MonoBehaviour:
   notificationSuccess: {fileID: 11400000, guid: 6bbf79f66a244c5449cfb70a63d5877e, type: 2}
   notificationWarning: {fileID: 0}
   notificationError: {fileID: 11400000, guid: 600a2317e163e3b4e8b3626d6f0a5cc8, type: 2}
-  uiHover: {fileID: 0}
-  uiClick: {fileID: 0}
-  uiApply: {fileID: 0}
-  uiReset: {fileID: 0}
-  uiSliderTick: {fileID: 0}
-  uiSliderLimit: {fileID: 0}
-  uiError: {fileID: 0}
+  uiHover: {fileID: 11400000, guid: ae62db4a7b6a3ac4aaa1aebde92e9de7, type: 2}
+  uiClick: {fileID: 11400000, guid: 95f698fd4ca70b045a8e4af53b310d68, type: 2}
+  uiApply: {fileID: 11400000, guid: b8c064cac7490f54c9f644dd30280d38, type: 2}
+  uiReset: {fileID: 11400000, guid: 0c69e85f41499f64d8f7f2cbd2c5db8c, type: 2}
+  uiSliderTick: {fileID: 11400000, guid: ca2fcfecb33423149bb71d28e09c6035, type: 2}
+  uiSliderLimit: {fileID: 11400000, guid: 42d533e4f0122e94c99bada511a27eac, type: 2}
+  uiError: {fileID: 11400000, guid: fd56a884b6607dd42ba75a48d7fa47df, type: 2}
   feedbackHit: {fileID: 0}
   feedbackExplosion: {fileID: 0}
   feedbackPickup: {fileID: 0}

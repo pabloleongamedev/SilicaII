@@ -25,14 +25,21 @@ public class OptionsMenuManager : MonoBehaviour
     [SerializeField] private Slider effectsSlider;
     [SerializeField] private Slider masterVolumeSlider;
 
+    [Header("Toggles")]
+    [SerializeField] private Toggle fullscreenToggle;
+
     [Header("Audio")]
     [SerializeField] private SoundSettings soundSettings;
+
+    [Header("Graphics")]
+    [SerializeField] private GraphicsSettings graphicsSettings;
 
     [Header("Settings Service")]
     [SerializeField] private MonoBehaviour settingsServiceBehaviour;
 
     private IGameSettingsReader settingsReader;
     private IGameSettingsWriter settingsWriter;
+    private bool warnedMissingFullscreenToggle;
 
     private void Awake()
     {
@@ -43,29 +50,45 @@ public class OptionsMenuManager : MonoBehaviour
     {
         ResolveSettingsService();
         ConfigureMasterSlider();
-        LoadSettingsIntoUI();
+        LoadSettingsIntoUI(true);
 
-        applyButton.onClick.AddListener(ApplySettings);
-        resetButton.onClick.AddListener(ResetSettings);
-        closeButton.onClick.AddListener(CloseOptionsPanel);
+        AddButtonListener(applyButton, ApplySettings, nameof(applyButton));
+        AddButtonListener(resetButton, ResetSettings, nameof(resetButton));
+        AddButtonListener(closeButton, CloseOptionsPanel, nameof(closeButton));
     }
 
     private void ConfigureMasterSlider()
     {
+        if (masterVolumeSlider == null)
+        {
+            Debug.LogWarning("[OptionsMenuManager] Asigna Master Volume Slider por Inspector.", this);
+            return;
+        }
+
         masterVolumeSlider.minValue = 1f;
         masterVolumeSlider.maxValue = 10f;
         masterVolumeSlider.wholeNumbers = true;
     }
 
-    private void LoadSettingsIntoUI()
+    private void LoadSettingsIntoUI(bool warnMissingFullscreenToggle = false)
     {
         if (settingsReader == null)
             return;
 
-        brightnessSlider.value = settingsReader.Brightness;
-        musicSlider.value = settingsReader.MusicVolume;
-        effectsSlider.value = settingsReader.EffectsVolume;
-        masterVolumeSlider.value = settingsReader.GetMasterVolumeSegments();
+        SetSliderValue(brightnessSlider, settingsReader.Brightness, nameof(brightnessSlider));
+        SetSliderValue(musicSlider, settingsReader.MusicVolume, nameof(musicSlider));
+        SetSliderValue(effectsSlider, settingsReader.EffectsVolume, nameof(effectsSlider));
+        SetSliderValue(masterVolumeSlider, settingsReader.GetMasterVolumeSegments(), nameof(masterVolumeSlider));
+
+        if (fullscreenToggle != null)
+        {
+            fullscreenToggle.isOn = settingsReader.Fullscreen;
+        }
+        else if (warnMissingFullscreenToggle && !warnedMissingFullscreenToggle)
+        {
+            warnedMissingFullscreenToggle = true;
+            Debug.LogWarning("[OptionsMenuManager] Asigna fullscreenToggle por Inspector.", this);
+        }
     }
 
     private void ApplySettings()
@@ -73,16 +96,24 @@ public class OptionsMenuManager : MonoBehaviour
         if (settingsWriter == null)
             return;
 
+        if (!HasRequiredSliders())
+            return;
+
         settingsWriter.Brightness = brightnessSlider.value;
         settingsWriter.MusicVolume = musicSlider.value;
         settingsWriter.EffectsVolume = effectsSlider.value;
         settingsWriter.SetMasterVolumeFromSegments(masterVolumeSlider.value);
+
+        if (fullscreenToggle != null)
+            settingsWriter.Fullscreen = fullscreenToggle.isOn;
+
         settingsWriter.Save();
 
         if (soundSettings != null)
-        {
             soundSettings.ApplySound();
-        }
+
+        if (graphicsSettings != null)
+            graphicsSettings.ApplyGraphics();
     }
 
     private void ResetSettings()
@@ -94,14 +125,52 @@ public class OptionsMenuManager : MonoBehaviour
         LoadSettingsIntoUI();
 
         if (soundSettings != null)
-        {
             soundSettings.ApplySound();
-        }
+
+        if (graphicsSettings != null)
+            graphicsSettings.ApplyGraphics();
     }
 
     private void CloseOptionsPanel()
     {
+        if (optionsPanel == null)
+        {
+            Debug.LogWarning("[OptionsMenuManager] Asigna Options Panel por Inspector para cerrar opciones.", this);
+            return;
+        }
+
         optionsPanel.SetActive(false);
+    }
+
+    private void AddButtonListener(Button button, UnityEngine.Events.UnityAction action, string fieldName)
+    {
+        if (button == null)
+        {
+            Debug.LogWarning($"[OptionsMenuManager] Asigna {fieldName} por Inspector.", this);
+            return;
+        }
+
+        button.onClick.AddListener(action);
+    }
+
+    private void SetSliderValue(Slider slider, float value, string fieldName)
+    {
+        if (slider == null)
+        {
+            Debug.LogWarning($"[OptionsMenuManager] Asigna {fieldName} por Inspector.", this);
+            return;
+        }
+
+        slider.value = value;
+    }
+
+    private bool HasRequiredSliders()
+    {
+        if (brightnessSlider != null && musicSlider != null && effectsSlider != null && masterVolumeSlider != null)
+            return true;
+
+        Debug.LogWarning("[OptionsMenuManager] Faltan sliders de opciones por Inspector; no se aplican cambios.", this);
+        return false;
     }
 
     private void ResolveSettingsService()

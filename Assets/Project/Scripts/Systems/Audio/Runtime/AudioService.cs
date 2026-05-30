@@ -2,17 +2,21 @@
  * Arquitectura: Audio/Runtime
  * Script: AudioService
  * Rol: Servicio runtime de audio por escena/prefab. Resuelve AudioCueKey contra AudioCueLibrary_SO y reproduce AudioCue_SO.
- * Relaciones: PlayerAudioFeedback, ScannerTrigger, UIAudioManager y NotificationAudioController dependen de IAudioService.
+ * Relaciones: PlayerAudioFeedback, ScannerTrigger, ButtonAccessibility, SegmentedSliderInteractive y NotificationAudioController dependen de IAudioService.
  * Riesgo arquitectonico mitigado: evita singletons y permite reemplazar la implementacion por Inspector.
  * Uso como referencia: nuevos sistemas deben pedir AudioCueKey; las referencias AudioCue_SO viven en AudioCueLibrary_SO.
  */
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class AudioService : MonoBehaviour, IAudioService
 {
     [Header("Audio Library")]
     [SerializeField] private AudioCueLibrary_SO audioLibrary;
+
+    [Header("Mixer Routing")]
+    [SerializeField] private AudioMixerGroup defaultOutputGroup;
     
     private readonly Dictionary<string, AudioSource> sourcesByID = new();
     private readonly HashSet<AudioCueKey> missingCueWarnings = new();
@@ -87,6 +91,7 @@ public class AudioService : MonoBehaviour, IAudioService
         source.pitch = cue.Pitch;
         source.loop = cue.Loop;
         source.spatialBlend = 0f;
+        source.outputAudioMixerGroup = defaultOutputGroup;
         sourcesByID.Add(cue.CueID, source);
     }
 

@@ -16,10 +16,41 @@ public class HealthBehaviour : MonoBehaviour, IDamageable
 
     private HealthComponent health;
 
-    public HealthComponent Health => health;
-    public int CurrentHealth => health != null ? health.Current : maxHealth;
-    public int MaxHealth => health != null ? health.Max : maxHealth;
-    public float HealthRatio => health != null ? health.GetHealthRatio() : 1f;
+    public HealthComponent Health
+    {
+        get
+        {
+            EnsureInitialized();
+            return health;
+        }
+    }
+
+    public int CurrentHealth
+    {
+        get
+        {
+            EnsureInitialized();
+            return health.Current;
+        }
+    }
+
+    public int MaxHealth
+    {
+        get
+        {
+            EnsureInitialized();
+            return health.Max;
+        }
+    }
+
+    public float HealthRatio
+    {
+        get
+        {
+            EnsureInitialized();
+            return health.GetHealthRatio();
+        }
+    }
 
     public event Action<int, int> OnHealthChanged;
     public event Action<DamageContext> OnDamaged;
@@ -27,6 +58,14 @@ public class HealthBehaviour : MonoBehaviour, IDamageable
 
     private void Awake()
     {
+        EnsureInitialized();
+    }
+
+    private void EnsureInitialized()
+    {
+        if (health != null)
+            return;
+
         health = new HealthComponent(maxHealth);
         health.OnHealthChanged += HandleHealthChanged;
         health.OnDamaged += HandleDamaged;
@@ -45,17 +84,20 @@ public class HealthBehaviour : MonoBehaviour, IDamageable
 
     public void ReceiveDamage(in DamageContext context)
     {
+        EnsureInitialized();
         health.ReceiveDamage(context);
     }
 
     public void Heal(int amount)
     {
+        EnsureInitialized();
         health.Heal(amount);
     }
 
     public void RestoreHealth(int current, int max)
     {
         // SaveLoad restaura estado sin emitir muerte; morir es gameplay, no hidratacion de datos.
+        EnsureInitialized();
         health.RestoreState(current, max);
     }
 

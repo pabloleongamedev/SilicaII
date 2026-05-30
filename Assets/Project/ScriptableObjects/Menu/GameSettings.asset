@@ -17,12 +17,12 @@ MonoBehaviour:
   effectsVolumeKey: EffectsVolume
   masterVolumeKey: MasterVolume
   fullscreenKey: Fullscreen
-  defaultBrightness: 0.75
+  defaultBrightness: 0.6
   defaultMusicVolume: 0.5
   defaultEffectsVolume: 0.5
   defaultMasterVolume: 1
   defaultFullscreen: 1
-  brightness: 0.75
+  brightness: 0.6
   musicVolume: 0.5
   effectsVolume: 0.5
   masterVolume: 1

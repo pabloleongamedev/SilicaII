@@ -10,6 +10,10 @@ using UnityEngine.UI;
 
 public class GraphicsSettings : MonoBehaviour
 {
+    private const float NeutralBrightness = 0.6f;
+    private const float MaxDarkAlpha = 242f / 255f;
+    private const float MaxLightAlpha = 8f / 255f;
+
     [Header("UI References")]
     [SerializeField] private Slider brightnessSlider;
     [SerializeField] private Toggle fullscreenToggle;
@@ -40,6 +44,11 @@ public class GraphicsSettings : MonoBehaviour
 
         if (fullscreenToggle != null)
             fullscreenToggle.onValueChanged.RemoveListener(ApplyFullscreen);
+    }
+
+    public void ApplyGraphics()
+    {
+        RenderFromSettings();
     }
 
     private void RenderFromSettings()
@@ -74,7 +83,6 @@ public class GraphicsSettings : MonoBehaviour
             return;
 
         settingsWriter.Brightness = value;
-        settingsWriter.Save();
     }
 
     private void ApplyBrightnessVisual(float value)
@@ -82,8 +90,15 @@ public class GraphicsSettings : MonoBehaviour
         if (brightnessOverlay == null)
             return;
 
-        Color color = brightnessOverlay.color;
-        color.a = 1f - Mathf.Clamp01(value);
+        float normalized = Mathf.Clamp01(value);
+        bool isDarker = normalized < NeutralBrightness;
+
+        float alpha = isDarker
+            ? Mathf.Lerp(MaxDarkAlpha, 0f, normalized / NeutralBrightness)
+            : Mathf.Lerp(0f, MaxLightAlpha, (normalized - NeutralBrightness) / (1f - NeutralBrightness));
+
+        Color color = isDarker ? Color.black : Color.white;
+        color.a = alpha;
         brightnessOverlay.color = color;
     }
 
@@ -95,7 +110,6 @@ public class GraphicsSettings : MonoBehaviour
             return;
 
         settingsWriter.Fullscreen = isFullscreen;
-        settingsWriter.Save();
     }
 
     private void ResolveSettingsService()

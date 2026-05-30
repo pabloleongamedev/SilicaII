@@ -77,7 +77,7 @@ Reglas de capas:
 ## Sistemas principales
 
 - Events: `EventChannel_SO` por dominio, asignado por Inspector.
-- SaveLoad: `SaveLoadSceneBinding` como fachada de escena, `SaveParticipantRegistry`, `ISaveParticipant`, `GameData`.
+- SaveLoad: `SaveLoadSceneBinding` como fachada de escena, `SaveParticipantRegistry`, `ISaveParticipant`, `GameData`. `SaveParticipantRegistry.participantBehaviours` debe contener solo componentes que implementen `ISaveParticipant`; `InventoryController` no va directo ahi porque lo persiste `PlayerSaveParticipant`.
 - Settings: `GameSettings.asset` + `GameSettingsService`, consumido por `IGameSettingsReader` / `IGameSettingsWriter`.
 - Pause: `IGamePauseService` + `GamePauseService`.
 - Player/Input: `PlayerInputHandler` depende de referencias serializadas.
@@ -89,16 +89,21 @@ Reglas de capas:
 - Crafting/Chemistry: datos + controllers + canales, sin UI como dominio.
 - Quest: progreso persistente via `QuestSystem` / `QuestSaveData`.
 - Notification/Audio/HUD: presenters y servicios/canales. Los pasos y aterrizajes del Player se disparan solo por `AnimationEvent OnFootstep` / `OnLand` en el Animator visual, recibidos por `PlayerFootstepAnimationEvents` y delegados a `PlayerAudioFeedback`. `PlayerFootstepAnimationEvents` filtra duplicados muy cercanos para evitar rafagas por blending/transiciones del Animator. No hay sonido al iniciar salto. Audio de locomocion usa `WalkBase` / `JumpBase` por defecto, y cambia a variantes Grass/Metal si el ground tag contiene `Grass` o `Metal`. El jetpack es la excepcion: su audio lo controla `MovementController.OnJetpackActiveChanged`.
-- Interaction/Scanner/World/Delivery: contexto de escena, referencias explicitas, warning + no-op si falta dependencia.
+- Interaction/Scanner/World/Delivery: contexto de escena, referencias explicitas, warning + no-op si falta dependencia. `ScannerTrigger` solo usa triggers de Animator si el Animator esta activo, inicializado y con controller; en `OnDisable` debe hacer no-op si el visual ya no puede reproducir Animator.
+- Restore temprano: `SaveLoadSceneBinding` puede restaurar en `Awake`; componentes restaurables deben tolerar restore antes de su propio `Awake`. `HealthBehaviour` inicializa perezosamente su `HealthComponent` antes de restaurar/leer/danar para evitar NRE por orden de Awake.
 
 ## Escenas y assets clave
 
 - `Assets/Project/Scenes/Pablo_TestMechanics.unity`
+- Runtime settings: en `Pablo_TestMechanics.unity`, `Systems` contiene `GameSettingsService` con `GameSettings.asset` y `GameSettingsRuntimeApplier` con `MainMixer` y `Global Volume`. Al arrancar gameplay carga `PlayerPrefs` y aplica fullscreen/audio; el brillo se aplica sobre `ColorAdjustments.postExposure` del `Global Volume` leyendo `profile` o `sharedProfile`. `brightnessOverlay` es opcional y puede quedar `None` si la escena no usa overlay visual de brillo. `AudioService.defaultOutputGroup` debe apuntar al grupo `SFX` del `MainMixer`; si queda `None`, los `AudioSource` creados por `AudioService` no pasan por el mixer y los sliders de volumen no afectan esos sonidos.
 - `Assets/Project/Scenes/Menu.unity`
 - Menu scene wiring: este es el estado canonico que se debe preservar. `Canvas` contiene `MainMenuManager`, `SceneLoadService` y `SaveLoadSceneBinding`. `MainMenuManager` usa `SceneLoadService` por Inspector y consume `SaveLoadSceneBinding` como `ISaveSlotReader`/`IGameSessionLoader`.
   - Estado inicial: `MenuButton` activo, `BannerGame` activo, `Play_Panel` oculto, `OptionsPanel` oculto y `CreditsPanel` oculto.
   - `Jugar`: no oculta `MenuButton` ni `BannerGame`; solo muestra `Play_Panel` y refresca sus `SaveSlot`.
   - `Opciones`: mantiene `MenuButton`, oculta `BannerGame`, oculta `Play_Panel`, muestra `OptionsPanel` y al cerrar vuelve a `ShowMainMenu`.
+  - `OptionsMenuManager`: debe tener `optionsPanel`, `applyButton`, `resetButton`, `closeButton`, sliders, `fullscreenToggle`, `soundSettings`, `graphicsSettings` y `settingsServiceBehaviour` asignados por Inspector. `APLICAR` escribe brillo, fullscreen, volumen maestro, musica y efectos en `GameSettingsService`, guarda en `PlayerPrefs` y aplica audio/graficos. `RESTABLECER` vuelve a defaults, refresca UI y aplica. Si falta una referencia, el script debe emitir warning y hacer no-op en vez de lanzar excepcion.
+  - Audio de menu: `Canvas` debe tener `AudioService` con `Audio Cue Library_SO` y `defaultOutputGroup` apuntando a `SFX` del `MainMixer`. `ButtonAccessibility.audioServiceBehaviour` apunta a ese servicio y reproduce `UIHover` / `UIClick` por `AudioCueKey`; `SegmentedSliderInteractive.audioServiceBehaviour` usa `UISliderTick` / `UISliderLimit`. Las referencias reales viven en `AudioCueLibrary_SO` y en `Assets/Project/ScriptableObjects/Audio/Sounds/Menu/*.asset`; no dejar cues UI vacios.
+  - Brillo en menu: `Canvas/ZZ_BrightnessOverlay_RuntimeVisual` es una `Image` fullscreen con `Raycast Target` desactivado. `GraphicsSettings.brightnessOverlay` apunta a esa imagen; mover `BrightnessSlider` cambia su color/alpha en tiempo real y no debe bloquear botones. El valor `0.6` es neutral/equilibrado y alpha `0`; `0` oscurece con negro alpha `242/255`; `1` aclara con blanco alpha `8/255`. `GameSettings.defaultBrightness` debe mantenerse en `0.6`. Si Unity ya tenia la escena abierta cuando se edito desde archivo, recargar `Menu.unity` para ver el objeto en jerarquia.
   - `Creditos`: mantiene `MenuButton`, oculta `BannerGame`, oculta `Play_Panel`, muestra `CreditsPanel` y al cerrar vuelve a `ShowMainMenu`. El `Button` de creditos debe ejecutar `ShowCredits` y tambien tener wiring explicito `BannerGame.SetActive(false)` / `CreditsPanel.SetActive(true)`; el cierre debe ejecutar `ShowMainMenu` y `BannerGame.SetActive(true)` / `CreditsPanel.SetActive(false)`.
   - `SaveSlot` soporta modo `NewGame` y `LoadGame` para separar crear partida de cargar existente.
 - `Assets/Project/Prefabs/UI/OptionsPanel.prefab`

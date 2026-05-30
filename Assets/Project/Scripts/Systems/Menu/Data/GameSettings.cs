@@ -19,14 +19,14 @@ public class GameSettings : ScriptableObject
     [SerializeField] private string fullscreenKey = "Fullscreen";
 
     [Header("Defaults")]
-    [SerializeField, Range(0f, 1f)] private float defaultBrightness = 0.75f;
+    [SerializeField, Range(0f, 1f)] private float defaultBrightness = 0.6f;
     [SerializeField, Range(0f, 1f)] private float defaultMusicVolume = 0.5f;
     [SerializeField, Range(0f, 1f)] private float defaultEffectsVolume = 0.5f;
     [SerializeField, Range(0.1f, 1f)] private float defaultMasterVolume = 1f;
     [SerializeField] private bool defaultFullscreen = true;
 
     [Header("Runtime Values")]
-    [SerializeField, Range(0f, 1f)] private float brightness = 0.75f;
+    [SerializeField, Range(0f, 1f)] private float brightness = 0.6f;
     [SerializeField, Range(0f, 1f)] private float musicVolume = 0.5f;
     [SerializeField, Range(0f, 1f)] private float effectsVolume = 0.5f;
     [SerializeField, Range(0.1f, 1f)] private float masterVolume = 1f;
