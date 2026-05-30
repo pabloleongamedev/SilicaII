@@ -47,6 +47,7 @@ Write-Host "Assets root: $assetsRoot"
 Invoke-HealthStep "Required documentation exists" {
     $requiredDocs = @(
         "Assets\AI\PROJECT_CONTEXT.md",
+        "Assets\AI\AUDITORIA_ARQUITECTURA_ACTUAL.md",
         "Assets\AI\Documentacion\Arquitectura_Tecnica_SilicaII.docx",
         "Assets\AI\Documentacion\Manual_Integracion_SilicaII.docx",
         "Assets\AI\Documentacion\Base\Requerimientos_Sistemas_SilicaII.docx",
@@ -94,6 +95,142 @@ Invoke-HealthStep "Missing Script scan" {
         }
 
         throw "Missing Script references found."
+    }
+}
+
+Invoke-HealthStep "Quest SaveParticipant wiring" {
+    $unityAssets = @(
+        (Join-Path $assetsRoot "Project\Scenes"),
+        (Join-Path $assetsRoot "Project\Prefabs")
+    )
+
+    $files = foreach ($path in $unityAssets) {
+        if (Test-Path -LiteralPath $path) {
+            Get-ChildItem -Path $path -Recurse -Include "*.unity", "*.prefab"
+        }
+    }
+
+    $violations = New-Object System.Collections.Generic.List[string]
+
+    foreach ($file in $files) {
+        $questFileIDs = New-Object System.Collections.Generic.List[string]
+        $registeredFileIDs = New-Object System.Collections.Generic.HashSet[string]
+        $currentMonoBehaviourID = $null
+        $isCurrentRegistry = $false
+
+        foreach ($line in Get-Content -LiteralPath $file.FullName) {
+            if ($line -match "^--- !u!114 &(?<id>-?\d+)") {
+                $currentMonoBehaviourID = $Matches["id"]
+                $isCurrentRegistry = $false
+                continue
+            }
+
+            if ($currentMonoBehaviourID -eq $null) {
+                continue
+            }
+
+            if ($line -match "m_EditorClassIdentifier:\s*(?:.*::)?QuestSystem\s*$") {
+                $questFileIDs.Add($currentMonoBehaviourID)
+                continue
+            }
+
+            if ($line -match "m_EditorClassIdentifier:\s*(?:.*::)?SaveParticipantRegistry\s*$") {
+                $isCurrentRegistry = $true
+                continue
+            }
+
+            if ($isCurrentRegistry -and $line -match "-\s*\{fileID:\s*(?<id>-?\d+)\b") {
+                [void]$registeredFileIDs.Add($Matches["id"])
+            }
+        }
+
+        if ($questFileIDs.Count -eq 0) {
+            continue
+        }
+
+        foreach ($questFileID in $questFileIDs) {
+            if (-not $registeredFileIDs.Contains($questFileID)) {
+                $relativePath = $file.FullName.Replace($ProjectRoot + "\", "")
+                $violations.Add("${relativePath}: QuestSystem fileID $questFileID no esta registrado en SaveParticipantRegistry.participantBehaviours.")
+            }
+        }
+    }
+
+    if ($violations.Count -gt 0) {
+        $violations | ForEach-Object { Write-Host $_ }
+        throw "QuestSystem debe registrarse explicitamente como ISaveParticipant para persistir progreso."
+    }
+}
+
+Invoke-HealthStep "Scanner explicit visual references" {
+    $unityAssets = @(
+        (Join-Path $assetsRoot "Project\Scenes"),
+        (Join-Path $assetsRoot "Project\Prefabs")
+    )
+
+    $files = foreach ($path in $unityAssets) {
+        if (Test-Path -LiteralPath $path) {
+            Get-ChildItem -Path $path -Recurse -Include "*.unity", "*.prefab"
+        }
+    }
+
+    $violations = New-Object System.Collections.Generic.List[string]
+
+    foreach ($file in $files) {
+        $currentMonoBehaviourID = $null
+        $isCurrentScanner = $false
+        $hasPivotScan = $false
+        $hasScanAnimator = $false
+        $hasScanRenderer = $false
+
+        foreach ($line in Get-Content -LiteralPath $file.FullName) {
+            if ($line -match "^--- !u!114 &(?<id>-?\d+)") {
+                if ($isCurrentScanner -and (-not $hasPivotScan -or -not $hasScanAnimator -or -not $hasScanRenderer)) {
+                    $relativePath = $file.FullName.Replace($ProjectRoot + "\", "")
+                    $violations.Add("${relativePath}: ScannerTrigger fileID $currentMonoBehaviourID requiere pivotScan, scanAnimator y scanRenderer por Inspector.")
+                }
+
+                $currentMonoBehaviourID = $Matches["id"]
+                $isCurrentScanner = $false
+                $hasPivotScan = $false
+                $hasScanAnimator = $false
+                $hasScanRenderer = $false
+                continue
+            }
+
+            if ($currentMonoBehaviourID -eq $null) {
+                continue
+            }
+
+            if ($line -match "m_EditorClassIdentifier:\s*(?:.*::)?ScannerTrigger\s*$") {
+                $isCurrentScanner = $true
+                continue
+            }
+
+            if (-not $isCurrentScanner) {
+                continue
+            }
+
+            if ($line -match "pivotScan:\s*\{fileID:\s*(?!0\b)-?\d+") {
+                $hasPivotScan = $true
+            }
+            elseif ($line -match "scanAnimator:\s*\{fileID:\s*(?!0\b)-?\d+") {
+                $hasScanAnimator = $true
+            }
+            elseif ($line -match "scanRenderer:\s*\{fileID:\s*(?!0\b)-?\d+") {
+                $hasScanRenderer = $true
+            }
+        }
+
+        if ($isCurrentScanner -and (-not $hasPivotScan -or -not $hasScanAnimator -or -not $hasScanRenderer)) {
+            $relativePath = $file.FullName.Replace($ProjectRoot + "\", "")
+            $violations.Add("${relativePath}: ScannerTrigger fileID $currentMonoBehaviourID requiere pivotScan, scanAnimator y scanRenderer por Inspector.")
+        }
+    }
+
+    if ($violations.Count -gt 0) {
+        $violations | ForEach-Object { Write-Host $_ }
+        throw "ScannerTrigger debe declarar referencias visuales explicitas por Inspector."
     }
 }
 

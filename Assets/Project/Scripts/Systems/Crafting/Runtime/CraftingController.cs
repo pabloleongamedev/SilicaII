@@ -65,7 +65,6 @@ public class CraftingController : MonoBehaviour
         toolView.OnItemDragOut -= HandleItemReturned;
         craftButton.onClick.RemoveListener(OnCraftClicked);
 
-        // 🔥 rollback seguro
         if (write != null)
         {
             system.ClearAll(write);
@@ -73,9 +72,6 @@ public class CraftingController : MonoBehaviour
         }
     }
 
-    // =========================================================
-    // UI BUILD
-    // =========================================================
     private void BuildRecipesUI()
     {
         if (listView == null || database == null)
@@ -88,7 +84,6 @@ public class CraftingController : MonoBehaviour
     {
         // Al cambiar receta se devuelven items reservados para mantener
         // consistencia entre Core, Inventory y UI.
-        // 🔥 devolver items antes de cambiar
         system.ClearAll(write);
 
         system.SetRecipe(recipe);
@@ -103,9 +98,6 @@ public class CraftingController : MonoBehaviour
         UpdateCraftButton();
     }
 
-    // =========================================================
-    // DRAG & DROP
-    // =========================================================
     private void HandleItemDropped(int slotIndex, ItemData_SO item)
     {
         var result = system.TryPlaceItem(slotIndex, item, read, write);
@@ -133,9 +125,6 @@ public class CraftingController : MonoBehaviour
         UpdateCraftButton();
     }
 
-    // =========================================================
-    // VALIDACIÓN
-    // =========================================================
     private void UpdateCraftButton()
     {
         if (craftButton == null)
@@ -144,9 +133,6 @@ public class CraftingController : MonoBehaviour
         craftButton.interactable = system.IsRecipeComplete();
     }
 
-    // =========================================================
-    // CRAFT
-    // =========================================================
     private void OnCraftClicked()
     {
         // Flujo de crafting: validar Core, producir en Inventory, publicar evento
@@ -163,7 +149,6 @@ public class CraftingController : MonoBehaviour
         {
             Notify("Receta incompleta", NotificationType.Warning);
 
-            // rollback
             system.ClearAll(write);
             toolView.Clear();
 
@@ -171,7 +156,7 @@ public class CraftingController : MonoBehaviour
             return;
         }
 
-        //  PRODUCCIÓN (usa inventory system → ya notifica)
+        // Inventory procesa la produccion y publica sus propias notificaciones.
         var consumed = new (ItemData_SO item, int amount)[0];
         var produced = new[] { (recipe.result, recipe.resultAmount) };
 
@@ -185,7 +170,6 @@ public class CraftingController : MonoBehaviour
         }
         craftingChannel?.RaiseItemCrafted(recipe.result, recipe.resultAmount);
         craftingChannel?.RaiseItemCraftedByID(recipe.result != null ? recipe.result.itemID : string.Empty, recipe.resultAmount);
-        //  limpiar slots internos
         system.ClearAllNoReturn();
 
         toolView.Clear();
@@ -195,9 +179,6 @@ public class CraftingController : MonoBehaviour
         UpdateCraftButton();
     }
 
-    // =========================================================
-    // NOTIFY
-    // =========================================================
     private void Notify(string message, NotificationType type)
     {
         var notification = new NotificationData

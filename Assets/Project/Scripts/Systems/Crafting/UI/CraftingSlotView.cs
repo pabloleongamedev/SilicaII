@@ -25,9 +25,6 @@ public class CraftingSlotView : MonoBehaviour,
 
     public ItemData_SO GetItem() => currentItem;
 
-    // =========================
-    // DROP DESDE INVENTARIO
-    // =========================
     public void OnDrop(PointerEventData eventData)
     {
         var dragged = eventData.pointerDrag?.GetComponent<InventoryListItemView>();
@@ -39,9 +36,6 @@ public class CraftingSlotView : MonoBehaviour,
         OnItemDropped?.Invoke(this, item);
     }
 
-    // =========================
-    // DRAG HACIA INVENTARIO
-    // =========================
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (currentItem == null) return;
@@ -51,7 +45,6 @@ public class CraftingSlotView : MonoBehaviour,
 
     public void OnEndDrag(PointerEventData eventData) { }
 
-    // =========================
     public void SetItem(ItemData_SO item)
     {
         currentItem = item;

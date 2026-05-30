@@ -96,8 +96,12 @@ public class SaveLoadSceneBinding : MonoBehaviour,
 
         if (reloadScene)
         {
+            var loader = ResolveSceneLoader();
+            if (loader == null)
+                return;
+
             PreparePendingSceneSession();
-            ResolveSceneLoader().LoadScene(currentGameData.currentScene);
+            loader.LoadScene(currentGameData.currentScene);
             return;
         }
 
@@ -112,8 +116,12 @@ public class SaveLoadSceneBinding : MonoBehaviour,
         autosaveController.Reset();
         isInGame = false;
 
+        var loader = ResolveSceneLoader();
+        if (loader == null)
+            return;
+
         PreparePendingSceneSession();
-        ResolveSceneLoader().LoadScene(currentGameData.currentScene);
+        loader.LoadScene(currentGameData.currentScene);
     }
 
     public bool TrySaveCheckpoint(bool createIfMissing)
@@ -304,7 +312,7 @@ public class SaveLoadSceneBinding : MonoBehaviour,
             Debug.LogWarning("[SaveLoadSceneBinding] El Scene Loader asignado no implementa ISceneLoader.", this);
 
         if (sceneLoader == null)
-            sceneLoader = new UnitySceneLoader();
+            Debug.LogWarning("[SaveLoadSceneBinding] Asigna un SceneLoadService por Inspector.", this);
 
         return sceneLoader;
     }

@@ -2,7 +2,7 @@
  * Arquitectura: Menu/Runtime
  * Script: SceneLoadService
  * Rol: Adapter Unity para cargar escenas.
- * Relaciones: Implementa ISceneLoader; UI y SaveLoad pueden recibirlo por Inspector o usar UnitySceneLoader como fallback temporal.
+ * Relaciones: Implementa ISceneLoader; UI y SaveLoad deben recibirlo por Inspector.
  * Uso como referencia: si luego agregas loading screen, fade, async loading o SceneCatalog_SO, el cambio vive aqui.
  */
 using UnityEngine;

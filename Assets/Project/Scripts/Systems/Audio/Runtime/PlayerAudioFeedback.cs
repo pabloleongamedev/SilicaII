@@ -21,6 +21,7 @@ public class PlayerAudioFeedback : MonoBehaviour
     private bool isGrounded;
     private bool isSprinting;
     private bool isJetpackActive;
+    private bool isJetpackAudioPlaying;
     private string currentGroundTag = "Ground";
     private bool hasLoggedMissingAudioService;
 
@@ -41,6 +42,12 @@ public class PlayerAudioFeedback : MonoBehaviour
     {
         Unsubscribe();
         StopJetpackAudio();
+    }
+
+    private void Update()
+    {
+        SyncFromMovement();
+        RefreshJetpackAudio();
     }
 
     private void Subscribe()
@@ -70,7 +77,7 @@ public class PlayerAudioFeedback : MonoBehaviour
 
         isGrounded = movementController.IsGrounded();
         isSprinting = movementController.IsSprinting();
-        isJetpackActive = movementController.IsJetpackActive();
+        isJetpackActive = movementController.IsJetpackActive() && movementController.IsJetpackConsumingFuel();
         currentGroundTag = movementController.GetGroundTag();
     }
 
@@ -81,7 +88,7 @@ public class PlayerAudioFeedback : MonoBehaviour
 
     private void HandleJetpackActiveChanged(bool active)
     {
-        isJetpackActive = active;
+        SyncFromMovement();
         RefreshJetpackAudio();
     }
 
@@ -118,7 +125,12 @@ public class PlayerAudioFeedback : MonoBehaviour
     {
         if (isJetpackActive)
         {
-            AudioService?.Play(AudioCueKey.PlayerJetpack);
+            if (!isJetpackAudioPlaying)
+            {
+                AudioService?.Play(AudioCueKey.PlayerJetpack);
+                isJetpackAudioPlaying = true;
+            }
+
             return;
         }
 
@@ -127,7 +139,11 @@ public class PlayerAudioFeedback : MonoBehaviour
 
     private void StopJetpackAudio()
     {
+        if (!isJetpackAudioPlaying)
+            return;
+
         AudioService?.Stop(AudioCueKey.PlayerJetpack);
+        isJetpackAudioPlaying = false;
     }
 
     private AudioCueKey GetWalkCue(string groundTag)

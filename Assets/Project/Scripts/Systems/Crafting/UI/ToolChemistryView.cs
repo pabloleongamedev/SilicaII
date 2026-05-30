@@ -34,9 +34,6 @@ public class ToolChemistryView : MonoBehaviour, IDropHandler
 
         var item = itemInstance.Data;
 
-        // =====================================================
-        // 🔥 VALIDACIÓN + NOTIFICACIÓN
-        // =====================================================
         var compound = database.Get(item);
 
         if (compound == null)
@@ -47,13 +44,10 @@ public class ToolChemistryView : MonoBehaviour, IDropHandler
 
         if (currentItem != null)
         {
-            Notify("El refinador ya está ocupado", NotificationType.Warning);
+            Notify("El refinador ya esta ocupado", NotificationType.Warning);
             return;
         }
 
-        // =====================================================
-        // ✔ SOLO SI PASA VALIDACIÓN
-        // =====================================================
         SetItem(item);
     }
 
@@ -78,9 +72,6 @@ public class ToolChemistryView : MonoBehaviour, IDropHandler
 
     public ItemData_SO GetItem() => currentItem;
 
-    // =====================================================
-    // 🔥 SISTEMA DE NOTIFICACIÓN CENTRALIZADO
-    // =====================================================
     private void Notify(string msg, NotificationType type)
     {
         Debug.Log("[Chemistry][Drop] " + msg);

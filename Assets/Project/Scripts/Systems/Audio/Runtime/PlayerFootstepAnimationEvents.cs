@@ -2,7 +2,9 @@
  * Arquitectura: Audio/Runtime
  * Script: PlayerFootstepAnimationEvents
  * Rol: Recibe AnimationEvents del modelo visual y delega sonidos de locomocion al feedback de audio del Player.
- * Relaciones: Vive junto al Animator que emite OnFootstep; PlayerAudioFeedback decide superficie, pitch y servicio de audio.
+ * Relaciones: Vive junto al Animator que emite OnFootstep y OnLand.
+ * Contrato AnimationEvent: las animaciones Walk/Run llaman OnFootstep; JumpLand llama OnLand.
+ * Este script es la unica fuente de pasos/aterrizaje para audio y camara.
  */
 using UnityEngine;
 using System;

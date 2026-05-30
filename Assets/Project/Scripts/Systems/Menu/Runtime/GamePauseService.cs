@@ -16,11 +16,3 @@ public class GamePauseService : MonoBehaviour, IGamePauseService
         Time.timeScale = paused ? pausedTimeScale : runningTimeScale;
     }
 }
-
-public class UnityGamePauseService : IGamePauseService
-{
-    public void SetPaused(bool paused)
-    {
-        Time.timeScale = paused ? 0f : 1f;
-    }
-}

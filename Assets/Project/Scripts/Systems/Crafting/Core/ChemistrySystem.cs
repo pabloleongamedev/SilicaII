@@ -10,23 +10,17 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// Sistema PURO de lógica de separación.
-/// ✔ No depende de MonoBehaviour
-/// ✔ No depende de UI
-/// ✔ No consume input (eso ya ocurre en el DROP)
-/// ✔ Solo valida outputs y los ejecuta
+/// Reglas de dominio para separacion quimica.
+/// No depende de MonoBehaviour, UI ni input.
+/// El input ya fue reservado por el flujo de drop.
 /// </summary>
 public class ChemistrySystem
 {
-    // =========================================================
-    // VALIDACIÓN
-    // =========================================================
     public bool CanSeparate(
         CompoundDefinition_SO compound,
         SeparationMethod_SO method,
         IInventoryReadModel read)
     {
-        // 🔥 VALIDACIONES BASE
         if (compound == null)
         {
             Debug.LogWarning("CanSeparate: compound NULL");
@@ -39,18 +33,13 @@ public class ChemistrySystem
             return false;
         }
 
-        // 🔥 VALIDAR MÉTODO
         if (compound.requiredMethod != method)
         {
-            Debug.LogWarning("CanSeparate: método incorrecto");
+            Debug.LogWarning("CanSeparate: metodo incorrecto");
             return false;
         }
 
-        // 🔥 IMPORTANTE:
-        // ❌ NO VALIDAMOS INPUT EN INVENTARIO
-        // ✔ porque ya fue consumido en el DROP
-
-        // 🔥 VALIDAR ESPACIO PARA OUTPUTS
+        // El input ya fue consumido al reservar el item en la mesa.
         var add = compound.outputs
             .Where(o => o.item != null && o.amount > 0)
             .Select(o => (o.item, o.amount))
@@ -66,9 +55,6 @@ public class ChemistrySystem
         return canAdd;
     }
 
-    // =========================================================
-    // EJECUCIÓN
-    // =========================================================
     public bool Execute(
         CompoundDefinition_SO compound,
         SeparationMethod_SO method,
@@ -79,7 +65,6 @@ public class ChemistrySystem
         if (compound == null)
             return false;
         
-        // VALIDAR ANTES DE EJECUTAR
         if (!CanSeparate(compound, method, read))
             return false;
         
@@ -93,7 +78,7 @@ public class ChemistrySystem
         if (!write.TryProcessBatch(remove, add))
             return false;
 
-        Debug.Log("✔ Separación completada");
+        Debug.Log("Separacion completada");
 
         return true;
     }

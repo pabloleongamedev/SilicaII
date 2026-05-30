@@ -3,6 +3,8 @@
  * Script: PlayerAnimatorPresenter
  * Rol: Presenta animacion del modelo 3P leyendo MovementController, sin leer input ni mover al jugador.
  * Relaciones: MovementController publica estado real; Animator solo refleja Speed/Grounded/Jump/FreeFall/MotionSpeed.
+ * Contrato Animator: requiere parametros Speed, Grounded, Jump, FreeFall y MotionSpeed.
+ * Jetpack: mientras hay jetpack efectivo, fuerza locomocion idle y solo inclina el visual.
  */
 using UnityEngine;
 
@@ -17,6 +19,11 @@ public class PlayerAnimatorPresenter : MonoBehaviour
     [SerializeField] private float speedBlendRate = 10f;
     [SerializeField] private float airborneFreeFallDelay = 0.15f;
 
+    private const string SpeedParameter = "Speed";
+    private const string GroundedParameter = "Grounded";
+    private const string JumpParameter = "Jump";
+    private const string FreeFallParameter = "FreeFall";
+    private const string MotionSpeedParameter = "MotionSpeed";
     private const string LocomotionStateName = "Idle Walk Run Blend";
     private const float JumpVerticalSpeedThreshold = 0.25f;
     private const float FallVerticalSpeedThreshold = -0.25f;
@@ -35,11 +42,19 @@ public class PlayerAnimatorPresenter : MonoBehaviour
     private bool wasEffectiveJetpackActive;
     private bool hasLoggedMissingReferences;
     private bool hasLoggedMissingVisualTiltRoot;
+    private bool hasLoggedMissingAnimatorController;
+    private bool hasSpeedParameter;
+    private bool hasGroundedParameter;
+    private bool hasJumpParameter;
+    private bool hasFreeFallParameter;
+    private bool hasMotionSpeedParameter;
+    private bool hasLocomotionState;
 
     private void Awake()
     {
         ResolveReferences();
         CacheAnimatorIds();
+        ValidateAnimatorContract();
         CacheVisualPose();
     }
 
@@ -68,14 +83,23 @@ public class PlayerAnimatorPresenter : MonoBehaviour
             && verticalSpeed <= FallVerticalSpeedThreshold
             && airborneTimer > airborneFreeFallDelay;
 
-        if (effectiveJetpackActive && !wasEffectiveJetpackActive)
+        if (effectiveJetpackActive && !wasEffectiveJetpackActive && hasLocomotionState)
             animator.CrossFade(LocomotionStateName, 0.08f);
 
-        animator.SetFloat(speedId, currentSpeedBlend);
-        animator.SetFloat(motionSpeedId, !effectiveJetpackActive && hasMoveInput ? 1f : 0f);
-        animator.SetBool(groundedId, grounded);
-        animator.SetBool(jumpId, jumping);
-        animator.SetBool(freeFallId, falling);
+        if (hasSpeedParameter)
+            animator.SetFloat(speedId, currentSpeedBlend);
+
+        if (hasMotionSpeedParameter)
+            animator.SetFloat(motionSpeedId, !effectiveJetpackActive && hasMoveInput ? 1f : 0f);
+
+        if (hasGroundedParameter)
+            animator.SetBool(groundedId, grounded);
+
+        if (hasJumpParameter)
+            animator.SetBool(jumpId, jumping);
+
+        if (hasFreeFallParameter)
+            animator.SetBool(freeFallId, falling);
 
         ApplyJetpackTilt(effectiveJetpackActive, boostActive, moveInput);
         wasEffectiveJetpackActive = effectiveJetpackActive;
@@ -92,11 +116,22 @@ public class PlayerAnimatorPresenter : MonoBehaviour
 
     private bool HasReferences()
     {
-        if (movementController != null && animator != null)
+        if (movementController == null || animator == null)
+        {
+            ResolveReferences();
+            return false;
+        }
+
+        if (animator.runtimeAnimatorController != null)
             return true;
 
-        ResolveReferences();
-        return movementController != null && animator != null;
+        if (!hasLoggedMissingAnimatorController)
+        {
+            hasLoggedMissingAnimatorController = true;
+            Debug.LogWarning("[PlayerAnimatorPresenter] El Animator asignado no tiene RuntimeAnimatorController.", this);
+        }
+
+        return false;
     }
 
     private void CacheVisualPose()
@@ -142,10 +177,38 @@ public class PlayerAnimatorPresenter : MonoBehaviour
 
     private void CacheAnimatorIds()
     {
-        speedId = Animator.StringToHash("Speed");
-        groundedId = Animator.StringToHash("Grounded");
-        jumpId = Animator.StringToHash("Jump");
-        freeFallId = Animator.StringToHash("FreeFall");
-        motionSpeedId = Animator.StringToHash("MotionSpeed");
+        speedId = Animator.StringToHash(SpeedParameter);
+        groundedId = Animator.StringToHash(GroundedParameter);
+        jumpId = Animator.StringToHash(JumpParameter);
+        freeFallId = Animator.StringToHash(FreeFallParameter);
+        motionSpeedId = Animator.StringToHash(MotionSpeedParameter);
+    }
+
+    private void ValidateAnimatorContract()
+    {
+        if (animator == null || animator.runtimeAnimatorController == null)
+            return;
+
+        hasSpeedParameter = HasAnimatorParameter(SpeedParameter, AnimatorControllerParameterType.Float);
+        hasGroundedParameter = HasAnimatorParameter(GroundedParameter, AnimatorControllerParameterType.Bool);
+        hasJumpParameter = HasAnimatorParameter(JumpParameter, AnimatorControllerParameterType.Bool);
+        hasFreeFallParameter = HasAnimatorParameter(FreeFallParameter, AnimatorControllerParameterType.Bool);
+        hasMotionSpeedParameter = HasAnimatorParameter(MotionSpeedParameter, AnimatorControllerParameterType.Float);
+        hasLocomotionState = animator.HasState(0, Animator.StringToHash(LocomotionStateName));
+
+        if (!hasLocomotionState)
+            Debug.LogWarning($"[PlayerAnimatorPresenter] El Animator no contiene el estado '{LocomotionStateName}' en layer 0; jetpack no forzara CrossFade a locomocion.", this);
+    }
+
+    private bool HasAnimatorParameter(string parameterName, AnimatorControllerParameterType expectedType)
+    {
+        foreach (var parameter in animator.parameters)
+        {
+            if (parameter.name == parameterName && parameter.type == expectedType)
+                return true;
+        }
+
+        Debug.LogWarning($"[PlayerAnimatorPresenter] Falta parametro Animator '{parameterName}' de tipo {expectedType}.", this);
+        return false;
     }
 }

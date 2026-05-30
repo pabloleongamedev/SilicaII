@@ -28,8 +28,8 @@ public class PauseMenuManager : MonoBehaviour
     void Awake()
     {
         inputActions = new InputSystem_Actions();
-        sceneLoader = ResolveSceneLoader();
-        pauseService = ResolvePauseService();
+        ResolveSceneLoader();
+        ResolvePauseService();
         
     }
 
@@ -78,7 +78,12 @@ public class PauseMenuManager : MonoBehaviour
         ResolvePauseService()?.SetPaused(false);
         if (playerStateController != null)
             playerStateController.SetState(UIState.None);
-        ResolveSceneLoader().LoadScene(menuSceneName);
+
+        var loader = ResolveSceneLoader();
+        if (loader == null)
+            return;
+
+        loader.LoadScene(menuSceneName);
     }
 
     public void OpenOptions()
@@ -110,7 +115,7 @@ public class PauseMenuManager : MonoBehaviour
             Debug.LogWarning("[PauseMenuManager] El Scene Loader asignado no implementa ISceneLoader.", this);
 
         if (sceneLoader == null)
-            sceneLoader = new UnitySceneLoader();
+            Debug.LogWarning("[PauseMenuManager] Asigna un SceneLoadService por Inspector.", this);
 
         return sceneLoader;
     }
@@ -124,7 +129,7 @@ public class PauseMenuManager : MonoBehaviour
             Debug.LogWarning("[PauseMenuManager] El Pause Service asignado no implementa IGamePauseService.", this);
 
         if (pauseService == null)
-            pauseService = new UnityGamePauseService();
+            Debug.LogWarning("[PauseMenuManager] Asigna un GamePauseService por Inspector.", this);
 
         return pauseService;
     }

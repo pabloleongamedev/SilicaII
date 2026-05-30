@@ -8,6 +8,7 @@
  * Uso como referencia: la vista conoce intenciones de aplicacion, no detalles de JSON, disco ni singleton.
  */
 using TMPro;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,6 +28,11 @@ public class SaveSlot : MonoBehaviour
     [SerializeField] private MonoBehaviour saveSlotReaderBehaviour;
     [SerializeField] private MonoBehaviour gameSessionLoaderBehaviour;
 
+    [Header("Loading Transition")]
+    [SerializeField] private GameObject loadingImage;
+    [SerializeField, Min(0f)] private float minimumLoadingTime = 1f;
+    [SerializeField, Min(0f)] private float fadeOutDuration = 0.35f;
+
     private const string UniqueSlot = "1";
 
     private bool hasData;
@@ -34,6 +40,7 @@ public class SaveSlot : MonoBehaviour
     private ISaveSlotReader saveSlotReader;
     private IGameSessionLoader gameSessionLoader;
     private Button button;
+    private Coroutine loadingRoutine;
 
     private void Awake()
     {
@@ -72,7 +79,7 @@ public class SaveSlot : MonoBehaviour
         if (slotAction == SlotAction.NewGame)
         {
             Debug.Log("[SaveSlot] Creando nueva partida...");
-            gameSessionLoader.CreateNewGame(UniqueSlot);
+            BeginLoadingThenRun(() => gameSessionLoader.CreateNewGame(UniqueSlot));
             return;
         }
 
@@ -85,19 +92,19 @@ public class SaveSlot : MonoBehaviour
             }
 
             Debug.Log("[SaveSlot] Cargando partida guardada...");
-            gameSessionLoader.LoadGame(UniqueSlot);
+            BeginLoadingThenRun(() => gameSessionLoader.LoadGame(UniqueSlot));
             return;
         }
 
         if (hasData)
         {
             Debug.Log("[SaveSlot] Cargando partida guardada...");
-            gameSessionLoader.LoadGame(UniqueSlot);
+            BeginLoadingThenRun(() => gameSessionLoader.LoadGame(UniqueSlot));
         }
         else
         {
             Debug.Log("[SaveSlot] Creando nueva partida...");
-            gameSessionLoader.CreateNewGame(UniqueSlot);
+            BeginLoadingThenRun(() => gameSessionLoader.CreateNewGame(UniqueSlot));
         }
     }
 
@@ -160,5 +167,61 @@ public class SaveSlot : MonoBehaviour
 
         if (gameSessionLoader == null)
             gameSessionLoader = gameSessionLoaderBehaviour as IGameSessionLoader;
+    }
+
+    private void BeginLoadingThenRun(System.Action loadAction)
+    {
+        if (loadingRoutine != null)
+            return;
+
+        if (button != null)
+            button.interactable = false;
+
+        loadingRoutine = StartCoroutine(LoadingRoutine(loadAction));
+    }
+
+    private IEnumerator LoadingRoutine(System.Action loadAction)
+    {
+        yield return FadeOutLoadingImage();
+
+        float remainingDelay = Mathf.Max(0f, minimumLoadingTime - fadeOutDuration);
+        if (remainingDelay > 0f)
+            yield return new WaitForSeconds(remainingDelay);
+
+        loadAction?.Invoke();
+    }
+
+    private IEnumerator FadeOutLoadingImage()
+    {
+        if (loadingImage == null)
+            yield break;
+
+        var loadingGraphic = loadingImage.GetComponent<Graphic>();
+        loadingImage.SetActive(true);
+
+        if (loadingGraphic == null)
+            yield break;
+
+        Color targetColor = loadingGraphic.color;
+        Color startColor = targetColor;
+        startColor.a = 0f;
+        loadingGraphic.color = startColor;
+
+        if (fadeOutDuration <= 0f)
+        {
+            loadingGraphic.color = targetColor;
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < fadeOutDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / fadeOutDuration);
+            loadingGraphic.color = Color.Lerp(startColor, targetColor, t);
+            yield return null;
+        }
+
+        loadingGraphic.color = targetColor;
     }
 }

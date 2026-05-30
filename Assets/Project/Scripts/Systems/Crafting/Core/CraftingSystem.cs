@@ -15,14 +15,12 @@ public class CraftingSystem
 
     private Dictionary<int, (ItemData_SO item, int amount)> slots = new();
 
-    // =========================
     public void SetRecipe(RecipeData_SO recipe)
     {
         currentRecipe = recipe;
         slots.Clear();
     }
 
-    // =========================
     public CraftingResult TryPlaceItem(int slotIndex, ItemData_SO item, IInventoryReadModel read, IInventoryWriteModel write)
     {
         if (slots.ContainsKey(slotIndex))
@@ -56,13 +54,11 @@ public class CraftingSystem
         return CraftingResult.Success($"Agregaste  {item.itemID}  x{remaining}");
     }
 
-    // =========================
     public void ClearAllNoReturn()
     {
         slots.Clear();
     }
 
-    // =========================
     public int GetCurrentAmount(ItemData_SO item)
     {
         int total = 0;
@@ -76,7 +72,6 @@ public class CraftingSystem
         return total;
     }
 
-    // =========================
     public void ClearSlot(int index, IInventoryWriteModel write)
     {
         if (!slots.ContainsKey(index))
@@ -89,7 +84,6 @@ public class CraftingSystem
         slots.Remove(index);
     }
 
-    // =========================
     public void ClearAll(IInventoryWriteModel write)
     {
         foreach (var slot in slots.Values)
@@ -100,7 +94,6 @@ public class CraftingSystem
         slots.Clear();
     }
 
-    // =========================
     public bool IsRecipeComplete()
     {
         if (currentRecipe == null)
@@ -115,7 +108,6 @@ public class CraftingSystem
         return true;
     }
 
-    // =========================
     public (ItemData_SO item, int amount)[] BuildRemoveBatch()
     {
         if (currentRecipe == null)
@@ -131,7 +123,6 @@ public class CraftingSystem
         return list.ToArray();
     }
 
-    // =========================
     public RecipeData_SO GetCurrentRecipe()
     {
         return currentRecipe;

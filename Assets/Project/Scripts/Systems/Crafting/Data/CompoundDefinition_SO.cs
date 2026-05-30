@@ -12,9 +12,9 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Chemistry/Compound")]
 public class CompoundDefinition_SO : ScriptableObject
 {
-    public ItemData_SO inputItem; //  EL ITEM QUE SE SEPARA
+    public ItemData_SO inputItem;
 
-    public SeparationMethod_SO requiredMethod; // MÉTODO CORRECTO
+    public SeparationMethod_SO requiredMethod;
 
     [System.Serializable]
     public struct OutputElement

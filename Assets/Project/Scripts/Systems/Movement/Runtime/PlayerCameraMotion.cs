@@ -2,7 +2,9 @@
  * Arquitectura: Movement/Runtime
  * Script: PlayerCameraMotion
  * Rol: Aplica movimiento visual de camara al caminar/correr leyendo MovementController.
- * Relaciones: PlayerFootstepAnimationEvents marca el pulso; PlayerPerspectiveController define el offset base.
+ * Relaciones: PlayerFootstepAnimationEvents marca el pulso desde AnimationEvent OnFootstep.
+ * Contrato simple: no calcula ritmo propio; si no llegan eventos de pasos, no mueve la camara.
+ * PlayerPerspectiveController define el offset base y este script solo suma un offset temporal suave.
  */
 using UnityEngine;
 

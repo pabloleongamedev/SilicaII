@@ -24,7 +24,7 @@ public class PlayerStateController : MonoBehaviour
 
     private MovementController movementController;
     private PlayerCameraRig cameraRig;
-    private IGamePauseService pauseService = new UnityGamePauseService();
+    private IGamePauseService pauseService;
 
     private void Awake()
     {
@@ -85,6 +85,6 @@ public class PlayerStateController : MonoBehaviour
             Debug.LogWarning("[PlayerStateController] El Pause Service asignado no implementa IGamePauseService.", this);
 
         if (pauseService == null)
-            pauseService = new UnityGamePauseService();
+            Debug.LogWarning("[PlayerStateController] Asigna un GamePauseService por Inspector.", this);
     }
 }

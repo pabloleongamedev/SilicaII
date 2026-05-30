@@ -7,7 +7,6 @@
  * Riesgo arquitectonico mitigado: no conoce la implementacion concreta de SaveLoad; requiere asignar servicios por Inspector.
  * Uso como referencia: la UI delega casos de uso y evita conocer SaveController, disco o GameData.
  */
-using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -27,11 +26,6 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private Button optionsFirstButton;
     [SerializeField] private Button creditsFirstButton;
 
-    [Header("Loading")]
-    [SerializeField] private GameObject loadingImage;
-    [SerializeField] private float delay = 4f;
-    [SerializeField] private int fallbackSceneIndex = 1;
-
     [Header("SaveLoad Use Cases")]
     [SerializeField] private MonoBehaviour saveSlotReaderBehaviour;
     [SerializeField] private MonoBehaviour gameSessionLoaderBehaviour;
@@ -49,7 +43,7 @@ public class MainMenuManager : MonoBehaviour
     {
         saveSlotReader = saveSlotReaderBehaviour as ISaveSlotReader;
         gameSessionLoader = gameSessionLoaderBehaviour as IGameSessionLoader;
-        sceneLoader = ResolveSceneLoader();
+        ResolveSceneLoader();
     }
 
     private void Start()
@@ -129,23 +123,9 @@ public class MainMenuManager : MonoBehaviour
             gameSessionLoader.CreateNewGame(UniqueSlot);
     }
 
-    public void LoadSceneFromButton()
-    {
-        StartCoroutine(LoadSceneRoutine());
-    }
-
     public void ExitGame()
     {
         Application.Quit();
-    }
-
-    private IEnumerator LoadSceneRoutine()
-    {
-        if (loadingImage != null)
-            loadingImage.SetActive(true);
-
-        yield return new WaitForSeconds(delay);
-        ResolveSceneLoader().LoadScene(fallbackSceneIndex);
     }
 
     private void SetPanel(GameObject panel, bool active)
@@ -184,7 +164,7 @@ public class MainMenuManager : MonoBehaviour
             Debug.LogWarning("[MainMenuManager] El Scene Loader asignado no implementa ISceneLoader.", this);
 
         if (sceneLoader == null)
-            sceneLoader = new UnitySceneLoader();
+            Debug.LogWarning("[MainMenuManager] Asigna un SceneLoadService por Inspector.", this);
 
         return sceneLoader;
     }

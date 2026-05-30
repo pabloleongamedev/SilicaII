@@ -19,7 +19,6 @@ public class CraftingTable : MonoBehaviour, IInteractable, IUIStateInteractable
 
         var current = playerState.GetState();
 
-        // 🔥 toggle basado en estado global
         if (current == UIState.Crafting)
         {
             playerState.SetState(UIState.None);

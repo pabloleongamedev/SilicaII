@@ -39,6 +39,7 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
     private bool isJumpDown;
     private bool isSprinting;
     private bool isJetpackActive;
+    private bool isJetpackConsumingFuel;
     private float groundedTimer;
     private float lastGroundedCheckHeight;
     private float maxAirborneCheckHeight;
@@ -158,7 +159,9 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
         isJumpDown = false;
 
         // ABILITIES
+        float fuelBeforeAbilities = GetCurrentFuel();
         abilitySystem.Tick(Time.fixedDeltaTime);
+        isJetpackConsumingFuel = isJetpackActive && GetCurrentFuel() < fuelBeforeAbilities;
         PublishFuelRatioIfChanged();
 
         // aplicar fuerzas finales
@@ -301,6 +304,11 @@ public class MovementController : MonoBehaviour, IJetpackMovementContext, IJetpa
     public bool IsJetpackActive()
     {
         return isJetpackActive;
+    }
+
+    public bool IsJetpackConsumingFuel()
+    {
+        return isJetpackConsumingFuel;
     }
 
     public string GetGroundTag()

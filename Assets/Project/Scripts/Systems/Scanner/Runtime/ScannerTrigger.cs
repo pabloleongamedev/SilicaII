@@ -5,6 +5,7 @@
  * Modulo: Escucha ScannerFeedbackEventChannel_SO y ejecuta animacion/audio cuando un IInteractable escaneable confirma que puede escanearse.
  * Relaciones: ItemPickup en modo Scannable no conoce este componente; solo publica por EventChannel.
  * Uso como referencia: ScannerTrigger ya no lee input ni decide que objeto se escanea; Interaction es la entrada oficial.
+ * Dependencias visuales: pivot, animator y renderer deben quedar visibles por Inspector.
  */
 using System.Collections;
 using UnityEngine;
@@ -19,17 +20,19 @@ public class ScannerTrigger : MonoBehaviour
 
     [Header("Scanner Visual")]
     [SerializeField] private GameObject pivotScan;
+    [SerializeField] private Animator scanAnimator;
+    [SerializeField] private Renderer scanRenderer;
     [SerializeField] private string startScanTrigger = "StartScan";
     [SerializeField] private float visualDuration = 0.6f;
 
     [Header("Texture Effect")]
     [SerializeField] private float textureScrollSpeed = 2f;
 
-    private Animator animator;
-    private Renderer meshRenderer;
     private IAudioService audioService;
     private Coroutine stopRoutine;
     private bool hasLoggedMissingAudioService;
+    private bool hasLoggedMissingAnimator;
+    private bool hasLoggedMissingRenderer;
 
     private void Awake()
     {
@@ -53,10 +56,10 @@ public class ScannerTrigger : MonoBehaviour
 
     private void Update()
     {
-        if (pivotScan != null && pivotScan.activeSelf && meshRenderer != null)
+        if (pivotScan != null && pivotScan.activeSelf && scanRenderer != null)
         {
             float offset = Time.time * textureScrollSpeed;
-            meshRenderer.material.SetTextureOffset("_MainTex", new Vector2(offset, 0));
+            scanRenderer.material.SetTextureOffset("_MainTex", new Vector2(offset, 0));
         }
     }
 
@@ -76,7 +79,7 @@ public class ScannerTrigger : MonoBehaviour
         AudioService?.Play(AudioCueKey.ScannerScan);
 
         if (CanUseAnimatorTrigger())
-            animator.SetTrigger(startScanTrigger);
+            scanAnimator.SetTrigger(startScanTrigger);
 
         if (stopRoutine != null)
             StopCoroutine(stopRoutine);
@@ -99,7 +102,7 @@ public class ScannerTrigger : MonoBehaviour
         AudioService?.Stop(AudioCueKey.ScannerScan);
 
         if (CanUseAnimatorTrigger())
-            animator.ResetTrigger(startScanTrigger);
+            scanAnimator.ResetTrigger(startScanTrigger);
     }
 
     private IEnumerator StopAfterDelay()
@@ -114,20 +117,26 @@ public class ScannerTrigger : MonoBehaviour
         if (pivotScan == null)
             return;
 
-        if (animator == null)
-            animator = pivotScan.GetComponent<Animator>();
+        if (scanAnimator == null && !hasLoggedMissingAnimator)
+        {
+            hasLoggedMissingAnimator = true;
+            Debug.LogWarning("[ScannerTrigger] Asigna Scan Animator por Inspector.", this);
+        }
 
-        if (meshRenderer == null)
-            meshRenderer = pivotScan.GetComponentInChildren<Renderer>(true);
+        if (scanRenderer == null && !hasLoggedMissingRenderer)
+        {
+            hasLoggedMissingRenderer = true;
+            Debug.LogWarning("[ScannerTrigger] Asigna Scan Renderer por Inspector para el efecto de textura.", this);
+        }
     }
 
     private bool CanUseAnimatorTrigger()
     {
-        return animator != null
-            && animator.isActiveAndEnabled
-            && animator.gameObject.activeInHierarchy
-            && animator.isInitialized
-            && animator.runtimeAnimatorController != null
+        return scanAnimator != null
+            && scanAnimator.isActiveAndEnabled
+            && scanAnimator.gameObject.activeInHierarchy
+            && scanAnimator.isInitialized
+            && scanAnimator.runtimeAnimatorController != null
             && !string.IsNullOrEmpty(startScanTrigger);
     }
 

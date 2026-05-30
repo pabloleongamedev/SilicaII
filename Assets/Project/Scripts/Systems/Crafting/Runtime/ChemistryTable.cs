@@ -19,7 +19,6 @@ public class ChemistryTable : MonoBehaviour, IInteractable, IUIStateInteractable
 
         var current = playerState.GetState();
 
-        // 🔥 TOGGLE LIMPIO basado en estado global
         if (current == UIState.Chemistry)
         {
             playerState.SetState(UIState.None);

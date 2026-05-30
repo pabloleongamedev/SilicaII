@@ -53,12 +53,10 @@ public class ToolCraftingView : MonoBehaviour
     }
     public bool IsComplete(RecipeData_SO recipe)
     {
-        // 🔥 recorrer ingredientes
         foreach (var ingredient in recipe.ingredients)
         {
             bool found = false;
 
-            // 🔥 buscar en TODOS los slots
             foreach (var slot in slots)
             {
                 var item = slot.GetItem();
