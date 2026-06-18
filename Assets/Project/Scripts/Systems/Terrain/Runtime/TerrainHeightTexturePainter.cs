@@ -13,6 +13,15 @@ namespace Project.Systems.Terrain.Runtime
     [DisallowMultipleComponent]
     public sealed class TerrainHeightTexturePainter : MonoBehaviour
     {
+        public enum BlendCurveMode
+        {
+            Linear,
+            SmoothStep,
+            SmootherStep,
+            EaseIn,
+            EaseOut
+        }
+
         [Serializable]
         public sealed class HeightTextureLayer
         {
@@ -29,6 +38,9 @@ namespace Project.Systems.Terrain.Runtime
             [Tooltip("Soft blend distance around min/max height.")]
             public float blendDistance = 1f;
 
+            [Tooltip("Controls how soft or sharp the height transition feels inside Blend Distance.")]
+            public BlendCurveMode blendCurve = BlendCurveMode.SmootherStep;
+
             [Range(0f, 1f)]
             [Tooltip("Layer strength after height blending.")]
             public float opacity = 1f;
@@ -44,6 +56,19 @@ namespace Project.Systems.Terrain.Runtime
 
         [Min(1)]
         [SerializeField] private int alphamapResolutionOverride;
+
+        [Header("Smoothing")]
+        [Min(0)]
+        [Tooltip("Applies a box blur to the final alphamap. Use this to remove jagged height-band edges.")]
+        [SerializeField] private int blurIterations = 1;
+
+        [Range(1, 8)]
+        [Tooltip("How many alphamap pixels each blur step samples around every point.")]
+        [SerializeField] private int blurRadius = 2;
+
+        [Range(0f, 1f)]
+        [Tooltip("0 keeps the raw height paint, 1 uses the fully blurred result.")]
+        [SerializeField] private float blurStrength = 0.75f;
 
         public IReadOnlyList<HeightTextureLayer> Layers => layers;
 
@@ -120,6 +145,7 @@ namespace Project.Systems.Terrain.Runtime
                 }
             }
 
+            SmoothAlphamaps(alphamaps, width, height, layerCount);
             terrainData.SetAlphamaps(0, 0, alphamaps);
 
 #if UNITY_EDITOR
@@ -215,9 +241,107 @@ namespace Project.Systems.Terrain.Runtime
         private static float CalculateHeightWeight(HeightTextureLayer layer, float height)
         {
             var blend = Mathf.Max(0.001f, layer.blendDistance);
-            var fadeIn = Mathf.InverseLerp(layer.minHeight - blend, layer.minHeight + blend, height);
-            var fadeOut = 1f - Mathf.InverseLerp(layer.maxHeight - blend, layer.maxHeight + blend, height);
+            var fadeIn = ApplyBlendCurve(Mathf.InverseLerp(layer.minHeight - blend, layer.minHeight + blend, height), layer.blendCurve);
+            var fadeOut = 1f - ApplyBlendCurve(Mathf.InverseLerp(layer.maxHeight - blend, layer.maxHeight + blend, height), layer.blendCurve);
             return Mathf.Clamp01(fadeIn * fadeOut) * layer.opacity;
+        }
+
+        private void SmoothAlphamaps(float[,,] alphamaps, int width, int height, int layerCount)
+        {
+            if (blurIterations <= 0 || blurStrength <= 0f || width <= 1 || height <= 1)
+            {
+                return;
+            }
+
+            var source = alphamaps;
+            var working = new float[height, width, layerCount];
+            var radius = Mathf.Max(1, blurRadius);
+
+            for (var iteration = 0; iteration < blurIterations; iteration++)
+            {
+                for (var y = 0; y < height; y++)
+                {
+                    for (var x = 0; x < width; x++)
+                    {
+                        var sampleCount = 0;
+                        for (var sampleY = Mathf.Max(0, y - radius); sampleY <= Mathf.Min(height - 1, y + radius); sampleY++)
+                        {
+                            for (var sampleX = Mathf.Max(0, x - radius); sampleX <= Mathf.Min(width - 1, x + radius); sampleX++)
+                            {
+                                for (var layerIndex = 0; layerIndex < layerCount; layerIndex++)
+                                {
+                                    working[y, x, layerIndex] += source[sampleY, sampleX, layerIndex];
+                                }
+
+                                sampleCount++;
+                            }
+                        }
+
+                        var totalWeight = 0f;
+                        for (var layerIndex = 0; layerIndex < layerCount; layerIndex++)
+                        {
+                            var blurred = working[y, x, layerIndex] / sampleCount;
+                            var blended = Mathf.Lerp(source[y, x, layerIndex], blurred, blurStrength);
+                            working[y, x, layerIndex] = blended;
+                            totalWeight += blended;
+                        }
+
+                        NormalizeWeights(working, y, x, layerCount, totalWeight);
+                    }
+                }
+
+                if (iteration < blurIterations - 1)
+                {
+                    Array.Clear(source, 0, source.Length);
+                    (source, working) = (working, source);
+                }
+            }
+
+            if (!ReferenceEquals(working, alphamaps))
+            {
+                for (var y = 0; y < height; y++)
+                {
+                    for (var x = 0; x < width; x++)
+                    {
+                        for (var layerIndex = 0; layerIndex < layerCount; layerIndex++)
+                        {
+                            alphamaps[y, x, layerIndex] = working[y, x, layerIndex];
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void NormalizeWeights(float[,,] alphamaps, int y, int x, int layerCount, float totalWeight)
+        {
+            if (totalWeight <= 0f)
+            {
+                alphamaps[y, x, 0] = 1f;
+                for (var layerIndex = 1; layerIndex < layerCount; layerIndex++)
+                {
+                    alphamaps[y, x, layerIndex] = 0f;
+                }
+
+                return;
+            }
+
+            for (var layerIndex = 0; layerIndex < layerCount; layerIndex++)
+            {
+                alphamaps[y, x, layerIndex] /= totalWeight;
+            }
+        }
+
+        private static float ApplyBlendCurve(float value, BlendCurveMode mode)
+        {
+            var t = Mathf.Clamp01(value);
+            return mode switch
+            {
+                BlendCurveMode.SmoothStep => t * t * (3f - 2f * t),
+                BlendCurveMode.SmootherStep => t * t * t * (t * (6f * t - 15f) + 10f),
+                BlendCurveMode.EaseIn => t * t,
+                BlendCurveMode.EaseOut => 1f - (1f - t) * (1f - t),
+                _ => t
+            };
         }
 
         private void Reset()
