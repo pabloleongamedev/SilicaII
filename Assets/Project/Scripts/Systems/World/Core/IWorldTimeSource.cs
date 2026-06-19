@@ -2,7 +2,7 @@
  * Arquitectura: World/Core
  * Script: IWorldTimeSource
  * Rol: Contrato de lectura para sistemas que necesitan hora del mundo sin depender de DayNightCycle.
- * Relaciones: WorldTimeService y DayNightCycle pueden implementarlo; RainController consume este contrato.
+ * Relaciones: WorldTimeService lo implementa; presenters como DayNightCycle, RainController y NightSkyStars lo consumen.
  */
 using System;
 

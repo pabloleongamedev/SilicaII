@@ -12,8 +12,6 @@ public class RainController : MonoBehaviour
 {
     [Header("Referencias")]
     [SerializeField] private MonoBehaviour timeSourceBehaviour;
-    [FormerlySerializedAs("scriptCiclo")]
-    [SerializeField] private DayNightCycle legacyTimeSource;
     [FormerlySerializedAs("objetoLluvia")]
     [SerializeField] private GameObject rainObject;
 
@@ -73,9 +71,6 @@ public class RainController : MonoBehaviour
 
     private void ResolveTimeSource()
     {
-        if (timeSourceBehaviour == null && legacyTimeSource != null)
-            timeSourceBehaviour = legacyTimeSource;
-
         timeSource = timeSourceBehaviour as IWorldTimeSource;
 
         if (timeSourceBehaviour != null && timeSource == null)

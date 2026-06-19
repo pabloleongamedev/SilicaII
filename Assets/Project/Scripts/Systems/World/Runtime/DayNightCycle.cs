@@ -1,39 +1,25 @@
 /*
  * Arquitectura: World/Runtime
  * Script: DayNightCycle
- * Rol: Presenter ambiental del sol/luz. La hora canonica puede venir de WorldTimeService.
- * Relaciones: Consume IWorldTimeSource; mantiene compatibilidad local si aun no existe WorldTimeService en escena.
+ * Rol: Presenter ambiental del sol/luz.
+ * Relaciones: Consume WorldTimeService mediante IWorldTimeSource y no decide la hora del mundo.
  * Uso como referencia: WorldTimeService decide tiempo, DayNightCycle solo presenta rotacion e intensidad.
  */
-using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-public class DayNightCycle : MonoBehaviour, IWorldTimeSource
+public class DayNightCycle : MonoBehaviour
 {
     [Header("Time Source")]
     [SerializeField] private MonoBehaviour timeSourceBehaviour;
-    [FormerlySerializedAs("hora")]
-    [SerializeField, Range(0f, 24f)] private float fallbackHour = 9f;
-    [FormerlySerializedAs("DuracionDelDiaEnMinutos")]
-    [SerializeField] private float fallbackDayDurationMinutes = 24f;
 
     [Header("Sun Presentation")]
-    [FormerlySerializedAs("sol")]
     [SerializeField] private Transform sun;
 
     private IWorldTimeSource timeSource;
     private Light sunLight;
 
-    public event Action<float> OnHourChanged;
-
-    public float CurrentHour => timeSource != null ? timeSource.CurrentHour : fallbackHour;
-    public float DayDurationMinutes => timeSource != null ? timeSource.DayDurationMinutes : fallbackDayDurationMinutes;
-
     private void Awake()
     {
-        ResolveTimeSource();
-
         if (sun != null)
             sunLight = sun.GetComponent<Light>();
     }
@@ -43,7 +29,10 @@ public class DayNightCycle : MonoBehaviour, IWorldTimeSource
         ResolveTimeSource();
 
         if (timeSource != null)
+        {
             timeSource.OnHourChanged += HandleHourChanged;
+            RenderSun(timeSource.CurrentHour);
+        }
     }
 
     private void OnDisable()
@@ -52,19 +41,9 @@ public class DayNightCycle : MonoBehaviour, IWorldTimeSource
             timeSource.OnHourChanged -= HandleHourChanged;
     }
 
-    private void Update()
-    {
-        if (timeSource == null)
-        {
-            AdvanceFallback(Time.deltaTime);
-            RenderSun(fallbackHour);
-        }
-    }
-
     private void HandleHourChanged(float hour)
     {
         RenderSun(hour);
-        OnHourChanged?.Invoke(hour);
     }
 
     private void RenderSun(float hour)
@@ -78,24 +57,14 @@ public class DayNightCycle : MonoBehaviour, IWorldTimeSource
             sunLight.intensity = hour < 6f || hour > 18f ? 0f : 1f;
     }
 
-    private void AdvanceFallback(float deltaTime)
-    {
-        if (fallbackDayDurationMinutes <= 0f)
-            return;
-
-        fallbackHour += deltaTime * (24f / (60f * fallbackDayDurationMinutes));
-
-        if (fallbackHour >= 24f)
-            fallbackHour = 0f;
-
-        OnHourChanged?.Invoke(fallbackHour);
-    }
-
     private void ResolveTimeSource()
     {
         timeSource = timeSourceBehaviour as IWorldTimeSource;
 
         if (timeSourceBehaviour != null && timeSource == null)
             Debug.LogWarning("[DayNightCycle] El Time Source asignado no implementa IWorldTimeSource.", this);
+
+        if (timeSourceBehaviour == null)
+            Debug.LogWarning("[DayNightCycle] Asigna WorldTimeService por Inspector.", this);
     }
 }
