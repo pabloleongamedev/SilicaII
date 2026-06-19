@@ -144,11 +144,11 @@ Material:
     - _BackgroundCoverageStrength: 0
     - _BackgroundDistortionAmount: 0.1
     - _BackgroundDistortionSpeed: 0.5
-    - _BackgroundExposure: 0.1
+    - _BackgroundExposure: 0.411
     - _BackgroundGradientBlend: 0.875
     - _BackgroundNoiseSpeed: 1.25
-    - _BackgroundOpacity: 1
-    - _BackgroundRotation: 150
+    - _BackgroundOpacity: 0.968
+    - _BackgroundRotation: 0
     - _BackgroundRotationSpeed: 0
     - _BackgroundSpecularAngle: 1
     - _BackgroundSpecularIntensity: 0.6
