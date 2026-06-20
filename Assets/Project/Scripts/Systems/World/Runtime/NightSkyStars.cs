@@ -1,7 +1,7 @@
 /*
  * Arquitectura: World/Runtime
  * Script: NightSkyStars
- * Rol: Presenter ambiental que aplica ajustes de noche sin reemplazar el skybox activo.
+ * Rol: Presenter ambiental que cambia el skybox cuando llega la noche.
  * Relaciones: Consume WorldTimeService mediante IWorldTimeSource.
  * Uso como referencia: reacciona al tiempo del mundo sin buscar dependencias globales ni modificar assets compartidos.
  */
@@ -17,7 +17,12 @@ public sealed class NightSkyStars : MonoBehaviour
     [SerializeField, Range(0f, 24f)] private float nightStartHour = 18f;
     [SerializeField, Range(0f, 24f)] private float nightEndHour = 6f;
 
+    [Header("Skyboxes")]
+    [SerializeField] private Material daySkybox;
+    [SerializeField] private Material nightSkybox;
+
     private IWorldTimeSource timeSource;
+    private bool isNightSkyboxActive;
 
     private void Awake()
     {
@@ -27,6 +32,53 @@ public sealed class NightSkyStars : MonoBehaviour
     private void OnEnable()
     {
         ResolveTimeSource();
+        UpdateSkybox();
+    }
+
+    private void LateUpdate()
+    {
+        UpdateSkybox();
+    }
+
+    private void OnDisable()
+    {
+        RestoreDaySkybox();
+    }
+
+    private void UpdateSkybox()
+    {
+        if (timeSource == null || nightSkybox == null)
+            return;
+
+        if (IsNight(timeSource.CurrentHour))
+            ActivateNightSkybox();
+        else
+            RestoreDaySkybox();
+    }
+
+    private void ActivateNightSkybox()
+    {
+        if (RenderSettings.skybox == nightSkybox)
+        {
+            isNightSkyboxActive = true;
+            return;
+        }
+
+        RenderSettings.skybox = nightSkybox;
+        isNightSkyboxActive = true;
+        DynamicGI.UpdateEnvironment();
+    }
+
+    private void RestoreDaySkybox()
+    {
+        if (!isNightSkyboxActive || daySkybox == null)
+            return;
+
+        if (RenderSettings.skybox == nightSkybox)
+            RenderSettings.skybox = daySkybox;
+
+        isNightSkyboxActive = false;
+        DynamicGI.UpdateEnvironment();
     }
 
     private bool IsNight(float hour)
@@ -46,5 +98,7 @@ public sealed class NightSkyStars : MonoBehaviour
         if (timeSourceBehaviour == null)
             Debug.LogWarning("[NightSkyStars] Asigna WorldTimeService por Inspector.", this);
 
+        if (nightSkybox == null)
+            Debug.LogWarning("[NightSkyStars] Asigna Night Skybox por Inspector.", this);
     }
 }
