@@ -9,6 +9,9 @@ using UnityEngine;
 
 public class SkyboxCloudAnimator : MonoBehaviour
 {
+    private static readonly int BackgroundRotationId = Shader.PropertyToID("_BackgroundRotation");
+    private static readonly int MidgroundRotationId = Shader.PropertyToID("_MidgroundRotation");
+    private static readonly int ForegroundRotationId = Shader.PropertyToID("_ForegroundRotation");
     private static readonly int BackgroundRotationSpeedId = Shader.PropertyToID("_BackgroundRotationSpeed");
     private static readonly int MidgroundRotationSpeedId = Shader.PropertyToID("_MidgroundRotationSpeed");
     private static readonly int ForegroundRotationSpeedId = Shader.PropertyToID("_ForegroundRotationSpeed");
@@ -38,10 +41,40 @@ public class SkyboxCloudAnimator : MonoBehaviour
 
     private Material runtimeSkybox;
     private Material originalSkybox;
+    private Material instancedSourceSkybox;
+    private float backgroundRotation;
+    private float midgroundRotation;
+    private float foregroundRotation;
+
+    public Material GetOrCreateAnimatedSkybox()
+    {
+        return GetOrCreateAnimatedSkybox(sourceSkybox);
+    }
+
+    public Material GetOrCreateAnimatedSkybox(Material skybox)
+    {
+        var material = skybox != null ? skybox : sourceSkybox;
+        if (material == null)
+            material = RenderSettings.skybox;
+
+        ApplySkyboxInstance(material);
+        ApplySpeeds();
+
+        return runtimeSkybox != null ? runtimeSkybox : material;
+    }
 
     private void OnEnable()
     {
         ApplySkyboxInstance();
+        ApplySpeeds();
+    }
+
+    private void Update()
+    {
+        if (runtimeSkybox == null)
+            return;
+
+        AdvanceRotations(Time.unscaledDeltaTime);
         ApplySpeeds();
     }
 
@@ -65,13 +98,18 @@ public class SkyboxCloudAnimator : MonoBehaviour
     private void ApplySkyboxInstance()
     {
         var material = sourceSkybox != null ? sourceSkybox : RenderSettings.skybox;
+        ApplySkyboxInstance(material);
+    }
+
+    private void ApplySkyboxInstance(Material material)
+    {
         if (material == null)
         {
             Debug.LogWarning("[SkyboxCloudAnimator] Asigna un skybox material o configura RenderSettings.skybox.", this);
             return;
         }
 
-        if (runtimeSkybox != null && runtimeSkybox.shader == material.shader)
+        if (runtimeSkybox != null && instancedSourceSkybox == material)
             return;
 
         RestoreOriginalSkybox();
@@ -83,9 +121,14 @@ public class SkyboxCloudAnimator : MonoBehaviour
             name = $"{material.name} (Cloud Animator Runtime)",
             hideFlags = HideFlags.DontSave
         };
+        instancedSourceSkybox = material;
+        CaptureRotations(runtimeSkybox);
 
         if (useRenderSettingsSkybox)
+        {
             RenderSettings.skybox = runtimeSkybox;
+            DynamicGI.UpdateEnvironment();
+        }
     }
 
     private void ApplySpeeds()
@@ -125,11 +168,35 @@ public class SkyboxCloudAnimator : MonoBehaviour
             DestroyImmediate(runtimeSkybox);
 
         runtimeSkybox = null;
+        instancedSourceSkybox = null;
+    }
+
+    private void CaptureRotations(Material material)
+    {
+        backgroundRotation = GetFloatIfPresent(material, BackgroundRotationId, backgroundRotation);
+        midgroundRotation = GetFloatIfPresent(material, MidgroundRotationId, midgroundRotation);
+        foregroundRotation = GetFloatIfPresent(material, ForegroundRotationId, foregroundRotation);
+    }
+
+    private void AdvanceRotations(float deltaTime)
+    {
+        backgroundRotation = Mathf.Repeat(backgroundRotation + backgroundSpeed * deltaTime, 360f);
+        midgroundRotation = Mathf.Repeat(midgroundRotation + midgroundSpeed * deltaTime, 360f);
+        foregroundRotation = Mathf.Repeat(foregroundRotation + foregroundSpeed * deltaTime, 360f);
+
+        SetFloatIfPresent(runtimeSkybox, BackgroundRotationId, backgroundRotation);
+        SetFloatIfPresent(runtimeSkybox, MidgroundRotationId, midgroundRotation);
+        SetFloatIfPresent(runtimeSkybox, ForegroundRotationId, foregroundRotation);
     }
 
     private static void SetFloatIfPresent(Material material, int propertyId, float value)
     {
         if (material.HasProperty(propertyId))
             material.SetFloat(propertyId, value);
+    }
+
+    private static float GetFloatIfPresent(Material material, int propertyId, float fallback)
+    {
+        return material.HasProperty(propertyId) ? material.GetFloat(propertyId) : fallback;
     }
 }

@@ -2,7 +2,7 @@
  * Arquitectura: World/Runtime
  * Script: NightSkyStars
  * Rol: Presenter ambiental que cambia el skybox cuando llega la noche.
- * Relaciones: Consume WorldTimeService mediante IWorldTimeSource.
+ * Relaciones: Consume WorldTimeService mediante IWorldTimeSource y puede restaurar el skybox diurno animado desde SkyboxCloudAnimator.
  * Uso como referencia: la escena asigna materiales de skybox explicitos; no crea shaders ni materiales runtime.
  */
 using UnityEngine;
@@ -20,13 +20,20 @@ public sealed class NightSkyStars : MonoBehaviour
     [Header("Skyboxes")]
     [SerializeField] private Material daySkybox;
     [SerializeField] private Material nightSkybox;
+    [SerializeField] private SkyboxCloudAnimator daySkyboxAnimator;
+
+    [Header("Sun Reset")]
+    [SerializeField] private Transform sunToReset;
+    [SerializeField] private bool resetSunWhileNight = true;
 
     private IWorldTimeSource timeSource;
+    private Quaternion originalSunLocalRotation;
     private bool isNightSkyboxActive;
 
     private void Awake()
     {
         ResolveTimeSource();
+        CaptureOriginalSunRotation();
         CaptureDaySkyboxIfNeeded();
     }
 
@@ -67,15 +74,18 @@ public sealed class NightSkyStars : MonoBehaviour
     {
         CaptureDaySkyboxIfNeeded();
 
-        if (RenderSettings.skybox == nightSkybox)
+        var activeNightSkybox = GetNightSkybox();
+        if (RenderSettings.skybox == activeNightSkybox)
         {
             isNightSkyboxActive = true;
+            ResetSunForNight();
             return;
         }
 
-        RenderSettings.skybox = nightSkybox;
+        RenderSettings.skybox = activeNightSkybox;
         isNightSkyboxActive = true;
-        DynamicGI.UpdateEnvironment();
+        ResetSunForNight();
+        //DynamicGI.UpdateEnvironment();
     }
 
     private void RestoreOriginalSkybox()
@@ -83,8 +93,8 @@ public sealed class NightSkyStars : MonoBehaviour
         if (!isNightSkyboxActive)
             return;
 
-        if (RenderSettings.skybox == nightSkybox)
-            RenderSettings.skybox = daySkybox;
+        if (RenderSettings.skybox != GetDaySkybox())
+            RenderSettings.skybox = GetDaySkybox();
 
         isNightSkyboxActive = false;
         DynamicGI.UpdateEnvironment();
@@ -94,6 +104,44 @@ public sealed class NightSkyStars : MonoBehaviour
     {
         if (daySkybox == null && RenderSettings.skybox != nightSkybox)
             daySkybox = RenderSettings.skybox;
+    }
+
+    private void CaptureOriginalSunRotation()
+    {
+        if (sunToReset != null)
+            originalSunLocalRotation = sunToReset.localRotation;
+    }
+
+    private void ResetSunForNight()
+    {
+        if (!resetSunWhileNight || sunToReset == null)
+            return;
+
+        sunToReset.localRotation = originalSunLocalRotation;
+    }
+
+    private Material GetDaySkybox()
+    {
+        if (daySkyboxAnimator != null)
+        {
+            var animatedSkybox = daySkyboxAnimator.GetOrCreateAnimatedSkybox(daySkybox);
+            if (animatedSkybox != null)
+                return animatedSkybox;
+        }
+
+        return daySkybox;
+    }
+
+    private Material GetNightSkybox()
+    {
+        if (daySkyboxAnimator != null)
+        {
+            var animatedSkybox = daySkyboxAnimator.GetOrCreateAnimatedSkybox(nightSkybox);
+            if (animatedSkybox != null)
+                return animatedSkybox;
+        }
+
+        return nightSkybox;
     }
 
     private bool IsNight(float hour)
