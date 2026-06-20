@@ -6,14 +6,30 @@
  * Uso como referencia: WorldTimeService decide tiempo, DayNightCycle solo presenta rotacion e intensidad.
  */
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class DayNightCycle : MonoBehaviour
 {
     [Header("Time Source")]
     [SerializeField] private MonoBehaviour timeSourceBehaviour;
 
+    [Header("Schedule")]
+    [FormerlySerializedAs("dayStartHour")]
+    [SerializeField, Range(0f, 24f)] private float dawnHour = 6f;
+
+    [FormerlySerializedAs("nightStartHour")]
+    [SerializeField, Range(0f, 24f)] private float duskHour = 18f;
+
     [Header("Sun Presentation")]
     [SerializeField] private Transform sun;
+    [SerializeField] private float daySunIntensity = 1f;
+    [SerializeField] private float nightSunIntensity = 0.2f;
+
+    [FormerlySerializedAs("sunriseEulerAngles")]
+    [SerializeField] private Vector3 dawnSunEulerAngles = new Vector3(90f, 0f, 0f);
+
+    [FormerlySerializedAs("sunsetEulerAngles")]
+    [SerializeField] private Vector3 duskSunEulerAngles = new Vector3(270f, 0f, 0f);
 
     private IWorldTimeSource timeSource;
     private Light sunLight;
@@ -51,10 +67,30 @@ public class DayNightCycle : MonoBehaviour
         if (sun == null)
             return;
 
-        sun.localEulerAngles = new Vector3(15f * hour, 0f, 0f);
+        sun.localEulerAngles = CalculateSunEulerAngles(hour);
 
         if (sunLight != null)
-            sunLight.intensity = hour < 6f || hour > 18f ? 0f : 1f;
+            sunLight.intensity = IsDay(hour) ? daySunIntensity : nightSunIntensity;
+    }
+
+    private Vector3 CalculateSunEulerAngles(float hour)
+    {
+        if (IsDay(hour))
+        {
+            float dayProgress = Mathf.InverseLerp(dawnHour, duskHour, hour);
+            return Vector3.Lerp(dawnSunEulerAngles, duskSunEulerAngles, dayProgress);
+        }
+
+        float nightProgress = hour >= duskHour
+            ? Mathf.InverseLerp(duskHour, 24f, hour) * 0.5f
+            : 0.5f + Mathf.InverseLerp(0f, dawnHour, hour) * 0.5f;
+
+        return Vector3.Lerp(duskSunEulerAngles, dawnSunEulerAngles, nightProgress);
+    }
+
+    private bool IsDay(float hour)
+    {
+        return hour >= dawnHour && hour <= duskHour;
     }
 
     private void ResolveTimeSource()
