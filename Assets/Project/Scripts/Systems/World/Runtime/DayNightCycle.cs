@@ -115,12 +115,12 @@ public class DayNightCycle : MonoBehaviour
             return LerpEulerAngles(sunsetSunEulerAngles, nightStartSunEulerAngles, Mathf.InverseLerp(sunset, nightStart, current));
 
         if (current <= midnight)
-            return LerpEulerAngles(nightStartSunEulerAngles, midnightSunEulerAngles, Mathf.InverseLerp(nightStart, midnight, current));
+            return LerpEulerAngles(nightStartSunEulerAngles, sunsetSunEulerAngles, Mathf.InverseLerp(nightStart, midnight, current));
 
         if (current <= nightEnd)
-            return LerpEulerAngles(midnightSunEulerAngles, nightEndSunEulerAngles, Mathf.InverseLerp(midnight, nightEnd, current));
+            return LerpEulerAngles(sunsetSunEulerAngles, zenithSunEulerAngles, Mathf.InverseLerp(midnight, nightEnd, current));
 
-        return LerpEulerAngles(nightEndSunEulerAngles, dawnSunEulerAngles, Mathf.InverseLerp(nightEnd, nextDawn, current));
+        return LerpEulerAngles(zenithSunEulerAngles, dawnSunEulerAngles, Mathf.InverseLerp(nightEnd, nextDawn, current));
     }
 
     private float CalculateSunIntensity(float hour)
