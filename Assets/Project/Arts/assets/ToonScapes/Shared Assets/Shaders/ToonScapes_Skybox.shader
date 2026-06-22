@@ -13,6 +13,17 @@ Shader "ToonScapes/URP/Skybox"
 		[Header(Night Time Colors)][Space (8)] _ZenithColorNight( "Zenith Color Night", Color ) = ( 0, 0, 0, 1 )
 		_EquatorColorNight( "Equator Color Night", Color ) = ( 1, 1, 1, 1 )
 		_NadirColorNight( "Nadir Color Night", Color ) = ( 1, 1, 1, 1 )
+		[Header(Inicio de Noche Colors)][Space (8)] _ZenithColorNightStart( "Zenith Color Inicio de Noche", Color ) = ( 0.02, 0.16, 0.34, 1 )
+		_EquatorColorNightStart( "Equator Color Inicio de Noche", Color ) = ( 0.04, 0.19, 0.42, 1 )
+		_NadirColorNightStart( "Nadir Color Inicio de Noche", Color ) = ( 0.14, 0.15, 0.17, 1 )
+		[Header(Media Noche Colors)][Space (8)] _ZenithColorMidnight( "Zenith Color Media Noche", Color ) = ( 0.01, 0.05, 0.14, 1 )
+		_EquatorColorMidnight( "Equator Color Media Noche", Color ) = ( 0.02, 0.08, 0.2, 1 )
+		_NadirColorMidnight( "Nadir Color Media Noche", Color ) = ( 0.02, 0.02, 0.03, 1 )
+		[Header(Fin de Noche Colors)][Space (8)] _ZenithColorNightEnd( "Zenith Color Fin de Noche", Color ) = ( 0.02, 0.16, 0.34, 1 )
+		_EquatorColorNightEnd( "Equator Color Fin de Noche", Color ) = ( 0.04, 0.19, 0.42, 1 )
+		_NadirColorNightEnd( "Nadir Color Fin de Noche", Color ) = ( 0.14, 0.15, 0.17, 1 )
+		_NightPhase( "Night Phase (0 inicio, 0.5 media, 1 fin)", Range( 0, 1 ) ) = 0
+		_UseNightPalette( "Use Night Palette", Range( 0, 1 ) ) = 0
 		[Header(Background)][NoScaleOffset][Space(8)] _BackgroundCubemap( "Background Cubemap", CUBE ) = "white" {}
 		[IntRange] _BackgroundRotation( "Background Rotation", Range( 0, 360 ) ) = 0
 		_BackgroundRotationSpeed( "Background Rotation Speed", Float ) = 1
@@ -119,6 +130,17 @@ Shader "ToonScapes/URP/Skybox"
 		uniform float4 _NadirColorNight;
 		uniform float4 _EquatorColorNight;
 		uniform float4 _ZenithColorNight;
+		uniform float4 _NadirColorNightStart;
+		uniform float4 _EquatorColorNightStart;
+		uniform float4 _ZenithColorNightStart;
+		uniform float4 _NadirColorMidnight;
+		uniform float4 _EquatorColorMidnight;
+		uniform float4 _ZenithColorMidnight;
+		uniform float4 _NadirColorNightEnd;
+		uniform float4 _EquatorColorNightEnd;
+		uniform float4 _ZenithColorNightEnd;
+		uniform float _NightPhase;
+		uniform float _UseNightPalette;
 		uniform float4 _NadirColorTwilight;
 		uniform float4 _EquatorColorTwilight;
 		uniform float4 _ZenithColorTwilight;
@@ -208,9 +230,14 @@ Shader "ToonScapes/URP/Skybox"
 			float3 ase_viewDirWS = normalize( ase_viewVectorWS );
 			float3 normalizeResult97 = normalize( ase_viewDirWS );
 			float HeightFactor104 = ( 1.0 -  (0.0 + ( normalizeResult97.y - -1.0 ) * ( 1.0 - 0.0 ) / ( 1.0 - -1.0 ) ) );
-			float4 lerpResult119 = lerp( _NadirColorNight , _EquatorColorNight , saturate( ( HeightFactor104 * 2 ) ));
-			float4 lerpResult120 = lerp( lerpResult119 , _ZenithColorNight , saturate( ( ( HeightFactor104 - 0.5 ) * 2 ) ));
-			float4 NightGradient132 = lerpResult120;
+			float4 nightStartLowerGradient = lerp( _NadirColorNightStart , _EquatorColorNightStart , saturate( ( HeightFactor104 * 2 ) ));
+			float4 nightStartGradient = lerp( nightStartLowerGradient , _ZenithColorNightStart , saturate( ( ( HeightFactor104 - 0.5 ) * 2 ) ));
+			float4 midnightLowerGradient = lerp( _NadirColorMidnight , _EquatorColorMidnight , saturate( ( HeightFactor104 * 2 ) ));
+			float4 midnightGradient = lerp( midnightLowerGradient , _ZenithColorMidnight , saturate( ( ( HeightFactor104 - 0.5 ) * 2 ) ));
+			float4 nightEndLowerGradient = lerp( _NadirColorNightEnd , _EquatorColorNightEnd , saturate( ( HeightFactor104 * 2 ) ));
+			float4 nightEndGradient = lerp( nightEndLowerGradient , _ZenithColorNightEnd , saturate( ( ( HeightFactor104 - 0.5 ) * 2 ) ));
+			float nightPhase = saturate( _NightPhase );
+			float4 NightGradient132 = lerp( lerp( nightStartGradient , midnightGradient , saturate( nightPhase * 2 ) ) , nightEndGradient , saturate( ( nightPhase - 0.5 ) * 2 ) );
 			float4 lerpResult1376 = lerp( _NadirColorTwilight , _EquatorColorTwilight , saturate( ( HeightFactor104 * 2 ) ));
 			float4 lerpResult1379 = lerp( lerpResult1376 , _ZenithColorTwilight , saturate( ( ( HeightFactor104 - 0.5 ) * 2 ) ));
 			float4 TwilightGradient1380 = lerpResult1379;
@@ -226,7 +253,7 @@ Shader "ToonScapes/URP/Skybox"
 			float4 lerpResult110 = lerp( lerpResult108 , _ZenithColorDay , saturate( ( ( HeightFactor104 - 0.5 ) * 2 ) ));
 			float4 DayGradient131 = lerpResult110;
 			float4 lerpResult1383 = lerp( lerpResult133 , DayGradient131 , saturate( ( temp_output_1396_0 * ( smoothstepResult1389 - 0.5 ) ) ));
-			float4 GradientColor93 = lerpResult1383;
+			float4 GradientColor93 = lerp( lerpResult1383 , NightGradient132 , saturate( _UseNightPalette ) );
 			float3 ase_viewDirSafeWS = Unity_SafeNormalize( ase_viewVectorWS );
 			float3 normalizeResult516 = normalize( ase_viewDirSafeWS );
 			float3 normalizeResult517 = normalize( ase_lightDirWS );

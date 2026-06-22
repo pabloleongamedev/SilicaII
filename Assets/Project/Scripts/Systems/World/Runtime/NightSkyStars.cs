@@ -1,28 +1,30 @@
 /*
  * Arquitectura: World/Runtime
  * Script: NightSkyStars
- * Rol: Presenter ambiental que cambia el skybox cuando llega la noche.
+ * Rol: Presenter ambiental que actualiza la fase nocturna del skybox activo sin cambiar de material.
  * Relaciones: Consume WorldTimeService mediante IWorldTimeSource.
- * Uso como referencia: reacciona al tiempo del mundo sin buscar dependencias globales ni modificar assets compartidos.
+ * Uso como referencia: reacciona al tiempo del mundo y delega la apariencia dia/noche a la paleta del material.
  */
 using UnityEngine;
 
 [DisallowMultipleComponent]
 public sealed class NightSkyStars : MonoBehaviour
 {
+    private static readonly int NightPhaseId = Shader.PropertyToID("_NightPhase");
+    private static readonly int UseNightPaletteId = Shader.PropertyToID("_UseNightPalette");
+
     [Header("Time Source")]
     [SerializeField] private MonoBehaviour timeSourceBehaviour;
 
     [Header("Schedule")]
     [SerializeField, Range(0f, 24f)] private float nightStartHour = 18f;
+    [SerializeField, Range(0f, 24f)] private float midnightHour = 0f;
     [SerializeField, Range(0f, 24f)] private float nightEndHour = 6f;
 
-    [Header("Skyboxes")]
-    [SerializeField] private Material daySkybox;
-    [SerializeField] private Material nightSkybox;
+    [Header("Skybox Palette")]
+    [SerializeField] private Material skyboxMaterial;
 
     private IWorldTimeSource timeSource;
-    private bool isNightSkyboxActive;
 
     private void Awake()
     {
@@ -32,53 +34,46 @@ public sealed class NightSkyStars : MonoBehaviour
     private void OnEnable()
     {
         ResolveTimeSource();
-        UpdateSkybox();
+        UpdateNightPhase();
     }
 
     private void LateUpdate()
     {
-        UpdateSkybox();
+        UpdateNightPhase();
     }
 
-    private void OnDisable()
+    private void UpdateNightPhase()
     {
-        RestoreDaySkybox();
-    }
-
-    private void UpdateSkybox()
-    {
-        if (timeSource == null || nightSkybox == null)
+        if (timeSource == null)
             return;
 
-        if (IsNight(timeSource.CurrentHour))
-            ActivateNightSkybox();
-        else
-            RestoreDaySkybox();
-    }
-
-    private void ActivateNightSkybox()
-    {
-        if (RenderSettings.skybox == nightSkybox)
-        {
-            isNightSkyboxActive = true;
-            return;
-        }
-
-        RenderSettings.skybox = nightSkybox;
-        isNightSkyboxActive = true;
-        DynamicGI.UpdateEnvironment();
-    }
-
-    private void RestoreDaySkybox()
-    {
-        if (!isNightSkyboxActive || daySkybox == null)
+        var material = skyboxMaterial != null ? skyboxMaterial : RenderSettings.skybox;
+        if (material == null)
             return;
 
-        if (RenderSettings.skybox == nightSkybox)
-            RenderSettings.skybox = daySkybox;
+        bool isNight = IsNight(timeSource.CurrentHour);
 
-        isNightSkyboxActive = false;
-        DynamicGI.UpdateEnvironment();
+        if (material.HasProperty(NightPhaseId))
+            material.SetFloat(NightPhaseId, isNight ? CalculateNightPhase(timeSource.CurrentHour) : 0f);
+
+        if (material.HasProperty(UseNightPaletteId))
+            material.SetFloat(UseNightPaletteId, isNight ? 1f : 0f);
+    }
+
+    private float CalculateNightPhase(float hour)
+    {
+        float nightStart = NormalizeHour(nightStartHour);
+        float midnight = NormalizePhaseAfter(midnightHour, nightStart);
+        float nightEnd = NormalizePhaseAfter(nightEndHour, midnight);
+        float current = NormalizeHour(hour);
+
+        if (current < nightStart)
+            current += 24f;
+
+        if (current <= midnight)
+            return Mathf.Lerp(0f, 0.5f, Mathf.InverseLerp(nightStart, midnight, current));
+
+        return Mathf.Lerp(0.5f, 1f, Mathf.InverseLerp(midnight, nightEnd, current));
     }
 
     private bool IsNight(float hour)
@@ -86,6 +81,20 @@ public sealed class NightSkyStars : MonoBehaviour
         return nightStartHour > nightEndHour
             ? hour >= nightStartHour || hour <= nightEndHour
             : hour >= nightStartHour && hour <= nightEndHour;
+    }
+
+    private static float NormalizeHour(float hour)
+    {
+        return Mathf.Repeat(hour, 24f);
+    }
+
+    private static float NormalizePhaseAfter(float hour, float previous)
+    {
+        float normalized = NormalizeHour(hour);
+        while (normalized <= previous)
+            normalized += 24f;
+
+        return normalized;
     }
 
     private void ResolveTimeSource()
@@ -98,7 +107,7 @@ public sealed class NightSkyStars : MonoBehaviour
         if (timeSourceBehaviour == null)
             Debug.LogWarning("[NightSkyStars] Asigna WorldTimeService por Inspector.", this);
 
-        if (nightSkybox == null)
-            Debug.LogWarning("[NightSkyStars] Asigna Night Skybox por Inspector.", this);
+        if (skyboxMaterial == null)
+            Debug.LogWarning("[NightSkyStars] Asigna TSI_Skybox_01A como Skybox Material por Inspector.", this);
     }
 }

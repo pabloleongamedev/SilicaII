@@ -267,6 +267,7 @@ Material:
     - _MoonDistance: 21.8
     - _MoonIntensity: 2
     - _MoonOffsetRotation: 1
+    - _NightPhase: 0
     - _MoonScale: 12
     - _MoonSharpness: 250
     - _MoonSize: 1.39
@@ -330,6 +331,7 @@ Material:
     - _XA: 0.14
     - _XB: -0.57
     - _XC: -0.91
+    - _UseNightPalette: 0
     - _ZWrite: 1
     - __dirty: 1
     m_Colors:
@@ -350,7 +352,10 @@ Material:
     - _DistortionDirection3: {r: 0.1, g: 0, b: 0.1, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EquatorColorDay: {r: 0, g: 0.298027, b: 0.6509804, a: 1}
+    - _EquatorColorMidnight: {r: 0.015, g: 0.07, b: 0.18, a: 1}
     - _EquatorColorNight: {r: 0.042052332, g: 0.18687274, b: 0.4245283, a: 1}
+    - _EquatorColorNightEnd: {r: 0.055, g: 0.22, b: 0.45, a: 1}
+    - _EquatorColorNightStart: {r: 0.042052332, g: 0.18687274, b: 0.4245283, a: 1}
     - _EquatorColorTwilight: {r: 0, g: 0.4847312, b: 1, a: 1}
     - _FixedDirection: {r: 0, g: 1, b: 0, a: 0}
     - _ForegroundDistortionDirection: {r: 0.1, g: 0, b: 0.1, a: 0}
@@ -360,8 +365,11 @@ Material:
     - _MoonColor: {r: 0.759434, g: 0.8906878, b: 1, a: 1}
     - _MoonDirection: {r: 2.13, g: 0, b: 0, a: 0}
     - _MoonOffset: {r: 0, g: 2, b: 0, a: 0}
+    - _NadirColorMidnight: {r: 0.018, g: 0.018, b: 0.028, a: 1}
     - _NadirColorDay: {r: 0.14930268, g: 0, b: 0.8584906, a: 1}
     - _NadirColorNight: {r: 0.14117648, g: 0.14537756, b: 0.16862746, a: 1}
+    - _NadirColorNightEnd: {r: 0.16, g: 0.16, b: 0.19, a: 1}
+    - _NadirColorNightStart: {r: 0.14117648, g: 0.14537756, b: 0.16862746, a: 1}
     - _NadirColorTwilight: {r: 0, g: 0, b: 1, a: 1}
     - _NoiseSpeed: {r: 0, g: 0, b: 0, a: 0}
     - _SkyColorDay: {r: 1, g: 1, b: 1, a: 1}
@@ -379,7 +387,10 @@ Material:
     - _TintColor: {r: 1, g: 1, b: 1, a: 1}
     - _Vector0: {r: 0.2, g: 0, b: 0.2, a: 0}
     - _ZenithColorDay: {r: 0, g: 0.2122642, b: 0.5566038, a: 1}
+    - _ZenithColorMidnight: {r: 0.008, g: 0.05, b: 0.13, a: 1}
     - _ZenithColorNight: {r: 0.020825924, g: 0.16072953, b: 0.33962262, a: 1}
+    - _ZenithColorNightEnd: {r: 0.03, g: 0.19, b: 0.38, a: 1}
+    - _ZenithColorNightStart: {r: 0.020825924, g: 0.16072953, b: 0.33962262, a: 1}
     - _ZenithColorTwilight: {r: 0, g: 0.20498486, b: 0.5188679, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
