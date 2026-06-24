@@ -49,6 +49,7 @@ ExportedObj/
 *.opendb
 *.VC.db
 *.md
+~$*.docx
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta
@@ -70,6 +71,7 @@ crashlytics-build.properties
 # Packed Addressables
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
 
-# Temporary auto-generated Android Assets
-/[Aa]ssets/[Ss]treamingAssets/aa.meta
-/[Aa]ssets/[Ss]treamingAssets/aa/*
+# para ventana de contexto de proyecto y documentación
+!Assets/AI/PROJECT_CONTEXT.md
+!Assets/AI/Documentacion/**/*.md
+

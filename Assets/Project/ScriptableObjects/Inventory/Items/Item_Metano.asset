@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
+  m_Name: Item_Metano
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
+  itemID: Ch4
+  displayName: Methane
+  icon: {fileID: 21300000, guid: 610be47a340ffa44bb850ffe82fe4cb5, type: 3}
+  maxStack: 99
+  description: "Metano: Gas incoloro, inodoro e inflamable que constituye el hidrocarburo
+    m\xE1s sencillo y el componente principal del gas natural. Se genera mediante
+    la descomposici\xF3n anaer\xF3bica de materia org\xE1nica. Se puede utilizar
+    como combustible para los propulsores."

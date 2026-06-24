@@ -1,0 +1,184 @@
+# SilicaII - Project Context
+
+Este archivo es el punto de arranque para cualquier nueva ventana o sesion de trabajo con IA.
+Antes de auditar, modificar o documentar el proyecto, leer este archivo y luego las fuentes de verdad indicadas abajo.
+
+## Objetivo arquitectonico
+
+SilicaII usa una arquitectura Unity modular, desacoplada y orientada a sistemas de gameplay.
+
+La escena compone dependencias mediante referencias visibles por Inspector.
+Los sistemas se comunican mediante interfaces pequenas, facades/runtime controllers y ScriptableObject EventChannels.
+La persistencia se resuelve con `SaveLoadSceneBinding`, `SaveParticipantRegistry` e `ISaveParticipant`.
+
+## Fuentes de verdad
+
+Leer estos documentos cuando haga falta recuperar contexto completo:
+
+- `Assets/AI/Documentacion/Arquitectura_Tecnica_SilicaII.docx`
+- `Assets/AI/Documentacion/Manual_Integracion_SilicaII.docx`
+- `Assets/AI/Documentacion/Base/Requerimientos_Sistemas_SilicaII.docx`
+- `Assets/AI/Documentacion/Base/Instructivo_Construccion_Sistemas_SilicaII.docx`
+- `Assets/AI/AUDITORIA_ARQUITECTURA_ACTUAL.md`
+
+Los diagramas asociados viven en:
+
+- `Assets/AI/Documentacion/_diagramas_generados`
+- `Assets/AI/Documentacion/Base/_diagramas_base`
+
+## Directriz de mantenimiento documental
+
+Siempre que se cambie arquitectura, dependencias por Inspector, flujos SaveLoad, EventChannels, settings, pausa, UI/HUD, audio, quest, inventory, crafting, scanner, world o cualquier sistema base:
+
+1. Actualizar el codigo/escenas/prefabs necesarios.
+2. Ejecutar validaciones razonables.
+3. Actualizar los documentos fuente de verdad afectados.
+4. Si cambia una relacion visual importante, actualizar tambien el diagrama correspondiente.
+5. Dejar claro en la respuesta final que documentos fueron actualizados.
+
+No cerrar una tarea de arquitectura como terminada si los documentos fuente de verdad quedaron desalineados con el codigo.
+
+## Reglas duras
+
+- No reintroducir `GameManager.Instance`.
+- No reintroducir `GameSettings.Instance`.
+- No reintroducir buses estaticos legacy.
+- No reintroducir rutas globales mutables como `activeBox`.
+- No usar `FindObjectOfType`, `FindFirstObjectByType`, `GameObject.Find` o `Resources.LoadAll` como solucion de arquitectura.
+- No usar `AddComponent` automatico para tapar dependencias faltantes.
+- No modificar `Time.timeScale` desde UI concreta; usar `IGamePauseService` / `GamePauseService`.
+- Las dependencias de escena deben ser visibles por Inspector.
+- Si falta una referencia critica, emitir warning claro y hacer no-op controlado.
+- UI y audio deben consumir interfaces, servicios asignados o canales, no implementaciones globales.
+- SaveLoad debe persistir por `ISaveParticipant` y `SaveParticipantRegistry`.
+
+## Capas esperadas por sistema
+
+Estructura recomendada:
+
+```text
+System/
+  Data/
+  Core/
+  Runtime/
+  UI/
+  Events/
+  Debug/
+```
+
+Reglas de capas:
+
+- `Data`: ScriptableObjects, DTOs y configuracion editable.
+- `Core`: contratos, modelos y reglas de dominio.
+- `Runtime`: MonoBehaviours, services, facades, controllers y scene bindings.
+- `UI`: presenters, views y componentes visuales.
+- `Events`: EventChannels ScriptableObject y payloads.
+- `Debug`: herramientas no obligatorias para runtime.
+
+## Sistemas principales
+
+- Events: `EventChannel_SO` por dominio, asignado por Inspector.
+- SaveLoad: `SaveLoadSceneBinding` como fachada de escena, `SaveParticipantRegistry`, `ISaveParticipant`, `GameData`. `SaveParticipantRegistry.participantBehaviours` es la ruta principal y explicita de persistencia; debe contener solo componentes que implementen `ISaveParticipant`. Si hay participantes explicitos validos, el registry no hace auto-descubrimiento. Las opciones `includeParticipantsOnThisObject` / `includeParticipantsInChildren` quedan solo como ayuda temporal de migracion y deben emitir warning si se usan. `InventoryController` no va directo ahi porque lo persiste `PlayerSaveParticipant`.
+- Settings: `GameSettings.asset` + `GameSettingsService`, consumido por `IGameSettingsReader` / `IGameSettingsWriter`.
+- Pause: `IGamePauseService` + `GamePauseService`. No hay fallback runtime tipo `UnityGamePauseService`; si falta la referencia por Inspector, el consumidor debe emitir warning y hacer no-op.
+- Scene loading: `SceneLoadService` implementa `ISceneLoader` y debe asignarse por Inspector a `MainMenuManager`, `SaveLoadSceneBinding`, `PauseMenuManager` o cualquier UI que cargue escenas. No hay fallback `UnitySceneLoader`; si falta la referencia, warning + no-op.
+- Player/Input: `PlayerInputHandler` depende de referencias serializadas.
+- Perspective: `PlayerPerspectiveController` alterna primera/tercera persona desde `PlayerInputHandler`; el cambio solo ajusta la camara compartida, no activa/desactiva el cuerpo. En `Pablo_TestMechanics.unity`, `PlayerRobotVisual` permanece visible y `Main Camera` se referencia en `Shared Camera Transform`; `PlayerAnimatorPresenter` sincroniza el Animator con `MovementController`.
+- Camera motion: `PlayerCameraMotion` vive en `Main Camera`, lee `MovementController` por Inspector y se sincroniza con `PlayerFootstepAnimationEvents.FootstepReceived`. Cada `AnimationEvent OnFootstep` dispara un pulso local suave de camara si hay input de movimiento, grounded y jetpack inactivo. `stepDuration` define la duracion del pulso y `smoothTime` suaviza la transicion. No controla input, yaw/pitch, ritmo propio ni offsets de perspectiva; `PlayerPerspectiveController` conserva el offset base de primera/tercera persona. Si no llegan eventos `OnFootstep`, la camara no inventa movimiento.
+- Player visual animation: `PlayerAnimatorPresenter` usa `MovementController.GetVerticalSpeed()` para activar `Jump` por velocidad vertical positiva real y no esperar a que termine `groundedGraceTime`; el umbral es constante interna para no agregar ruido al Inspector. `FreeFall` solo se activa con caida real: no grounded, velocidad vertical negativa suficiente y sin jetpack efectivo. Durante jetpack efectivo, el Animator vuelve a locomocion idle y `Visual Tilt Root` inclina el visual 20 grados hacia el movimiento, con 10 grados extra mientras sprint/boost esta activo. El Animator debe tener los parametros `Speed` float, `Grounded` bool, `Jump` bool, `FreeFall` bool y `MotionSpeed` float; si falta alguno, `PlayerAnimatorPresenter` emite warning y no escribe ese parametro. El estado `Idle Walk Run Blend` debe existir en layer 0 para que jetpack pueda forzar locomocion idle.
+- Jetpack: `JetpackAbility` aplica rampa de potencia con `MovementConfig_SO.jetpackRampUpTime`; el empuje vertical y el boost horizontal empiezan suaves y suben hasta la fuerza configurada para evitar impulso inicial brusco.
+- Inventory: controller central, vistas separadas y persistencia via participante.
+- Crafting/Chemistry: datos + controllers + canales, sin UI como dominio.
+- Quest: progreso persistente via `QuestSystem` / `QuestSaveData`. Si una escena o prefab contiene `QuestSystem`, debe estar registrado explicitamente en `SaveParticipantRegistry.participantBehaviours`; `RunProjectHealthCheck.ps1` valida este wiring y falla si no se cumple.
+- Notification/Audio/HUD: presenters y servicios/canales. Los pasos y aterrizajes del Player se disparan solo por `AnimationEvent OnFootstep` / `OnLand` en el Animator visual, recibidos por `PlayerFootstepAnimationEvents` y delegados a `PlayerAudioFeedback`; esos mismos `OnFootstep` alimentan `PlayerCameraMotion`. `PlayerFootstepAnimationEvents` filtra duplicados muy cercanos para evitar rafagas por blending/transiciones del Animator. No hay sonido al iniciar salto. Audio de locomocion usa `WalkBase` / `JumpBase` por defecto, y cambia a variantes Grass/Metal si el ground tag contiene `Grass` o `Metal`. El jetpack es la excepcion: su audio solo debe sonar mientras `MovementController.IsJetpackConsumingFuel()` sea verdadero; input activo sin consumo real de fuel no reproduce loop.
+- Interaction/Scanner/World/Delivery: contexto de escena, referencias explicitas, warning + no-op si falta dependencia. `ScannerTrigger` debe tener `pivotScan`, `scanAnimator` y `scanRenderer` asignados por Inspector; no debe buscar el Renderer en hijos. Solo usa triggers de Animator si el Animator esta activo, inicializado y con controller; en `OnDisable` debe hacer no-op si el visual ya no puede reproducir Animator.
+- Restore temprano: `SaveLoadSceneBinding` puede restaurar en `Awake`; componentes restaurables deben tolerar restore antes de su propio `Awake`. `HealthBehaviour` inicializa perezosamente su `HealthComponent` antes de restaurar/leer/danar para evitar NRE por orden de Awake.
+
+## Escenas y assets clave
+
+- `Assets/Project/Scenes/Pablo_TestMechanics.unity`
+- Scanner animation assets: `Assets/Project/Animations/Scanner`. No guardar `.anim` o `.controller` bajo `Assets/Project/Scripts`.
+- Runtime settings: en `Pablo_TestMechanics.unity`, `Systems` contiene `GameSettingsService` con `GameSettings.asset` y `GameSettingsRuntimeApplier` con `MainMixer` y `Global Volume`. Al arrancar gameplay carga `PlayerPrefs` y aplica fullscreen/audio; el brillo se aplica sobre `ColorAdjustments.postExposure` del `Global Volume` leyendo `profile` o `sharedProfile`. `brightnessOverlay` es opcional y puede quedar `None` si la escena no usa overlay visual de brillo. `AudioService.defaultOutputGroup` debe apuntar al grupo `SFX` del `MainMixer`; si queda `None`, los `AudioSource` creados por `AudioService` no pasan por el mixer y los sliders de volumen no afectan esos sonidos.
+- Servicios de escena gameplay: `Systems` tambien declara `SceneLoadService` y `GamePauseService`. `SaveLoadSceneBinding.sceneLoaderBehaviour` debe apuntar a `SceneLoadService`, y `PlayerStateController.pauseServiceBehaviour` debe apuntar a `GamePauseService`.
+- Entrada visual a gameplay: `Canvas/SceneFadeInOverlay` inicia activo con una `Image` negra y `SceneFadeInOnStart`. Al arrancar la escena, `fadeInDuration` controla cuanto tarda en pasar de negro a transparente; luego el overlay se desactiva.
+- `Assets/Project/Scenes/Menu.unity`
+- Menu scene wiring: este es el estado canonico que se debe preservar. `Canvas` contiene `MainMenuManager`, `SceneLoadService` y `SaveLoadSceneBinding`. `MainMenuManager` usa `SceneLoadService` por Inspector y consume `SaveLoadSceneBinding` como `ISaveSlotReader`/`IGameSessionLoader`.
+  - Estado inicial: `MenuButton` activo, `BannerGame` activo, `Play_Panel` oculto, `OptionsPanel` oculto y `CreditsPanel` oculto.
+  - `Jugar`: no oculta `MenuButton` ni `BannerGame`; solo muestra `Play_Panel` y refresca sus `SaveSlot`.
+  - Loading intermedio: `Canvas/LoadingImage` inicia oculto y es referenciado por los `SaveSlot` de `NewGame` y `LoadGame`. Al presionar un slot valido, `SaveSlot` desactiva su boton, activa `LoadingImage`, aplica fade usando `fadeOutDuration`, espera al menos `minimumLoadingTime` y delega en `SaveLoadSceneBinding` para crear/cargar la sesion. No usar `MainMenuManager` para cargar escena por indice ni saltarse SaveLoad.
+  - `Opciones`: mantiene `MenuButton`, oculta `BannerGame`, oculta `Play_Panel`, muestra `OptionsPanel` y al cerrar vuelve a `ShowMainMenu`.
+  - `OptionsMenuManager`: debe tener `optionsPanel`, `applyButton`, `resetButton`, `closeButton`, sliders, `fullscreenToggle`, `soundSettings`, `graphicsSettings` y `settingsServiceBehaviour` asignados por Inspector. `APLICAR` escribe brillo, fullscreen, volumen maestro, musica y efectos en `GameSettingsService`, guarda en `PlayerPrefs` y aplica audio/graficos. `RESTABLECER` vuelve a defaults, refresca UI y aplica. Si falta una referencia, el script debe emitir warning y hacer no-op en vez de lanzar excepcion.
+  - Audio de menu: `Canvas` debe tener `AudioService` con `Audio Cue Library_SO` y `defaultOutputGroup` apuntando a `SFX` del `MainMixer`. `ButtonAccessibility.audioServiceBehaviour` apunta a ese servicio y reproduce `UIHover` / `UIClick` por `AudioCueKey`; `SegmentedSliderInteractive.audioServiceBehaviour` usa `UISliderTick` / `UISliderLimit`. Las referencias reales viven en `AudioCueLibrary_SO` y en `Assets/Project/ScriptableObjects/Audio/Sounds/Menu/*.asset`; no dejar cues UI vacios.
+  - Brillo en menu: `Canvas/ZZ_BrightnessOverlay_RuntimeVisual` es una `Image` fullscreen con `Raycast Target` desactivado. `GraphicsSettings.brightnessOverlay` apunta a esa imagen; mover `BrightnessSlider` cambia su color/alpha en tiempo real y no debe bloquear botones. El valor `0.6` es neutral/equilibrado y alpha `0`; `0` oscurece con negro alpha `242/255`; `1` aclara con blanco alpha `8/255`. `GameSettings.defaultBrightness` debe mantenerse en `0.6`. Si Unity ya tenia la escena abierta cuando se edito desde archivo, recargar `Menu.unity` para ver el objeto en jerarquia.
+  - `Creditos`: mantiene `MenuButton`, oculta `BannerGame`, oculta `Play_Panel`, muestra `CreditsPanel` y al cerrar vuelve a `ShowMainMenu`. El `Button` de creditos debe ejecutar `ShowCredits` y tambien tener wiring explicito `BannerGame.SetActive(false)` / `CreditsPanel.SetActive(true)`; el cierre debe ejecutar `ShowMainMenu` y `BannerGame.SetActive(true)` / `CreditsPanel.SetActive(false)`.
+  - `SaveSlot` soporta modo `NewGame` y `LoadGame` para separar crear partida de cargar existente.
+- `Assets/Project/Prefabs/UI/OptionsPanel.prefab`
+- `Assets/Project/ScriptableObjects/Menu/GameSettings.asset`
+- `Assets/PlayerTest/Prefabs/PlayerRobot.prefab` debe mantenerse como prefab visual-only: sin input, movimiento, inventario, scanner, camara, audio listener ni servicios propios.
+
+## Validaciones recomendadas
+
+Health check completo:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\Assets\Project\Scripts\AI\Validation\RunProjectHealthCheck.ps1
+```
+
+Este health check tambien valida que todo `QuestSystem` encontrado en escenas/prefabs de `Assets/Project` este registrado en `SaveParticipantRegistry.participantBehaviours`, para que el progreso de misiones no quede fuera de SaveLoad por error de Inspector.
+
+Health check incluyendo errores recientes del log de Unity:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\Assets\Project\Scripts\AI\Validation\RunProjectHealthCheck.ps1 -ShowUnityLogErrors
+```
+
+Compilacion individual:
+
+```powershell
+dotnet build .\SilicaII.Systems.csproj
+```
+
+Reglas de arquitectura:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\Assets\Project\Scripts\AI\Validation\RunArchitectureChecks.ps1
+```
+
+Busquedas utiles:
+
+```powershell
+rg -n "GameManager\.Instance|GameSettings\.Instance|AudioManager\.Instance" Assets/Project/Scripts
+rg -n "GameplayEvents\.|QuestEvents\.|InventoryEvents\.|CraftingEvents\.|NotificationEvents\." Assets/Project/Scripts
+rg -n "FindObjectOfType|FindFirstObjectByType|GameObject\.Find|Resources\.LoadAll" Assets/Project/Scripts
+rg -n "activeBox|Time\.timeScale" Assets/Project/Scripts
+```
+
+Validacion manual en Unity:
+
+- Abrir `Pablo_TestMechanics.unity`, `Menu.unity` y `OptionsPanel.prefab`.
+- Confirmar que no haya Missing Script.
+- Probar menu: nueva partida y cargar.
+- Probar gameplay: checkpoint save/restore, autosave si aplica, inventory, crafting, quest, scanner, delivery, world.
+- Probar perspectiva: tecla `C` / accion `Player.Camera` alterna primera y tercera persona si `PlayerPerspectiveController` esta configurado por Inspector.
+- Probar opciones: brillo, fullscreen y volumen.
+- Probar pausa: abrir, reanudar y volver a menu.
+
+## Como iniciar una nueva ventana con IA
+
+Usar este prompt:
+
+```text
+Antes de responder, lee Assets/AI/PROJECT_CONTEXT.md.
+Despues usa como fuentes de verdad:
+- Assets/AI/Documentacion/Arquitectura_Tecnica_SilicaII.docx
+- Assets/AI/Documentacion/Manual_Integracion_SilicaII.docx
+- Assets/AI/Documentacion/Base/Requerimientos_Sistemas_SilicaII.docx
+- Assets/AI/Documentacion/Base/Instructivo_Construccion_Sistemas_SilicaII.docx
+
+Respeta las reglas del proyecto y, si haces cambios arquitectonicos, actualiza tambien los documentos fuente de verdad.
+```
+
+## Nota de versionado
+
+Si este archivo queda ignorado por `.gitignore`, revisar la regla `*.md`.
+Este contexto conviene versionarlo o mantenerlo sincronizado manualmente con los documentos fuente de verdad.

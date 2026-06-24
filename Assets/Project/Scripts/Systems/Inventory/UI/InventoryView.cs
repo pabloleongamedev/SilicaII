@@ -1,3 +1,11 @@
+/*
+ * Arquitectura: Inventory/UI
+ * Script: InventoryView
+ * Rol: Presenta informacion y captura intenciones de usuario. Debe delegar reglas de gameplay a Runtime/Core.
+ * Modulo: Gestiona items, cantidades, slots, vistas de inventario y contratos de lectura/escritura para otros sistemas.
+ * Relaciones: Se relaciona con Interaction, Crafting, Delivery, Quest y SaveLoad mediante interfaces, facades y eventos.
+ * Uso como referencia: este comentario explica la responsabilidad del archivo para facilitar estudiar y replicar la arquitectura modular en otros proyectos.
+ */
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +19,7 @@ public class InventoryView : MonoBehaviour
     [SerializeField] private InventoryDragHandler dragHandler;
     [SerializeField] private GameObject QuestPanel;
     [SerializeField] private GameObject inventoryPanel; 
+    [SerializeField] private UIStateEventChannel_SO uiStateChannel;
 
     private IInventoryReadModel inventory;
     private List<InventorySlotView> slotViews = new List<InventorySlotView>();
@@ -97,7 +106,7 @@ public class InventoryView : MonoBehaviour
         if (inventoryPanel != null)
             inventoryPanel.SetActive(false);
 
-        GameplayEvents.OnUIStateChanged?.Invoke(UIState.Quest);
+        uiStateChannel?.Raise(UIState.Quest);
     }
 
     public void ShowInventoryPanel()

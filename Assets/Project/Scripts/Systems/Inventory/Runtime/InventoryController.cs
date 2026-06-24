@@ -1,3 +1,12 @@
+/*
+ * Arquitectura: Inventory/Runtime
+ * Script: InventoryController
+ * Rol: Facade runtime de Inventory. Construye el Core desde configuracion y expone contratos de lectura/escritura.
+ * Modulo: Gestiona items, cantidades, slots, vistas de inventario y contratos de lectura/escritura para otros sistemas.
+ * Relaciones: Interaction y Crafting consumen IInventoryReadModel/IInventoryWriteModel; UI escucha ReadModel; SaveLoad exporta/importa InventorySaveData.
+ * Riesgo arquitectonico mitigado: publica en InventoryEventChannel_SO; el router de escena decide si Quest/Notification reaccionan.
+ * Uso como referencia: buen ejemplo de Core desacoplado con facade runtime y eventos propios del sistema.
+ */
 using UnityEngine;
 using System;
 using System.Collections.Generic;
@@ -11,6 +20,9 @@ public class InventoryController : MonoBehaviour
     [SerializeField] private InventoryView inventoryView;
     [SerializeField] private InventoryListView listView;
 
+    [Header("Events")]
+    [SerializeField] private InventoryEventChannel_SO inventoryChannel;
+
     public IInventoryReadModel ReadModel => inventorySystem.ReadModel;
     public IInventoryWriteModel WriteModel => inventorySystem;
 
@@ -19,6 +31,8 @@ public class InventoryController : MonoBehaviour
 
     private void Awake()
     {
+        // Facade Runtime: crea el Core desde datos editables y traduce eventos
+        // de dominio a eventos consumidos por UI, Quest y Notification.
         grid = new InventoryGrid(config.width, config.height);
         inventorySystem = new InventorySystem(config, grid);
         inventorySystem.OnNotificationRequested += HandleNotificationRequested;
@@ -97,20 +111,38 @@ public class InventoryController : MonoBehaviour
         return inventorySystem;
     }
 
-    private void HandleNotificationRequested(NotificationData notification)
+    private void HandleNotificationRequested(InventoryFeedback feedback)
     {
-        InventoryEvents.OnNotificationRequested?.Invoke(notification);
-        GameplayEvents.OnNotification?.Invoke(notification);
+        // Adapter entre Core y UI: InventorySystem no conoce NotificationData.
+        var notification = new NotificationData
+        {
+            message = feedback.message,
+            type = ToNotificationType(feedback.type)
+        };
+
+        inventoryChannel?.RaiseNotification(notification);
     }
 
     private void HandleItemAdded(ItemData_SO item, int amount)
     {
-        InventoryEvents.OnItemAdded?.Invoke(item, amount);
-        QuestEvents.OnItemCollected?.Invoke(item, amount);
+        inventoryChannel?.RaiseItemAdded(item, amount);
+        inventoryChannel?.RaiseItemAddedByID(item != null ? item.itemID : string.Empty, amount);
     }
 
     private void HandleItemRemoved(ItemData_SO item, int amount)
     {
-        InventoryEvents.OnItemRemoved?.Invoke(item, amount);
+        inventoryChannel?.RaiseItemRemoved(item, amount);
+        inventoryChannel?.RaiseItemRemovedByID(item != null ? item.itemID : string.Empty, amount);
+    }
+
+    private NotificationType ToNotificationType(InventoryFeedbackType type)
+    {
+        switch (type)
+        {
+            case InventoryFeedbackType.Success: return NotificationType.Success;
+            case InventoryFeedbackType.Error: return NotificationType.Error;
+            case InventoryFeedbackType.Info: return NotificationType.Info;
+            default: return NotificationType.Warning;
+        }
     }
 }
